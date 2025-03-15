@@ -33,7 +33,7 @@ PlantCare là ứng dụng hỗ trợ người dùng trong việc chăm sóc câ
 - 🔔 Gửi thông báo nhắc nhở về các hoạt động cần thực hiện theo lịch trình.
 - ⚠️ Cảnh báo về những thay đổi đột ngột trong môi trường có thể ảnh hưởng đến cây.
 
-## 👥 Thành Viên Tham Gia
+## 👥 Thành Viên
 - **B21DCCN297 - Ngô Hoàng Duy**
 
 ## 🚀 Công Nghệ Sử Dụng
