@@ -47,8 +47,6 @@ PlantCare là ứng dụng hỗ trợ người dùng trong việc chăm sóc câ
 2. Mở dự án bằng Android Studio.
 3. Build và chạy ứng dụng trên thiết bị ảo hoặc điện thoại thật.
 
-## 📞 Liên Hệ
-Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ qua email: **ngohduy@example.com**
 
 ---
 🚀 *PlantCare - Đồng hành cùng bạn trong hành trình chăm sóc cây cảnh!* 🌿
