@@ -1,56 +1,54 @@
-# 🌿 PlantCare - Ứng Dụng Theo Dõi & Chăm Sóc Cây Cảnh
+# 🌱 PlantCare - Ứng Dụng Theo Dõi Tiến Độ Trồng Trọt
 
-**PlantCare** là một ứng dụng Android giúp người dùng theo dõi tiến độ trồng trọt, hỗ trợ chăm sóc cây cảnh và vườn nhà thông qua các tính năng thông minh.
+## 📌 Giới Thiệu
+PlantCare là ứng dụng hỗ trợ người dùng trong việc chăm sóc cây cảnh và vườn nhà. Ứng dụng giúp theo dõi tiến độ phát triển của cây, nhắc nhở công việc chăm sóc, và cung cấp hướng dẫn phù hợp theo từng loại cây và điều kiện môi trường.
 
-## 🚀 Tính Năng Chính
+## 🔥 Tính Năng Chính
 
-### 1️⃣ Quản Lý Lịch Trình Chăm Sóc
-- 📅 Tạo lịch trình chăm sóc cây theo từng loại.
-- ⏰ Nhắc nhở các công việc quan trọng như tưới nước, bón phân, kiểm tra sâu bệnh.
+### 1. **Quản Lý Lịch Trình Chăm Sóc**
+- 📅 Tạo lịch trình chăm sóc cây cảnh và vườn nhà theo từng loại cây.
+- 🔔 Nhắc nhở về các công việc cụ thể như tưới nước, bón phân, và kiểm tra sâu bệnh.
 
-### 2️⃣ Theo Dõi Thông Tin Thực Vật
-- 📖 Lưu trữ chi tiết về mỗi loại cây, cách chăm sóc và thông số môi trường lý tưởng.
-- 🖼️ Cung cấp hình ảnh minh họa để nhận diện dễ dàng.
+### 2. **Theo Dõi Thông Tin Thực Vật**
+- 📝 Lưu trữ thông tin chi tiết về mỗi loại cây như loại cây, cách chăm sóc, và thông số môi trường lý tưởng.
+- 📷 Cung cấp hình ảnh minh họa để dễ nhận diện từng loại cây.
 
-### 3️⃣ Ghi Chú và Hình Ảnh
-- 📝 Ghi chú về sự phát triển và thay đổi của cây.
-- 📷 Chụp ảnh và lưu trữ quá trình phát triển của cây.
+### 3. **Ghi Chú và Hình Ảnh**
+- ✍️ Cho phép người dùng ghi chú về các quan sát và thay đổi của cây cảnh.
+- 📸 Tích hợp chức năng chụp hình để lưu giữ hình ảnh về sự phát triển của cây.
 
-### 4️⃣ Thống Kê Tiến Độ
-- 📊 Hiển thị đồ thị phát triển của cây theo thời gian.
-- 📏 Thống kê chiều cao, số lượng hoa quả và các chỉ số khác.
+### 4. **Thống Kê Tiến Độ**
+- 📊 Hiển thị đồ thị tiến độ phát triển của cây cảnh và vườn nhà theo thời gian.
+- 📏 Thống kê về chiều cao, số lượng hoa quả, và các chỉ số khác.
 
-### 5️⃣ Hướng Dẫn Chăm Sóc Tùy Chọn
-- 📌 Cung cấp hướng dẫn chăm sóc dựa trên dữ liệu địa phương và thời tiết.
-- 🌱 Đề xuất phương pháp chăm sóc đặc biệt theo mùa vụ.
+### 5. **Hướng Dẫn Chăm Sóc Tùy Chọn**
+- 📖 Cung cấp hướng dẫn chăm sóc tùy chọn dựa trên dữ liệu địa phương và thời tiết.
+- 🌾 Đề xuất các biện pháp chăm sóc đặc biệt theo từng mùa vụ.
 
-### 6️⃣ Giao Diện Thân Thiện & Dễ Sử Dụng
-- 🎨 Thiết kế trực quan, dễ sử dụng cho cả người mới bắt đầu và chuyên gia.
-- 📱 Hỗ trợ thao tác dễ dàng trên điện thoại di động và máy tính bảng.
+### 6. **Giao Diện Thân Thiện và Dễ Sử Dụng**
+- 🖥️ Thiết kế giao diện đơn giản, dễ sử dụng cho cả người mới bắt đầu và chuyên gia.
+- 📱 Hỗ trợ thao tác dễ dàng trên cả điện thoại di động và máy tính.
 
-### 7️⃣ Thông Báo Nhắc Nhở
-- 🔔 Gửi thông báo nhắc nhở các hoạt động theo lịch trình.
-- ⚠️ Cảnh báo thay đổi đột ngột trong môi trường có thể ảnh hưởng đến cây.
+### 7. **Thông Báo Nhắc Nhở**
+- 🔔 Gửi thông báo nhắc nhở về các hoạt động cần thực hiện theo lịch trình.
+- ⚠️ Cảnh báo về những thay đổi đột ngột trong môi trường có thể ảnh hưởng đến cây.
+
+## 👥 Thành Viên Tham Gia
+- **B21DCCN297 - Ngô Hoàng Duy**
+
+## 🚀 Công Nghệ Sử Dụng
+- **Ngôn ngữ lập trình:** Java
+- **Framework:** Android SDK
+- **Cơ sở dữ liệu:** Firebase / SQLite
+- **Kiến trúc:** Microservices với REST API
+
+## 📌 Hướng Dẫn Cài Đặt
+1. Clone repo: `git clone https://github.com/hduy1305/PlantCare.git`
+2. Mở dự án bằng Android Studio.
+3. Build và chạy ứng dụng trên thiết bị ảo hoặc điện thoại thật.
+
+## 📞 Liên Hệ
+Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ qua email: **ngohduy@example.com**
 
 ---
-
-## 🔧 Công Nghệ Sử Dụng
-- **Ngôn ngữ:** Java, Kotlin
-- **Cơ sở dữ liệu:** Firebase, SQLite
-- **Giao diện:** Material Design
-- **API tích hợp:** OpenWeather API (dự báo thời tiết), Google Vision (nhận diện cây trồng)
-
-## 📥 Cài Đặt
-1. Clone repo này:
-   ```sh
-   git clone https://github.com/hduy1305/PlantCare.git
-   ```
-2. Mở dự án bằng **Android Studio**.
-3. Build và chạy ứng dụng trên thiết bị hoặc giả lập.
-
-## 👥 Đóng Góp
-Mọi ý kiến đóng góp và phản hồi đều được hoan nghênh! Hãy tạo một **Issue** hoặc gửi **Pull Request** để cải thiện dự án.
-
----
-
-📌 **PlantCare - Ứng dụng về chăm sóc cây trồng của bạn!**
+🚀 *PlantCare - Đồng hành cùng bạn trong hành trình chăm sóc cây cảnh!* 🌿
