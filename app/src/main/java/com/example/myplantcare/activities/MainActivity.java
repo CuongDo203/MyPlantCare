@@ -1,7 +1,8 @@
-package com.example.myplantcare;
+package com.example.myplantcare.activities;
 
 import android.os.Bundle;
 
+import com.example.myplantcare.R;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MyPlantCare</string>
+    <string name="app_name">PlantCare</string>
     <string name="action_settings">Settings</string>
     <!-- Strings used for fragments for navigation -->
     <string name="first_fragment_label">First Fragment</string>
@@ -43,4 +43,14 @@
         libero vel nunc consequat, quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
+    <string name="landing_page_description">Theo dõi cây trồng của bạn</string>
+    <string name="button_start_text">Bắt đầu</string>
+    <string name="username_hint">Nhập email</string>
+    <string name="password_hint">Mật khẩu</string>
+    <string name="forgot_password">Quên mật khẩu?</string>
+    <string name="login">ĐĂNG NHẬP</string>
+    <string name="no_account">Chưa có tài khoản?</string>
+    <string name="has_account">Đã có tài khoản?</string>
+    <string name="register_now">Đăng ký ngay</string>
+    <string name="login_now">Đăng nhập ngay</string>
 </resources>
