@@ -27,7 +27,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Thời tiết hôm nay"
-                android:textSize="20sp"
+                android:textSize="28sp"
                 android:textStyle="bold"
                 android:textColor="@color/black" />
 
@@ -168,7 +168,7 @@
                         <ImageView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/tuoi_nuoc"
+                            android:src="@drawable/ic_tuoi_nuoc"
                             android:layout_marginStart="10dp"
                             />
                         <LinearLayout

@@ -21,13 +21,13 @@
             android:background="@color/white"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            app:layout_scrollFlags="scroll|enterAlways"
+
             >
 
             <ImageView
                 android:id="@+id/ivMenu"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:src="@drawable/ic_menu"
                 android:contentDescription="Logo" />
 
@@ -65,9 +65,9 @@
 
             <!-- Biểu tượng cài đặt / hồ sơ (alignEnd) -->
             <ImageView
-                android:id="@+id/ivProfile"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
+                android:id="@+id/ivNotification"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:layout_gravity="right|center_vertical"
                 android:src="@drawable/notification"
                 android:contentDescription="Notification" />
