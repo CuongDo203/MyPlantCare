@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".fragments.HomeFragment">
+
+
+
+    <!-- Nội dung chính cuộn được -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingHorizontal="16dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Tiêu đề "Thời tiết hôm nay" -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Thời tiết hôm nay"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="@color/black" />
+
+            <!-- CardView chứa thông tin thời tiết -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="16dp"
+                android:radius="16dp"
+                app:cardElevation="8dp"
+                android:backgroundTint="#C9E5FF"
+                app:cardBackgroundColor="#C9E5FF"
+                app:cardUseCompatPadding="true"
+                >
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:radius="12dp"
+                    >
+
+                    <!-- Icon thời tiết -->
+                    <ImageView
+                        android:id="@+id/ivWeatherIcon"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:src="@drawable/cloudy"
+                        android:contentDescription="Weather Icon" />
+
+                    <!-- Nhiệt độ -->
+                    <TextView
+                        android:id="@+id/tvTemperature"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginStart="80dp"
+                        android:text="32°"
+                        android:textColor="@color/black"
+                        android:textSize="32sp"
+                        android:textStyle="bold" />
+
+                    <!-- Mô tả thời tiết -->
+                    <TextView
+                        android:id="@+id/tvWeatherDescription"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/tvTemperature"
+                        android:layout_marginStart="80dp"
+                        android:text="Sunny Cloudy"
+                        android:textColor="@color/gray_text"
+                        android:textSize="14sp" />
+
+                    <!-- Thông tin độ ẩm, gió, v.v. -->
+                    <LinearLayout
+                        android:id="@+id/llWeatherInfo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/tvWeatherDescription"
+                        android:layout_marginStart="80dp"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="16 km/h | 83% | 2/10"
+                            android:textColor="@color/gray_text"
+                            android:textSize="14sp" />
+                    </LinearLayout>
+                </RelativeLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Phần "Việc cần làm" -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp"
+
+                >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Việc cần làm"
+                    android:textColor="@color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_weight="1"
+                    />
+
+                <TextView
+                    android:id="@+id/tvSeeMore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Xem thêm"
+                    android:textColor="@color/green_button"
+                    android:textSize="14sp"
+                    android:gravity="end"
+                    />
+            </LinearLayout>
+
+            <!-- Danh sách việc cần làm (RecyclerView hoặc LinearLayout) -->
+            <LinearLayout
+                android:id="@+id/llTaskList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                >
+
+                <!-- Mỗi Item: CardView hiển thị 1 công việc -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:radius="12dp"
+                    app:cardElevation="2dp"
+                    app:cardBackgroundColor="@color/white"
+                    >
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="10dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        >
+
+                        <!-- Ảnh minh họa cây -->
+                        <ImageView
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:src="@drawable/ic_launcher_background"
+                            android:contentDescription="Plant" />
+                        
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/ic_tuoi_nuoc"
+                            android:layout_marginStart="10dp"
+                            />
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:layout_marginStart="5dp"
+                            android:layout_weight="1"
+                            >
+                            <!-- Tiêu đề công việc -->
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+
+
+                                android:text="Cây EFG cần tưới nước"
+                                android:textSize="16sp"
+                                android:textColor="@color/black"
+                                android:textStyle="bold" />
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:layout_marginTop="5dp"
+                                android:gravity="center_vertical"
+                                >
+                                <ImageView
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:src="@drawable/alarmclock"
+                                    />
+                                <!-- Thời gian -->
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="4dp"
+                                    android:text="9:30 AM"
+                                    android:textSize="14sp"
+                                    android:textColor="@color/gray_text" />
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+
+                            android:src="@drawable/arrow_right"
+                            android:contentDescription="Task Icon" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <!-- Thêm nhiều CardView item tương tự -->
+                <!-- Hoặc thay bằng RecyclerView -->
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+
+</FrameLayout>
