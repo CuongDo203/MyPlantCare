@@ -1,41 +1,70 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:fillViewport="true">
 
-    <!-- Lịch ngày tháng -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewDays"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:overScrollMode="never"
-        android:clipToPadding="false"
-        android:scrollbars="none"
-        android:paddingBottom="10dp"/>
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <ImageView
-        android:id="@+id/btnOpenDatePicker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_arrow_down"
-        android:layout_gravity="center_horizontal"
-        android:padding="10dp"/>
+        <!-- Lịch ngày tháng -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewDays"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:nestedScrollingEnabled="false"/>
 
-    <!-- Lịch trình công việc -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Lịch trình hôm nay"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:textColor="@color/black"
-        android:paddingBottom="10dp"/>
+        <ImageView
+            android:id="@+id/btnOpenDatePicker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_arrow_down"
+            android:layout_gravity="center_horizontal"
+            android:padding="10dp"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewSchedule"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        <TextView
+            android:id="@+id/today"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hôm nay"
+            android:textSize="16sp"
+            android:layout_gravity="center"/>
 
-</LinearLayout>
+        <!-- Lịch trình công việc -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Chưa hoàn thành"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:paddingBottom="10dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewScheduleUncompleted"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đã Hoàn thành"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:paddingBottom="10dp"
+            android:layout_marginTop="10dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewScheduleCompleted"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"/>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

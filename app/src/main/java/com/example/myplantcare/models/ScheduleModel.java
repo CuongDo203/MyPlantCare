@@ -1,17 +1,39 @@
 package com.example.myplantcare.models;
 
-public class ScheduleModel {
-    private String title;
-    private String time;
-    private boolean isCompleted;
+import java.util.List;
 
-    public ScheduleModel(String title, String time, boolean isCompleted) {
-        this.title = title;
-        this.time = time;
-        this.isCompleted = isCompleted;
+public class ScheduleModel {
+    private String taskName;
+    private String taskType;
+    private List<TaskModel> tasks;
+
+    public ScheduleModel(String taskName, List<TaskModel> tasks, String taskType) {
+        this.taskName = taskName;
+        this.tasks = tasks;
+        this.taskType = taskType;
     }
 
-    public String getTitle() { return title; }
-    public String getTime() { return time; }
-    public boolean isCompleted() { return isCompleted; }
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
+    }
+
+    public String getTaskType() {
+        return taskType;
+    }
+
+    public void setTaskType(String taskType) {
+        this.taskType = taskType;
+    }
+
+    public void setTasks(List<TaskModel> tasks) {
+        this.tasks = tasks;
+    }
+
+    public String getTaskName() {
+        return taskName;
+    }
+
+    public List<TaskModel> getTasks() {
+        return tasks;
+    }
 }

@@ -17,6 +17,7 @@ import java.util.List;
 public class DayAdapter extends RecyclerView.Adapter<DayAdapter.DayViewHolder>{
 
     private List<DayModel> dayList;
+    private int selectedPosition = -1;
 
     public DayAdapter(List<DayModel> dayList) {
         this.dayList = dayList;
@@ -35,14 +36,22 @@ public class DayAdapter extends RecyclerView.Adapter<DayAdapter.DayViewHolder>{
         holder.dayOfWeek.setText(day.getDayOfWeek());
         holder.day.setText(String.valueOf(day.getDay()));
 
-        if (day.isToday()) {
-            holder.day.setTextColor(Color.RED);
-//            holder.day.setBackgroundResource(R.drawable.bg_today);
-        } else {
-            holder.day.setTextColor(Color.BLACK);
-            holder.day.setBackgroundResource(0);
+        if(position == selectedPosition || day.isToday()) {
+            holder.dayOfWeek.setBackgroundResource(R.drawable.bg_today);
         }
+        else {
+            holder.dayOfWeek.setBackgroundResource(0);
+        }
+        holder.day.setTextColor(day.isToday() ? Color.RED : Color.BLACK);
+        holder.itemView.setOnClickListener(v -> {
+            int previousPosition = selectedPosition;
+            selectedPosition = position;
+            notifyItemChanged(previousPosition); // Cập nhật item cũ
+            notifyItemChanged(selectedPosition); // Cập nhật item mới
+        });
     }
+
+
 
     @Override
     public int getItemCount() {

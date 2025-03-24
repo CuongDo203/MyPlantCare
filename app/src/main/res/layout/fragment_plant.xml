@@ -3,12 +3,38 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.PlantFragment">
-
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    tools:context=".fragments.PlantFragment"
+    >
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Plant fragment" />
+        >
 
+        <com.google.android.material.tabs.TabLayout
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/tab_plant"
+            android:layout_centerHorizontal="true"
+            android:background="@color/white"
+            >
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Cây của tôi"/>
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Thông tin cây"
+                />
+        </com.google.android.material.tabs.TabLayout>
+        <androidx.viewpager2.widget.ViewPager2
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/view_pager"
+            android:layout_below="@+id/tab_plant"
+            />
+
+    </RelativeLayout>
 </FrameLayout>

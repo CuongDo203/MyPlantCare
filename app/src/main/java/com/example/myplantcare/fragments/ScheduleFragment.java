@@ -11,66 +11,33 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.myplantcare.R;
 import com.example.myplantcare.adapters.DayAdapter;
 import com.example.myplantcare.adapters.ScheduleAdapter;
 import com.example.myplantcare.models.DayModel;
 import com.example.myplantcare.models.ScheduleModel;
+import com.example.myplantcare.models.TaskModel;
+import com.google.android.material.datepicker.MaterialDatePicker;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ScheduleFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ScheduleFragment extends Fragment {
 
-    private RecyclerView recyclerViewDays, recyclerViewSchedule;
+    private RecyclerView recyclerViewDays, recyclerViewScheduleUncompleted, recyclerViewScheduleCompleted;
     private DayAdapter dayAdapter;
     private ScheduleAdapter scheduleAdapter;
     private List<DayModel> dayList;
-    private List<ScheduleModel> scheduleList;
+    private List<ScheduleModel> scheduleListUncompleted, scheduleListCompleted;
     private ImageView btnOpenDatePicker;
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public ScheduleFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ScheduleFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ScheduleFragment newInstance(String param1, String param2) {
-        ScheduleFragment fragment = new ScheduleFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     // Tạo danh sách ngày
     private List<DayModel> generateDays() {
         List<DayModel> days = new ArrayList<>();
-        String[] weekdays = {"Th 2", "Th 3", "Th 4", "Th 5", "Th 6", "Th 7", "CN"};
+        String[] weekdays = {"CN","Th 2", "Th 3", "Th 4", "Th 5", "Th 6", "Th 7"};
         Calendar calendar = Calendar.getInstance();
         int today = calendar.get(Calendar.DAY_OF_MONTH);
 
@@ -88,39 +55,56 @@ public class ScheduleFragment extends Fragment {
     // Tạo danh sách lịch trình mẫu
     private List<ScheduleModel> generateSchedules() {
         List<ScheduleModel> schedules = new ArrayList<>();
-        schedules.add(new ScheduleModel("Tưới nước", "Cây EFG - 9:30 AM - Phòng khách", false));
-        schedules.add(new ScheduleModel("Bón phân", "Cây EFG - 10:00 AM - Phòng khách", false));
-        schedules.add(new ScheduleModel("Kiểm tra sâu bệnh", "Cây EFG - 11:00 AM - Phòng khách", false));
+
+        List<TaskModel> taskList1 = new ArrayList<>();
+        taskList1.add(new TaskModel("Cây A - 8:00 AM - Ban công", false));
+        taskList1.add(new TaskModel("Cây B - 9:30 AM - Phòng khách", false));
+
+        List<TaskModel> taskList2 = new ArrayList<>();
+        taskList2.add(new TaskModel("Cây C - 10:00 AM - Sân vườn", false));
+        taskList2.add(new TaskModel("Cây D - 11:30 AM - Ban công", false));
+
+        schedules.add(new ScheduleModel("Tưới nước", taskList1, "Tưới nước"));
+        schedules.add(new ScheduleModel("Bón phân", taskList2, "Bón phân"));
+
         return schedules;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
 
     private void openDatePicker() {
-        Calendar calendar = Calendar.getInstance();
-        new DatePickerDialog(getContext(),
-                (view, year, month, dayOfMonth) -> {
-                    // Xử lý ngày đã chọn
-                },
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)
-        ).show();
+        MaterialDatePicker<Long> datePicker =
+                MaterialDatePicker.Builder.datePicker()
+                        .setTitleText("Chọn ngày")
+                        .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                        .build();
+
+        datePicker.addOnPositiveButtonClickListener(selection -> {
+            // Chuyển đổi timestamp sang ngày tháng
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(selection);
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+            int month = calendar.get(Calendar.MONTH) + 1; // Tháng tính từ 0
+            int year = calendar.get(Calendar.YEAR);
+
+            // Cập nhật TextView hoặc RecyclerView với ngày đã chọn
+            String selectedDate = day + "/" + month + "/" + year;
+            Toast.makeText(getContext(), "Ngày đã chọn: " + selectedDate, Toast.LENGTH_SHORT).show();
+
+            // Đóng date picker
+            datePicker.dismiss();
+        });
+
+        datePicker.show(getParentFragmentManager(), "DATE_PICKER");
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_schedule, container, false);
         recyclerViewDays = view.findViewById(R.id.recyclerViewDays);
-        recyclerViewSchedule = view.findViewById(R.id.recyclerViewSchedule);
+        recyclerViewScheduleUncompleted = view.findViewById(R.id.recyclerViewScheduleUncompleted);
+        recyclerViewScheduleCompleted = view.findViewById(R.id.recyclerViewScheduleCompleted);
         btnOpenDatePicker = view.findViewById(R.id.btnOpenDatePicker);
 
         recyclerViewDays.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
@@ -128,10 +112,15 @@ public class ScheduleFragment extends Fragment {
         dayAdapter = new DayAdapter(dayList);
         recyclerViewDays.setAdapter(dayAdapter);
 
-        recyclerViewSchedule.setLayoutManager(new LinearLayoutManager(getContext()));
-        scheduleList = generateSchedules();
-        scheduleAdapter = new ScheduleAdapter(scheduleList);
-        recyclerViewSchedule.setAdapter(scheduleAdapter);
+        recyclerViewScheduleUncompleted.setLayoutManager(new LinearLayoutManager(getContext()));
+        scheduleListUncompleted = generateSchedules();
+        scheduleAdapter = new ScheduleAdapter(scheduleListUncompleted);
+        recyclerViewScheduleUncompleted.setAdapter(scheduleAdapter);
+
+        recyclerViewScheduleCompleted.setLayoutManager(new LinearLayoutManager(getContext()));
+        scheduleListCompleted = generateSchedules();
+        scheduleAdapter = new ScheduleAdapter(scheduleListCompleted);
+        recyclerViewScheduleCompleted.setAdapter(scheduleAdapter);
 
         btnOpenDatePicker.setOnClickListener(v -> openDatePicker());
         return view;
