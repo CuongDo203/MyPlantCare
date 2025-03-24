@@ -36,6 +36,7 @@ PlantCare là ứng dụng hỗ trợ người dùng trong việc chăm sóc câ
 ## 👥 Thành Viên
 - **B21DCCN297 - Ngô Hoàng Duy**
 - **B21DCCN189 - Đỗ Ngọc Cường**
+- **B21DCCN692 - Phùng Văn Thịnh**
 
 ## 🚀 Công Nghệ Sử Dụng
 - **Ngôn ngữ lập trình:** Java
