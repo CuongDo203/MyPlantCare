@@ -11,4 +11,8 @@
     <color name="bg_task_completed">#334AC675</color>
     <color name="bg_plant_info">#DEEAD8</color>
     <color name="green_text2">#476C5F</color>
+    <color name="green_text3">#094634</color>
+    <color name="bg_card_detail_end">#094B37</color>
+    <color name="bg_card_detail_start">#0D2D24</color>
+    <color name="tab_selected_color">#FFB700</color>
 </resources>

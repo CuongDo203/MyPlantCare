@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.myplantcare.R;
-import com.example.myplantcare.adapters.ViewPagerAdapter;
+import com.example.myplantcare.adapters.ViewPagerPlantAdapter;
 import com.google.android.material.tabs.TabLayout;
 
 /**
@@ -31,7 +31,7 @@ public class PlantFragment extends Fragment {
 
     private TabLayout tabLayout;
     private ViewPager2 viewPager2;
-    private ViewPagerAdapter viewPagerAdapter;
+    private ViewPagerPlantAdapter viewPagerAdapter;
 
     public PlantFragment() {
         // Required empty public constructor
@@ -72,7 +72,7 @@ public class PlantFragment extends Fragment {
 
         tabLayout = view.findViewById(R.id.tab_plant);
         viewPager2 = view.findViewById(R.id.view_pager);
-        viewPagerAdapter = new ViewPagerAdapter(this);
+        viewPagerAdapter = new ViewPagerPlantAdapter(this);
         viewPager2.setAdapter(viewPagerAdapter);
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {

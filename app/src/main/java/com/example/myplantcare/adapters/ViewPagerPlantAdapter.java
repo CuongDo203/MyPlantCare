@@ -8,12 +8,12 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import com.example.myplantcare.fragments.MyPlantFragment;
 import com.example.myplantcare.fragments.PlantInfoFragment;
 
-public class ViewPagerAdapter extends FragmentStateAdapter {
+public class ViewPagerPlantAdapter extends FragmentStateAdapter {
 
-    public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
+    public ViewPagerPlantAdapter(@NonNull FragmentActivity fragmentActivity) {
         super(fragmentActivity);
     }
-    public ViewPagerAdapter(@NonNull Fragment fragment) {
+    public ViewPagerPlantAdapter(@NonNull Fragment fragment) {
         super(fragment);
     }
 

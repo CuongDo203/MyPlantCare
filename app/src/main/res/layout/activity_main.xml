@@ -98,6 +98,5 @@
         app:itemIconTint="@color/nav_item_color_state"
         app:itemTextColor="@color/nav_item_color_state"
         android:elevation="8dp"
-
         />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
