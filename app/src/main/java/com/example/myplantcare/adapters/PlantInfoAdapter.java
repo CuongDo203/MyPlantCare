@@ -1,5 +1,7 @@
 package com.example.myplantcare.adapters;
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myplantcare.R;
+import com.example.myplantcare.activities.PlantInfoDetail;
 import com.example.myplantcare.models.PlantModel;
 
 import java.util.List;
@@ -39,6 +42,14 @@ public class PlantInfoAdapter extends RecyclerView.Adapter<PlantInfoAdapter.Plan
         holder.moistureInfo.setText(plantInfo.getIdealMoisture());
         holder.waterInfo.setText(plantInfo.getIdealWater());
 
+        holder.itemView.setOnClickListener(v -> {
+            // xử lý sự kiện khi 1 cây được click -> chuyển sang trang chi tiết về cây đó
+            Context context = v.getContext();
+            Intent intent = new Intent(context, PlantInfoDetail.class);
+
+            context.startActivity(intent);
+        });
+
     }
 
     @Override
@@ -49,6 +60,7 @@ public class PlantInfoAdapter extends RecyclerView.Adapter<PlantInfoAdapter.Plan
     public static class PlantInfoViewHolder extends RecyclerView.ViewHolder{
 
         TextView plantName, plantLocation, lightInfo, temperatureInfo, moistureInfo, waterInfo  ;
+
         public PlantInfoViewHolder(@NonNull View itemView) {
             super(itemView);
             plantName = itemView.findViewById(R.id.plant_name);
@@ -57,6 +69,7 @@ public class PlantInfoAdapter extends RecyclerView.Adapter<PlantInfoAdapter.Plan
             temperatureInfo = itemView.findViewById(R.id.temperature_info);
             moistureInfo = itemView.findViewById(R.id.moisture_info);
             waterInfo = itemView.findViewById(R.id.water_info);
+
         }
     }
 }

@@ -63,9 +63,6 @@
 
             </LinearLayout>
 
-
-
-            <!-- Biểu tượng cài đặt / hồ sơ (alignEnd) -->
             <ImageView
                 android:id="@+id/ivNotification"
                 android:layout_width="30dp"

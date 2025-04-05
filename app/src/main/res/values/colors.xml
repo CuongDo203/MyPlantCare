@@ -15,4 +15,5 @@
     <color name="bg_card_detail_end">#094B37</color>
     <color name="bg_card_detail_start">#0D2D24</color>
     <color name="tab_selected_color">#FFB700</color>
+    <color name="fab_bg">#D3C786</color>
 </resources>

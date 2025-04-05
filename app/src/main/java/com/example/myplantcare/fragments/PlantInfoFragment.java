@@ -41,7 +41,5 @@ public class PlantInfoFragment extends Fragment {
     private void initContents(View view) {
         recyclerView = view.findViewById(R.id.recyclerViewPlantInfo);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-
-
     }
 }
