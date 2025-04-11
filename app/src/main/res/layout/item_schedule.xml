@@ -1,34 +1,55 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="8dp"
-    android:gravity="center_vertical">
-
-    <CheckBox
-        android:id="@+id/taskCompleted"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+    android:gravity="center_vertical"
+    android:background="@color/bg_task_uncompleted"
+    android:padding="8dp">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingLeft="8dp">
 
-        <TextView
-            android:id="@+id/taskName"
+        <LinearLayout
+            android:id="@+id/task_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tưới nước"
-            android:textSize="16sp"
-            android:textStyle="bold"/>
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
 
-        <TextView
-            android:id="@+id/taskDetails"
-            android:layout_width="wrap_content"
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:src="@drawable/ic_tuoi_nuoc"
+                android:id="@+id/ic_task"
+                />
+
+            <TextView
+                android:id="@+id/taskName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:text="Tưới nước"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/black"
+                />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewTasks"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Cây EFG - 9:30 AM - Phòng khách"
-            android:textSize="14sp"/>
+            android:nestedScrollingEnabled="false" />
+
     </LinearLayout>
-</LinearLayout>
+
+    <ImageView
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentEnd="true"
+        android:src="@drawable/ic_task_checked"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="6dp"/>
+</RelativeLayout>

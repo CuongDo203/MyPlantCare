@@ -6,5 +6,14 @@
     <color name="gray_text">#666666</color>
     <color name="green_text">#013220</color>
     <color name="place_holder_color">#80013220</color>
-
+    <color name="bg_selected_day">#6DAA4F</color>
+    <color name="bg_task_uncompleted">#FDFBEA</color>
+    <color name="bg_task_completed">#334AC675</color>
+    <color name="bg_plant_info">#DEEAD8</color>
+    <color name="green_text2">#476C5F</color>
+    <color name="green_text3">#094634</color>
+    <color name="bg_card_detail_end">#094B37</color>
+    <color name="bg_card_detail_start">#0D2D24</color>
+    <color name="tab_selected_color">#FFB700</color>
+    <color name="fab_bg">#D3C786</color>
 </resources>
