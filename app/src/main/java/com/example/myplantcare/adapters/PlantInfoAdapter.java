@@ -37,10 +37,10 @@ public class PlantInfoAdapter extends RecyclerView.Adapter<PlantInfoAdapter.Plan
         // bind data to view holder
         holder.plantName.setText(plantInfo.getName());
         holder.plantLocation.setText(plantInfo.getLocation());
-        holder.lightInfo.setText(plantInfo.getIdealLight());
-        holder.temperatureInfo.setText(plantInfo.getIdealTemperature());
-        holder.moistureInfo.setText(plantInfo.getIdealMoisture());
-        holder.waterInfo.setText(plantInfo.getIdealWater());
+//        holder.lightInfo.setText(plantInfo.getIdealLight());
+//        holder.temperatureInfo.setText(plantInfo.getIdealTemperature());
+//        holder.moistureInfo.setText(plantInfo.getIdealMoisture());
+//        holder.waterInfo.setText(plantInfo.getIdealWater());
 
         holder.itemView.setOnClickListener(v -> {
             // xử lý sự kiện khi 1 cây được click -> chuyển sang trang chi tiết về cây đó

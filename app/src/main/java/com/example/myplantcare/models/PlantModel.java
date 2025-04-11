@@ -3,30 +3,24 @@ package com.example.myplantcare.models;
 public class PlantModel {
 
     private String name;
-    private String type;
+    private String speciesId;
     private String location;
     private String description;
     private String image;
 
-    private String idealLight;
-    private String idealTemperature;
-    private String idealMoisture;
-    private String idealWater;
+    private String id;
+    private String idealConditionId;
 
     public PlantModel() {
     }
 
-    public PlantModel(String name, String type, String location, String description,
-                      String image, String idealLight, String idealTemperature, String idealMoisture, String idealWater) {
+    public PlantModel(String name, String speciesId, String location, String description,
+                      String image) {
         this.name = name;
-        this.type = type;
+        this.speciesId = speciesId;
         this.location = location;
         this.description = description;
         this.image = image;
-        this.idealLight = idealLight;
-        this.idealTemperature = idealTemperature;
-        this.idealMoisture = idealMoisture;
-        this.idealWater = idealWater;
     }
 
     public String getName() {
@@ -37,12 +31,36 @@ public class PlantModel {
         this.name = name;
     }
 
+    public String getSpeciesId() {
+        return speciesId;
+    }
+
+    public void setSpeciesId(String speciesId) {
+        this.speciesId = speciesId;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getIdealConditionId() {
+        return idealConditionId;
+    }
+
+    public void setIdealConditionId(String idealConditionId) {
+        this.idealConditionId = idealConditionId;
+    }
+
     public String getType() {
-        return type;
+        return speciesId;
     }
 
     public void setType(String type) {
-        this.type = type;
+        this.speciesId = type;
     }
 
     public String getLocation() {
@@ -69,35 +87,4 @@ public class PlantModel {
         this.image = image;
     }
 
-    public String getIdealLight() {
-        return idealLight;
-    }
-
-    public void setIdealLight(String idealLight) {
-        this.idealLight = idealLight;
-    }
-
-    public String getIdealTemperature() {
-        return idealTemperature;
-    }
-
-    public void setIdealTemperature(String idealTemperature) {
-        this.idealTemperature = idealTemperature;
-    }
-
-    public String getIdealMoisture() {
-        return idealMoisture;
-    }
-
-    public void setIdealMoisture(String idealMoisture) {
-        this.idealMoisture = idealMoisture;
-    }
-
-    public String getIdealWater() {
-        return idealWater;
-    }
-
-    public void setIdealWater(String idealWater) {
-        this.idealWater = idealWater;
-    }
 }
