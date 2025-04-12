@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.MyPlantDetail"
+    tools:context=".activities.MyPlantDetailActivity"
     android:fitsSystemWindows="true"
     >
 
@@ -117,12 +117,14 @@
                                     android:layout_height="120dp"
                                     android:src="@drawable/plant_sample"
                                     android:background="@color/gray_text"
+                                    android:id="@+id/my_plant_img_dt"
                                     />
                                 <ImageView
                                     android:layout_width="match_parent"
                                     android:layout_height="28dp"
                                     android:src="@drawable/ic_change_image"
                                     android:paddingVertical="4dp"
+                                    android:id="@+id/change_my_plant_image"
                                     />
                             </LinearLayout>
 
@@ -138,12 +140,14 @@
                                 android:layout_height="30dp"
                                 android:src="@drawable/ic_trash"
                                 android:layout_weight="1"
+                                android:id="@+id/btn_delete_my_plant_detail"
                                 />
                             <ImageView
                                 android:layout_width="30dp"
                                 android:layout_height="30dp"
                                 android:src="@drawable/ic_update"
                                 android:layout_weight="1"
+                                android:id="@+id/btn_update_my_plant_detail"
                                 />
                         </LinearLayout>
 
@@ -160,6 +164,7 @@
                             android:text="Tên cây"
                             android:textSize="20sp"
                             android:textStyle="bold"
+                            android:id="@+id/my_plant_name_dt"
                             />
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -176,7 +181,9 @@
                                 android:layout_height="wrap_content"
                                 android:text="Phòng khách"
                                 android:textStyle="bold"
-                                android:textSize="20sp"/>
+                                android:textSize="20sp"
+                                android:id="@+id/my_plant_location_dt"
+                                />
                         </LinearLayout>
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -193,7 +200,9 @@
                                 android:layout_height="wrap_content"
                                 android:text="01/04/2025"
                                 android:textSize="20sp"
-                                android:textStyle="bold"/>
+                                android:textStyle="bold"
+                                android:id="@+id/my_plant_created_dt"
+                                />
                         </LinearLayout>
                         <LinearLayout
                             android:layout_width="wrap_content"
@@ -211,6 +220,7 @@
                                 android:text="40cm"
                                 android:textSize="20sp"
                                 android:textStyle="bold"
+                                android:id="@+id/my_plant_height_dt"
                                 />
                         </LinearLayout>
 
@@ -230,6 +240,7 @@
                                 android:text="Trong nhà"
                                 android:textSize="20sp"
                                 android:textStyle="bold"
+                                android:id="@+id/my_plant_type_dt"
                                 />
                         </LinearLayout>
 
@@ -249,6 +260,7 @@
                                 android:text="Tốt"
                                 android:textSize="20sp"
                                 android:textStyle="bold"
+                                android:id="@+id/my_plant_status_dt"
                                 />
                         </LinearLayout>
 
@@ -268,6 +280,7 @@
                                 android:text="01/04/2025"
                                 android:textSize="20sp"
                                 android:textStyle="bold"
+                                android:id="@+id/my_plant_updated_dt"
                                 />
                         </LinearLayout>
 
@@ -380,13 +393,47 @@
                                 />
                         </LinearLayout>
                     </androidx.cardview.widget.CardView>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="2dp"
+                        android:background="#cccccc"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginHorizontal="16dp"
+                        />
                     <Space
                         android:layout_width="match_parent"
-                        android:layout_height="20dp"/>
+                        android:layout_height="10dp"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="40dp"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_marginHorizontal="16dp"
+                        android:background="@color/white"
+                        android:paddingStart="12dp"
+                        android:paddingEnd="12dp">
+
+                        <ImageView
+                            android:layout_width="26dp"
+                            android:layout_height="26dp"
+                            android:src="@drawable/ic_plus"
+                            app:tint="@color/black" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Thêm vào"
+                            android:textColor="@color/black"
+                            android:textSize="20sp"
+                            android:layout_marginStart="8dp" />
+                    </LinearLayout>
+
                 </LinearLayout>
                 <Space
                     android:layout_width="match_parent"
                     android:layout_height="20dp"/>
+
             </LinearLayout>
 
 

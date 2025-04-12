@@ -37,11 +37,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="16dp"
-                android:radius="16dp"
                 app:cardElevation="8dp"
                 android:backgroundTint="#C9E5FF"
                 app:cardBackgroundColor="#C9E5FF"
                 app:cardUseCompatPadding="true"
+                app:cardCornerRadius="16dp"
                 >
 
                 <RelativeLayout
@@ -132,9 +132,8 @@
                     />
             </LinearLayout>
 
-            <!-- Danh sách việc cần làm (RecyclerView hoặc LinearLayout) -->
             <LinearLayout
-                android:id="@+id/llTaskList"
+                android:id="@+id/task_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -145,9 +144,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="8dp"
-                    android:radius="12dp"
                     app:cardElevation="2dp"
                     app:cardBackgroundColor="@color/white"
+                    app:cardCornerRadius="12dp"
+                    android:id="@+id/task_detail"
                     >
 
                     <LinearLayout
@@ -199,7 +199,7 @@
                                 <ImageView
                                     android:layout_width="16dp"
                                     android:layout_height="16dp"
-                                    android:src="@drawable/alarmclock"
+                                    android:src="@drawable/ic_alarmclock"
                                     />
                                 <!-- Thời gian -->
                                 <TextView

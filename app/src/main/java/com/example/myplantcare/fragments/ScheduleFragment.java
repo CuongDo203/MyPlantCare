@@ -20,6 +20,7 @@ import com.example.myplantcare.models.DayModel;
 import com.example.myplantcare.models.ScheduleModel;
 import com.example.myplantcare.models.TaskModel;
 import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -33,6 +34,7 @@ public class ScheduleFragment extends Fragment {
     private List<DayModel> dayList;
     private List<ScheduleModel> scheduleListUncompleted, scheduleListCompleted;
     private ImageView btnOpenDatePicker;
+    private FloatingActionButton fab;
 
     // Tạo danh sách ngày
     private List<DayModel> generateDays() {
@@ -102,10 +104,11 @@ public class ScheduleFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_schedule, container, false);
-        recyclerViewDays = view.findViewById(R.id.recyclerViewDays);
-        recyclerViewScheduleUncompleted = view.findViewById(R.id.recyclerViewScheduleUncompleted);
-        recyclerViewScheduleCompleted = view.findViewById(R.id.recyclerViewScheduleCompleted);
-        btnOpenDatePicker = view.findViewById(R.id.btnOpenDatePicker);
+        initContents(view);
+
+        fab.setOnClickListener(v -> {
+            showAddScheduleDialog();
+                });
 
         recyclerViewDays.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         dayList = generateDays();
@@ -124,5 +127,18 @@ public class ScheduleFragment extends Fragment {
 
         btnOpenDatePicker.setOnClickListener(v -> openDatePicker());
         return view;
+    }
+
+    private void showAddScheduleDialog() {
+        AddScheduleDialogFragment addScheduleDialogFragment = new AddScheduleDialogFragment();
+        addScheduleDialogFragment.show(getParentFragmentManager(), "ADD_SCHEDULE_DIALOG");
+    }
+
+    private void initContents(View view) {
+        recyclerViewDays = view.findViewById(R.id.recyclerViewDays);
+        recyclerViewScheduleUncompleted = view.findViewById(R.id.recyclerViewScheduleUncompleted);
+        recyclerViewScheduleCompleted = view.findViewById(R.id.recyclerViewScheduleCompleted);
+        btnOpenDatePicker = view.findViewById(R.id.btnOpenDatePicker);
+        fab = view.findViewById(R.id.fab_add_schedule);
     }
 }

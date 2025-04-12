@@ -22,6 +22,12 @@ public class MyPlantModel {
     // Constructor rỗng cần thiết cho Firestore
     public MyPlantModel() {}
 
+    public MyPlantModel(String nickname, String location, double progress) {
+        this.nickname = nickname;
+        this.location = location;
+        this.progress = progress;
+    }
+
     // Getters and Setters cho tất cả các trường...
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
