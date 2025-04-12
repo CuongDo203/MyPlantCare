@@ -42,8 +42,8 @@ public class MyPlantFragment extends Fragment {
         adapter = new MyPlantAdapter(myPlantList);
         recyclerView.setAdapter(adapter);
 
-        myPlantList.add(new MyPlantModel("Xương rồng", "Phòng khách", 70));
-        myPlantList.add(new MyPlantModel("Sen đá", "Ban công", 45));
+        myPlantList.add(new MyPlantModel("Xương rồng", "Phòng khách", 70, String.valueOf(R.drawable.plant_sample)));
+        myPlantList.add(new MyPlantModel("Sen đá", "Ban công", 45, String.valueOf(R.drawable.plant_sample)));
         adapter.notifyDataSetChanged();
 
         return view;

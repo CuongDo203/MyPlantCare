@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myplantcare.R;
 import com.example.myplantcare.activities.MyPlantDetailActivity;
+import com.example.myplantcare.activities.PlantLogActivity;
 import com.example.myplantcare.models.MyPlantModel;
 
 import java.util.List;
@@ -43,6 +44,13 @@ public class MyPlantAdapter  extends RecyclerView.Adapter<MyPlantAdapter.MyPlant
             intent.putExtra("plantName", myPlant.getNickname());
             intent.putExtra("location", myPlant.getLocation());
             // Thêm thông tin khác sau
+            holder.itemView.getContext().startActivity(intent);
+        });
+        holder.btnMyPlantLogs.setOnClickListener(v -> {
+            Intent intent = new Intent(holder.itemView.getContext(), PlantLogActivity.class);
+            intent.putExtra("plantName", myPlant.getNickname());
+            intent.putExtra("image", myPlant.getImage());
+            intent.putExtra("id", myPlant.getPlantId());
             holder.itemView.getContext().startActivity(intent);
         });
     }

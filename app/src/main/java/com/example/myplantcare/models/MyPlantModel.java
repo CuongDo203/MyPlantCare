@@ -14,6 +14,8 @@ public class MyPlantModel {
     private String plantId; // Tham chiếu đến Plant template ID
     private String userId; // Tham chiếu đến User ID
 
+    private String image;
+
     @ServerTimestamp
     private Date createdAt; // Tự động lấy timestamp từ server khi tạo
     @ServerTimestamp
@@ -22,10 +24,11 @@ public class MyPlantModel {
     // Constructor rỗng cần thiết cho Firestore
     public MyPlantModel() {}
 
-    public MyPlantModel(String nickname, String location, double progress) {
+    public MyPlantModel(String nickname, String location, double progress, String image) {
         this.nickname = nickname;
         this.location = location;
         this.progress = progress;
+        this.image = image;
     }
 
     // Getters and Setters cho tất cả các trường...
@@ -46,4 +49,6 @@ public class MyPlantModel {
     public void setLocation(String location) { this.location = location; }
     public double getProgress() { return progress; }
     public void setProgress(double progress) { this.progress = progress; }
+    public String getImage() { return image; }
+    public void setImage(String image) { this.image = image; }
 }
