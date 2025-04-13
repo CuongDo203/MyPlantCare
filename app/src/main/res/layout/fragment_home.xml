@@ -100,7 +100,13 @@
                                 android:id="@+id/tv_wind_speed"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="16 km/h | "
+                                android:text="16 km/h"
+                                android:textColor="@color/gray_text"
+                                android:textSize="14sp" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text=" | "
                                 android:textColor="@color/gray_text"
                                 android:textSize="14sp" />
                             <TextView
@@ -113,6 +119,16 @@
 
                         </LinearLayout>
                     </LinearLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ha Noi"
+                        android:textColor="@color/gray_text"
+                        android:textSize="20sp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="16dp"
+                        />
                 </RelativeLayout>
             </androidx.cardview.widget.CardView>
 

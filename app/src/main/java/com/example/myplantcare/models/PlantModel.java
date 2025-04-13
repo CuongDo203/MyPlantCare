@@ -1,14 +1,17 @@
 package com.example.myplantcare.models;
 
-public class PlantModel {
+import com.google.firebase.firestore.DocumentId;
+import com.google.firebase.firestore.PropertyName;
 
+public class PlantModel {
+    @DocumentId
+    private String id;
     private String name;
     private String speciesId;
     private String location;
     private String description;
     private String image;
 
-    private String id;
     private String idealConditionId;
 
     public PlantModel() {
@@ -30,11 +33,12 @@ public class PlantModel {
     public void setName(String name) {
         this.name = name;
     }
-
+    @PropertyName("speciesId")
     public String getSpeciesId() {
         return speciesId;
     }
 
+    @PropertyName("speciesId")
     public void setSpeciesId(String speciesId) {
         this.speciesId = speciesId;
     }
@@ -47,10 +51,11 @@ public class PlantModel {
         this.id = id;
     }
 
+    @PropertyName("idealConditionId")
     public String getIdealConditionId() {
         return idealConditionId;
     }
-
+    @PropertyName("idealConditionId")
     public void setIdealConditionId(String idealConditionId) {
         this.idealConditionId = idealConditionId;
     }

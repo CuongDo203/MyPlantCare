@@ -1,39 +1,72 @@
 package com.example.myplantcare.models;
 
+import com.google.firebase.firestore.DocumentId;
+import com.google.firebase.firestore.PropertyName;
+
+import java.sql.Time;
+import java.util.Date;
 import java.util.List;
 
 public class ScheduleModel {
-    private String taskName;
-    private String taskType;
-    private List<TaskModel> tasks;
+    @DocumentId
+    private String id;
+    private String taskId;
+    private String frequency;
+    private Date startDate;
+    private TaskModel task;
+    private String time;
 
-    public ScheduleModel(String taskName, List<TaskModel> tasks, String taskType) {
-        this.taskName = taskName;
-        this.tasks = tasks;
-        this.taskType = taskType;
+    public ScheduleModel(String taskName) {
+        this.taskId = taskName;
     }
 
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
+    public String getId() {
+        return id;
     }
 
-    public String getTaskType() {
-        return taskType;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public void setTaskType(String taskType) {
-        this.taskType = taskType;
+    public String getFrequency() {
+        return frequency;
     }
 
-    public void setTasks(List<TaskModel> tasks) {
-        this.tasks = tasks;
+    public void setFrequency(String frequency) {
+        this.frequency = frequency;
+    }
+    @PropertyName("start_date")
+    public Date getStartDate() {
+        return startDate;
+    }
+    @PropertyName("start_date")
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+    @PropertyName("taskId")
+    public TaskModel getTask() {
+        return task;
+    }
+    @PropertyName("taskId")
+    public void setTask(TaskModel task) {
+        this.task = task;
     }
 
-    public String getTaskName() {
-        return taskName;
+    public String getTime() {
+        return time;
     }
 
-    public List<TaskModel> getTasks() {
-        return tasks;
+    public void setTime(String time) {
+        this.time = time;
     }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
+
+
+    public String getTaskId() {
+        return taskId;
+    }
+
 }

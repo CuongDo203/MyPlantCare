@@ -66,8 +66,8 @@ public class ScheduleFragment extends Fragment {
         taskList2.add(new TaskModel("Cây C - 10:00 AM - Sân vườn", false));
         taskList2.add(new TaskModel("Cây D - 11:30 AM - Ban công", false));
 
-        schedules.add(new ScheduleModel("Tưới nước", taskList1, "Tưới nước"));
-        schedules.add(new ScheduleModel("Bón phân", taskList2, "Bón phân"));
+        schedules.add(new ScheduleModel("Tưới nước"));
+        schedules.add(new ScheduleModel("Bón phân"));
 
         return schedules;
     }

@@ -92,6 +92,7 @@
                     android:textSize="40sp" />
 
                 <TextView
+                    android:id="@+id/species"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/plant_name"
@@ -103,6 +104,7 @@
                     android:textSize="30sp" />
 
                 <ImageView
+                    android:id="@+id/plant_image"
                     android:layout_width="match_parent"
                     android:layout_height="300dp"
                     android:layout_alignParentBottom="true"
@@ -139,6 +141,7 @@
                         app:tint="#749FD3" />
 
                     <TextView
+                        android:id="@+id/moisture_info"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
@@ -167,6 +170,7 @@
                         app:tint="#4BADE5" />
 
                     <TextView
+                        android:id="@+id/water_info"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
@@ -195,6 +199,7 @@
                         app:tint="#E5392A" />
 
                     <TextView
+                        android:id="@+id/temperature_info"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
@@ -223,6 +228,7 @@
                         app:tint="#F0AF2C" />
 
                     <TextView
+                        android:id="@+id/light_info"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"

@@ -1,6 +1,10 @@
 package com.example.myplantcare.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,17 +22,20 @@ public class PlantInfoDetail extends AppCompatActivity {
     private ViewPager2 viewPager;
     private TabLayout tabLayout;
     private ViewPagerPlantInfoAdapter viewPagerAdapter;
+    private ImageView btnBack;
+    private TextView plantName, speciesName, lightInfo, temperatureInfo, moistureInfo, waterInfo;
+    ImageView plantImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_plant_info_detail);
 
-        viewPager = findViewById(R.id.view_pager_plant);
-        tabLayout = findViewById(R.id.tab_info);
-
-        viewPagerAdapter = new ViewPagerPlantInfoAdapter(this);
-        viewPager.setAdapter(viewPagerAdapter);
+        initContents();
+        getPlantData();
+        btnBack.setOnClickListener(v -> {
+            finish();
+        });
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -47,8 +54,61 @@ public class PlantInfoDetail extends AppCompatActivity {
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
-                tabLayout.getTabAt(position).select();
+                if (tabLayout.getTabCount() > position && tabLayout.getTabAt(position) != null) {
+                    tabLayout.getTabAt(position).select();
+                }
             }
         });
+    }
+
+    private void getPlantData() {
+        Intent intent = getIntent();
+        if(intent != null) {
+            String plantName = intent.getStringExtra("plantName");
+            String speciesName = intent.getStringExtra("speciesName");
+            String plantId = intent.getStringExtra("plantId");
+            String idealLight = intent.getStringExtra("idealLight");
+            double idealTemperatureMin = intent.getDoubleExtra("idealTemperatureMin", 0);
+            double idealTemperatureMax = intent.getDoubleExtra("idealTemperatureMax", 0);
+            double idealMoistureMin = intent.getDoubleExtra("idealMoistureMin", 0);
+            double idealMoistureMax = intent.getDoubleExtra("idealMoistureMax", 0);
+            double idealWaterMin = intent.getDoubleExtra("idealWaterMin", 0);
+            double idealWaterMax = intent.getDoubleExtra("idealWaterMax", 0);
+
+            Log.d("PlantInfoDetail", "plantId: " + plantId);
+            Log.d("PlantInfoDetail", "plantName: " + plantName);
+            Log.d("PlantInfoDetail", "speciesName: " + speciesName);
+            Log.d("PlantInfoDetail", "idealLight: " + idealLight);
+            Log.d("PlantInfoDetail", "idealTemperatureMin: " + idealTemperatureMin);
+            Log.d("PlantInfoDetail", "idealTemperatureMax: " + idealTemperatureMax);
+            Log.d("PlantInfoDetail", "idealMoistureMin: " + idealMoistureMin);
+            Log.d("PlantInfoDetail", "idealMoistureMax: " + idealMoistureMax);
+            Log.d("PlantInfoDetail", "idealWaterMin: " + idealWaterMin);
+            Log.d("PlantInfoDetail", "idealWaterMax: " + idealWaterMax);
+
+            this.plantName.setText(plantName);
+            this.speciesName.setText(speciesName);
+            this.lightInfo.setText(idealLight);
+//            this.temperatureInfo.setText(String.format("%s - %s C", String.valueOf(idealTemperatureMin), String.valueOf(idealTemperatureMax)));
+//            this.moistureInfo.setText(String.format("%s - %s %%", String.valueOf(idealMoistureMin), String.valueOf(idealMoistureMax)));
+//            this.waterInfo.setText(String.format("%s - %s ml", String.valueOf(idealWaterMin), String.valueOf(idealWaterMax)));
+            this.plantImage.setImageResource(R.drawable.plant_sample);
+        }
+    }
+
+    private void initContents() {
+        viewPager = findViewById(R.id.view_pager_plant);
+        tabLayout = findViewById(R.id.tab_info);
+        btnBack = findViewById(R.id.ivBack);
+        plantImage = findViewById(R.id.plant_image);
+        plantName = findViewById(R.id.plant_name);
+        speciesName = findViewById(R.id.species);
+        lightInfo = findViewById(R.id.light_info);
+        temperatureInfo = findViewById(R.id.temperature_info);
+        moistureInfo = findViewById(R.id.moisture_info);
+        waterInfo = findViewById(R.id.water_info);
+
+        viewPagerAdapter = new ViewPagerPlantInfoAdapter(this);
+        viewPager.setAdapter(viewPagerAdapter);
     }
 }
