@@ -2,14 +2,11 @@ package com.example.myplantcare.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,14 +18,13 @@ import com.example.myplantcare.models.TaskLogModel;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
-public class PlantLogActivity extends AppCompatActivity {
+public class PlantLogActivity extends AppCompatActivity implements View.OnClickListener{
 
     private RecyclerView recyclerView;
     private TaskLogAdapter taskLogAdapter;
     private List<TaskLogModel> taskLogList;
-    private ImageView plantImage;
+    private ImageView plantImage, btnBack;
     private TextView plantName;
     private String plantId;
 
@@ -39,7 +35,7 @@ public class PlantLogActivity extends AppCompatActivity {
         initContents();
         loadPlantInfo();
         loadTaskLog();
-
+        btnBack.setOnClickListener(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         taskLogAdapter = new TaskLogAdapter(this, taskLogList);
         recyclerView.setAdapter(taskLogAdapter);
@@ -86,5 +82,13 @@ public class PlantLogActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recycler_view_log);
         plantImage = findViewById(R.id.image_view_log_plant);
         plantName = findViewById(R.id.text_view_log_plant_name);
+        btnBack = findViewById(R.id.ivBack);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v.getId() == R.id.ivBack) {
+            finish();
+        }
     }
 }
