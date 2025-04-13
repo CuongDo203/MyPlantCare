@@ -1,5 +1,6 @@
 package com.example.myplantcare.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.example.myplantcare.R;
@@ -23,6 +24,7 @@ import com.example.myplantcare.databinding.ActivityMainBinding;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
@@ -83,6 +85,23 @@ public class MainActivity extends AppCompatActivity {
         });
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
+
+
+//        xử lý Notification
+        ImageView myImageView = findViewById(R.id.ivNotification);
+        myImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent();
+                i.setClass(MainActivity.this, NotificationActivity.class);
+                startActivity(i);
+            }
+        });
+
+
+
+
+
     }
 
     private void loadFragment(Fragment fragment) {
