@@ -75,23 +75,12 @@ public class PlantInfoDetail extends AppCompatActivity {
             double idealWaterMin = intent.getDoubleExtra("idealWaterMin", 0);
             double idealWaterMax = intent.getDoubleExtra("idealWaterMax", 0);
 
-            Log.d("PlantInfoDetail", "plantId: " + plantId);
-            Log.d("PlantInfoDetail", "plantName: " + plantName);
-            Log.d("PlantInfoDetail", "speciesName: " + speciesName);
-            Log.d("PlantInfoDetail", "idealLight: " + idealLight);
-            Log.d("PlantInfoDetail", "idealTemperatureMin: " + idealTemperatureMin);
-            Log.d("PlantInfoDetail", "idealTemperatureMax: " + idealTemperatureMax);
-            Log.d("PlantInfoDetail", "idealMoistureMin: " + idealMoistureMin);
-            Log.d("PlantInfoDetail", "idealMoistureMax: " + idealMoistureMax);
-            Log.d("PlantInfoDetail", "idealWaterMin: " + idealWaterMin);
-            Log.d("PlantInfoDetail", "idealWaterMax: " + idealWaterMax);
-
             this.plantName.setText(plantName);
             this.speciesName.setText(speciesName);
             this.lightInfo.setText(idealLight);
-//            this.temperatureInfo.setText(String.format("%s - %s C", String.valueOf(idealTemperatureMin), String.valueOf(idealTemperatureMax)));
-//            this.moistureInfo.setText(String.format("%s - %s %%", String.valueOf(idealMoistureMin), String.valueOf(idealMoistureMax)));
-//            this.waterInfo.setText(String.format("%s - %s ml", String.valueOf(idealWaterMin), String.valueOf(idealWaterMax)));
+            this.temperatureInfo.setText(String.format("%s - %s C", String.valueOf(idealTemperatureMin), String.valueOf(idealTemperatureMax)));
+            this.moistureInfo.setText(String.format("%s - %s %%", String.valueOf(idealMoistureMin), String.valueOf(idealMoistureMax)));
+            this.waterInfo.setText(String.format("%s - %s ml", String.valueOf(idealWaterMin), String.valueOf(idealWaterMax)));
             this.plantImage.setImageResource(R.drawable.plant_sample);
         }
     }

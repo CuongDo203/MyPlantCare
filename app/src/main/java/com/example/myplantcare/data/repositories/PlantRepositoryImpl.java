@@ -93,7 +93,6 @@ public class PlantRepositoryImpl implements PlantRepository{
                     }
                 }
 
-                // Xử lý kết quả conditions (results.get(1))
                 QuerySnapshot conditionsResult = (QuerySnapshot) results.get(1);
                 if (conditionsResult != null) {
                     for (QueryDocumentSnapshot doc : conditionsResult) {

@@ -52,12 +52,12 @@ public class PlantInfoAdapter extends RecyclerView.Adapter<PlantInfoAdapter.Plan
             intent.putExtra("plantName", plantInfo.getPlantName());
             intent.putExtra("speciesName", plantInfo.getSpeciesName());
             intent.putExtra("idealLight", plantInfo.getIdealLight());
-//            intent.putExtra("idealTemperatureMin", plantInfo.getIdealTemperatureMin());
-//            intent.putExtra("idealTemperatureMax", plantInfo.getIdealTemperatureMax());
-//            intent.putExtra("idealMoistureMin", plantInfo.getIdealMoistureMin());
-//            intent.putExtra("idealMoistureMax", plantInfo.getIdealMoistureMax());
-//            intent.putExtra("idealWaterMin", plantInfo.getIdealWaterMin());
-//            intent.putExtra("idealWaterMax", plantInfo.getIdealWaterMax());
+            intent.putExtra("idealTemperatureMin", plantInfo.getIdealTemperatureMin());
+            intent.putExtra("idealTemperatureMax", plantInfo.getIdealTemperatureMax());
+            intent.putExtra("idealMoistureMin", plantInfo.getIdealMoistureMin());
+            intent.putExtra("idealMoistureMax", plantInfo.getIdealMoistureMax());
+            intent.putExtra("idealWaterMin", plantInfo.getIdealWaterMin());
+            intent.putExtra("idealWaterMax", plantInfo.getIdealWaterMax());
 
             Log.d("PlantInfoAdapter", "plantId: " + plantInfo.getPlant().getId());
 
