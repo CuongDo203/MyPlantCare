@@ -98,10 +98,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
-
-
     }
 
     private void loadFragment(Fragment fragment) {
