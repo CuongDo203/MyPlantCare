@@ -74,12 +74,13 @@
 
     <!-- Button Xóa tất cả -->
     <Button
+        android:id="@+id/clear_button_notification"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Xóa tất cả thông báo"
-        android:backgroundTint="#007F5F"
-        android:textColor="#FFFFFF"
-        android:textStyle="bold"
         android:layout_marginTop="12dp"
-        android:layout_marginBottom="4dp" />
+        android:layout_marginBottom="4dp"
+        android:backgroundTint="#007F5F"
+        android:text="Xóa tất cả thông báo"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold" />
 </LinearLayout>

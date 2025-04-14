@@ -39,7 +39,13 @@ public class NotificationActivity extends AppCompatActivity {
 
         container.addView(itemView);
 
-        Button clear = findViewById(R.id.notification_layout);
+        Button clear = findViewById(R.id.clear_button_notification);
+        clear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDeleteConfirmationDialog();
+            }
+        });
     }
     // Gọi hàm này khi bạn muốn mở hộp thoại xác nhận
     private void showDeleteConfirmationDialog() {

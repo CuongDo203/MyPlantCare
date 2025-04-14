@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/care_instruction_layout"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -40,8 +41,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:contentDescription="Dropdown"
-            android:src="@drawable/ic_dropdown_arrow_dark" />
+            android:contentDescription="Dropdown"/>
     </LinearLayout>
 
     <!-- CardView chứa thông tin cây -->
@@ -140,7 +140,7 @@
                     android:layout_width="130dp"
                     android:layout_height="130dp"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/monstera_adansonii"
+
                     android:contentDescription="Hình ảnh cây"
                     android:layout_gravity="center_vertical"
                     android:layout_marginStart="16dp"/>
@@ -162,7 +162,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@drawable/spinner_background_gray"
+
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:paddingTop="12dp"
@@ -177,7 +177,7 @@
                 android:spinnerMode="dropdown"
                 android:prompt="@string/choose_season"
                 android:entries="@array/seasons"
-                android:background="@android:color.transparent"
+
                 android:textColor="#00425A"
                 android:textSize="16sp"
                 android:textStyle="normal"
@@ -199,7 +199,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@drawable/spinner_background_gray"
+
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:paddingTop="12dp"
@@ -214,7 +214,7 @@
                 android:spinnerMode="dropdown"
                 android:prompt="@string/choose_city"
                 android:entries="@array/cities"
-                android:background="@android:color.transparent"
+
                 android:textColor="#00425A"
                 android:textSize="16sp"
                 android:textStyle="normal"
