@@ -1,6 +1,6 @@
 package com.example.myplantcare.models;
 public class MyNotification {
-    private NotificationModel notificationModel;
+    private Notification notificationModel;
     private boolean isRead;
     private User user;
 
@@ -8,16 +8,16 @@ public class MyNotification {
     public MyNotification() {
     }
 
-    public MyNotification(NotificationModel notificationModel, User user, boolean isRead) {
+    public MyNotification(Notification notificationModel, User user, boolean isRead) {
         this.notificationModel = notificationModel;
         this.user = user;
         this.isRead = isRead;
     }
-    public NotificationModel getNotificationModel() {
+    public Notification getNotificationModel() {
         return notificationModel;
     }
 
-    public void setNotificationModel(NotificationModel notificationModel) {
+    public void setNotificationModel(Notification notificationModel) {
         this.notificationModel = notificationModel;
     }
 
