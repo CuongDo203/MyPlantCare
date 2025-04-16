@@ -1,6 +1,8 @@
 package com.example.myplantcare.models;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentId;
+import com.google.firebase.firestore.PropertyName;
 import com.google.firebase.firestore.ServerTimestamp;
 
 import java.util.Date;
@@ -14,13 +16,22 @@ public class MyPlantModel {
     private String plantId; // Tham chiếu đến Plant template ID
     private String userId; // Tham chiếu đến User ID
 
+    private String image;
+
     @ServerTimestamp
-    private Date createdAt; // Tự động lấy timestamp từ server khi tạo
+    private Timestamp createdAt; // Tự động lấy timestamp từ server khi tạo
     @ServerTimestamp
-    private Date updatedAt; // Tự động lấy timestamp từ server khi cập nhật
+    private Timestamp updatedAt; // Tự động lấy timestamp từ server khi cập nhật
 
     // Constructor rỗng cần thiết cho Firestore
     public MyPlantModel() {}
+
+    public MyPlantModel(String nickname, String location, double progress, String image) {
+        this.nickname = nickname;
+        this.location = location;
+        this.progress = progress;
+        this.image = image;
+    }
 
     // Getters and Setters cho tất cả các trường...
     public String getId() { return id; }
@@ -28,10 +39,15 @@ public class MyPlantModel {
     public String getNickname() { return nickname; }
     public void setNickname(String nickname) { this.nickname = nickname; }
     // ... các getters/setters khác
-    public Date getCreatedAt() { return createdAt; }
-    public void setCreatedAt(Date createdAt) { this.createdAt = createdAt; }
-    public Date getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(Date updatedAt) { this.updatedAt = updatedAt; }
+
+    @PropertyName("created_at")
+    public Timestamp getCreatedAt() { return createdAt; }
+    @PropertyName("created_at")
+    public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
+    @PropertyName("updated_at")
+    public Timestamp getUpdatedAt() { return updatedAt; }
+    @PropertyName("updated_at")
+    public void setUpdatedAt(Timestamp updatedAt) { this.updatedAt = updatedAt; }
     public String getPlantId() { return plantId; }
     public void setPlantId(String plantId) { this.plantId = plantId; }
     public String getUserId() { return userId; }
@@ -40,4 +56,6 @@ public class MyPlantModel {
     public void setLocation(String location) { this.location = location; }
     public double getProgress() { return progress; }
     public void setProgress(double progress) { this.progress = progress; }
+    public String getImage() { return image; }
+    public void setImage(String image) { this.image = image; }
 }

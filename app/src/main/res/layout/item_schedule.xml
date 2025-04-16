@@ -8,6 +8,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:minHeight="20dp"
         android:orientation="vertical"
         android:paddingLeft="8dp">
 
@@ -41,7 +42,9 @@
             android:id="@+id/recyclerViewTasks"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:nestedScrollingEnabled="false" />
+            android:minHeight="40dp"
+
+            />
 
     </LinearLayout>
 

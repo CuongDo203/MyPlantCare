@@ -1,5 +1,6 @@
 package com.example.myplantcare.adapters;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,15 +11,17 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myplantcare.R;
+import com.example.myplantcare.data.responses.ScheduleWithMyPlantInfo;
 import com.example.myplantcare.models.TaskModel;
+import com.example.myplantcare.utils.DateUtils;
 
 import java.util.List;
 
-public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
+public class ScheduleDetailAdapter extends RecyclerView.Adapter<ScheduleDetailAdapter.TaskViewHolder> {
 
-    private List<TaskModel> taskList;
+    private List<ScheduleWithMyPlantInfo> taskList;
 
-    public TaskAdapter(List<TaskModel> taskList) {
+    public ScheduleDetailAdapter(List<ScheduleWithMyPlantInfo> taskList) {
         this.taskList = taskList;
     }
 
@@ -31,9 +34,14 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
-        TaskModel task = taskList.get(position);
-        holder.taskDetails.setText(task.getDetails());
-        holder.taskCompleted.setChecked(task.isCompleted());
+        ScheduleWithMyPlantInfo task = taskList.get(position);
+        Log.d("ScheduleDetailAdapter", "Schedule ID: "+task.getSchedule().getId());
+        String taskDetail = task.getMyPlantNickname()+" - "+
+                DateUtils.formatTimestamp(task.getScheduleTime(), DateUtils.TIME_FORMAT_DISPLAY)
+                +" - "+task.getMyPlantLocation();
+        holder.taskDetails.setText(taskDetail);
+
+        holder.taskCompleted.setChecked(false);
     }
 
     @Override

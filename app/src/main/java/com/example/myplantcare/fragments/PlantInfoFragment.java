@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 
 import com.example.myplantcare.R;
 import com.example.myplantcare.adapters.PlantInfoAdapter;
+import com.example.myplantcare.data.responses.PlantResponse;
 import com.example.myplantcare.models.PlantModel;
 import com.example.myplantcare.viewmodels.PlantInfoViewModel;
 
@@ -25,7 +26,7 @@ public class PlantInfoFragment extends Fragment {
     private RecyclerView recyclerView;
     private PlantInfoAdapter plantInfoAdapter;
     private PlantInfoViewModel plantInfoViewModel;
-    List<PlantModel> plantInfos;
+    List<PlantResponse> plantInfos;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -59,7 +60,6 @@ public class PlantInfoFragment extends Fragment {
         plantInfos = new ArrayList<>();
         recyclerView = view.findViewById(R.id.recyclerViewPlantInfo);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-        Log.d("PlantInfo", "Số lượng cây: " + plantInfos.size());
         plantInfoAdapter = new PlantInfoAdapter(plantInfos);
         recyclerView.setAdapter(plantInfoAdapter);
     }

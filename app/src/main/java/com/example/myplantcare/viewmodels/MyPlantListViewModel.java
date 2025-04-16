@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.myplantcare.data.repositories.MyPlantRepository;
+import com.example.myplantcare.data.repositories.MyPlantRepositoryImpl;
 import com.example.myplantcare.models.MyPlantModel;
 import com.example.myplantcare.utils.FirestoreCallback;
 
@@ -20,12 +21,9 @@ public class MyPlantListViewModel extends ViewModel {
     private final MutableLiveData<Boolean> _isLoading = new MutableLiveData<>();
     public final LiveData<Boolean> isLoading = _isLoading;
 
-
-    // Constructor (nên được inject qua Factory hoặc Hilt)
-    public MyPlantListViewModel(MyPlantRepository repository, String userId) {
-        this.myPlantRepository = repository;
-        this.currentUserId = userId;
-        // Gọi loadMyPlants ngay khi ViewModel được tạo và có userId
+    public MyPlantListViewModel(String currentUserId) {
+        myPlantRepository  = new MyPlantRepositoryImpl();
+        this.currentUserId = currentUserId;
         loadMyPlants();
     }
 

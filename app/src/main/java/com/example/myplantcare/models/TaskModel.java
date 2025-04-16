@@ -1,21 +1,28 @@
 package com.example.myplantcare.models;
 
+import com.google.firebase.firestore.DocumentId;
+
 public class TaskModel {
+    @DocumentId
+    private String id;
 
-    private String details;
-    private boolean isCompleted;
+    private String name;
 
-    public TaskModel(String details, boolean isCompleted) {
-        this.details = details;
-        this.isCompleted = isCompleted;
+    private boolean description;
+
+    public TaskModel() {}
+
+    public TaskModel(String name, boolean description) {
+        this.name = name;
+        this.description = description;
     }
 
-    public String getDetails() {
-        return details;
+    public String getName() {
+        return name;
     }
 
-    public boolean isCompleted() {
-        return isCompleted;
+    public boolean isDescription() {
+        return description;
     }
 
 }

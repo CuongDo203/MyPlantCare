@@ -1,39 +1,73 @@
 package com.example.myplantcare.models;
 
-import java.util.List;
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentId;
+import com.google.firebase.firestore.Exclude;
+import com.google.firebase.firestore.PropertyName;
 
 public class ScheduleModel {
-    private String taskName;
-    private String taskType;
-    private List<TaskModel> tasks;
+    @DocumentId
+    private String id;
+    private String taskId;
+    private Integer frequency;
+    private Timestamp startDate;
+    private Timestamp time;
+    @Exclude
+    private String myPlantId;
 
-    public ScheduleModel(String taskName, List<TaskModel> tasks, String taskType) {
-        this.taskName = taskName;
-        this.tasks = tasks;
-        this.taskType = taskType;
+    public ScheduleModel() {
     }
 
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
+    public String getId() {
+        return id;
     }
 
-    public String getTaskType() {
-        return taskType;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public void setTaskType(String taskType) {
-        this.taskType = taskType;
+    public Integer getFrequency() {
+        return frequency;
     }
 
-    public void setTasks(List<TaskModel> tasks) {
-        this.tasks = tasks;
+    public void setFrequency(Integer frequency) {
+        this.frequency = frequency;
+    }
+    @PropertyName("start_date")
+    public Timestamp getStartDate() {
+        return startDate;
+    }
+    @PropertyName("start_date")
+    public void setStartDate(Timestamp startDate) {
+        this.startDate = startDate;
     }
 
-    public String getTaskName() {
-        return taskName;
+
+    public Timestamp getTime() {
+        return time;
     }
 
-    public List<TaskModel> getTasks() {
-        return tasks;
+    public void setTime(Timestamp time) {
+        this.time = time;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
+
+
+    public String getTaskId() {
+        return taskId;
+    }
+
+    @Override
+    public String toString() {
+        return "ScheduleModel{" +
+                "id='" + id + '\'' +
+                ", taskId='" + taskId + '\'' +
+                ", frequency='" + frequency + '\'' +
+                ", startDate=" + startDate +
+                ", time='" + time + '\'' +
+                '}';
     }
 }

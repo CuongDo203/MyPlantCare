@@ -31,7 +31,7 @@
             android:textColor="@color/green_text2"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:id="@+id/plant_location"
+            android:id="@+id/species"
             />
 
         <TextView
@@ -173,6 +173,7 @@
     </LinearLayout>
 
     <ImageView
+        android:id="@+id/plant_image"
         android:layout_width="wrap_content"
         android:layout_height="260dp"
         android:src="@drawable/plant_sample"
