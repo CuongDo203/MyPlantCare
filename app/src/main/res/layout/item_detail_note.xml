@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:layout_marginBottom="8dp">
+
+    <FrameLayout
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginEnd="12dp"
+        android:background="#AEC1A5">
+
+        <ImageView
+            android:id="@+id/image_note"
+            android:layout_width="match_parent"
+            android:layout_height="83dp"
+            android:contentDescription="Note Image"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_add" />
+
+        <TextView
+            android:id="@+id/text_add_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center|bottom"
+            android:gravity="center"
+            android:text="Thêm ảnh"
+            android:textColor="#333"
+            android:textSize="12sp" />
+    </FrameLayout>
+
+    <EditText
+        android:id="@+id/edit_note_content"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:layout_weight="1"
+        android:background="@android:color/transparent"
+        android:hint="Ghi chú..."
+        android:inputType="textMultiLine"
+        android:gravity="top|start"
+        android:textColor="#000"
+        android:textSize="14sp" />
+</LinearLayout>
