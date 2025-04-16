@@ -3,7 +3,7 @@
     android:id="@+id/insider_toolbar"
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
-    android:background="white">
+    android:background="@color/white">
 
     <ImageButton
         android:id="@+id/toolbar_back_button"

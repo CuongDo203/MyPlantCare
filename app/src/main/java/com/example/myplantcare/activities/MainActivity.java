@@ -18,7 +18,6 @@ import com.example.myplantcare.fragments.PlantFragment;
 import com.example.myplantcare.fragments.ScheduleFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-
 import android.view.View;
 
 
