@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
             } else if (itemId == R.id.nav_plant) {
                 fragment = new PlantFragment();
             } else if (itemId == R.id.nav_note) {
-                fragment = null;
+                fragment = new Note;
             }
             else if (itemId == R.id.nav_statics){
                 fragment = null;

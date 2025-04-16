@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.myplantcare.MainActivity;
 import com.example.myplantcare.R;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
