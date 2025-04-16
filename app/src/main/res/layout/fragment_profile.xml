@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <!-- Mục 1: Số loại cây trồng hiện có -->
+    <include layout="@layout/growplant_row"
+        android:id="@+id/itemPlants"/>
+<!--        android:tag="Số loại cây trồng hiện có : 5"-->
+<!--        />-->
+
+    <!-- Mục 2: Ngôn ngữ -->
+    <include layout="@layout/language_row"
+        android:id="@+id/itemLanguage"/>
+<!--        android:tag="Ngôn ngữ"-->
+<!--        />-->
+
+    <!-- Mục 3: Giao diện -->
+    <include layout="@layout/theme_row"
+        android:id="@+id/itemTheme"/>
+<!--        android:tag="Giao diện"-->
+<!--        />-->
+
+    <!-- Mục 4: Phản hồi -->
+    <include layout="@layout/feedback_row"
+        android:id="@+id/itemFeedback"/>
+<!--        android:tag="Phản hồi"-->
+<!--        />-->
+
+    <!-- Mục 5: Về chúng tôi -->
+    <include layout="@layout/aboutus_row"
+        android:id="@+id/itemAboutUs"/>
+<!--        android:tag="Về chúng tôi"-->
+<!--        />-->
+
+    <!-- Mục 6: Thông tin cây -->
+    <include layout="@layout/plantinfo_row"
+        android:id="@+id/itemPlantInfo"/>
+<!--        android:tag="Thông tin cây"-->
+<!--        />-->
+
+    <!-- Mục 7: Sổ tay hướng dẫn -->
+    <include layout="@layout/guide_row"
+        android:id="@+id/itemGuide"/>
+<!--        android:tag="Sổ tay hướng dẫn"-->
+<!--        />-->
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#DDD"
+        android:layout_marginVertical="8dp"/>
+
+    <!-- Mục 8: Đổi mật khẩu -->
+    <include layout="@layout/changepassword_row"
+        android:id="@+id/itemChangePassword"/>
+<!--        android:tag="Đổi mật khẩu"-->
+<!--        />-->
+
+    <!-- Mục 9: Đăng xuất -->
+    <include layout="@layout/logout_row"
+        android:id="@+id/itemLogout"/>
+<!--        android:tag="Đăng xuất"-->
+<!--        />-->
+
+</LinearLayout>

@@ -12,8 +12,7 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/white"
-        >
+        android:background="@color/white">
 
         <!-- Toolbar tùy chỉnh -->
         <androidx.appcompat.widget.Toolbar
@@ -82,6 +81,7 @@
         android:layout_marginTop="?attr/actionBarSize"
         android:layout_marginBottom="@dimen/bottom_nav_height"
         />
+         >
 
     <!-- Thanh điều hướng dưới (Bottom Navigation) -->
     <com.google.android.material.bottomnavigation.BottomNavigationView

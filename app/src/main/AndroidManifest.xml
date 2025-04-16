@@ -54,7 +54,8 @@
         <activity
             android:name=".activities.MainActivity"
             android:exported="false"
-            android:theme="@style/Theme.MyPlantCare" />
+            android:theme="@style/Theme.MyPlantCare"
+            />
 
         <meta-data
             android:name="preloaded_fonts"
