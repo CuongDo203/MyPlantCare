@@ -1,8 +1,7 @@
-package com.example.myplantcare.activities;
+package com.example.myplantcare;
 
 import android.os.Bundle;
 
-import com.example.myplantcare.R;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,9 +15,6 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.example.myplantcare.databinding.ActivityMainBinding;
 
-import android.view.Menu;
-import android.view.MenuItem;
-
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration appBarConfiguration;
@@ -31,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        setSupportActionBar(binding.toolbar);
+        setSupportActionBar((binding));
 
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
