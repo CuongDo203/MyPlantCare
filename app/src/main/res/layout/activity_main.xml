@@ -12,8 +12,7 @@
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="@color/white"
-        >
+        android:background="@color/white">
 
         <!-- Toolbar tùy chỉnh -->
         <androidx.appcompat.widget.Toolbar
@@ -83,20 +82,20 @@
         android:layout_above="@id/bottomNavigation"
         android:background="@color/white"
         android:layout_marginTop="?attr/actionBarSize"
-        android:layout_marginBottom="@dimen/bottom_nav_height"
-        />
+         >
 
-    <!-- Thanh điều hướng dưới (Bottom Navigation) -->
+    </FrameLayout>
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
         android:layout_height="90dp"
         android:layout_gravity="bottom"
         android:background="@drawable/bg_bottom_nav"
-        app:labelVisibilityMode="unlabeled"
-        app:menu="@menu/menu_bottom_nav"
+        android:elevation="8dp"
         app:itemIconTint="@color/nav_item_color_state"
         app:itemTextColor="@color/nav_item_color_state"
-        android:elevation="8dp"
-        />
+        app:labelVisibilityMode="unlabeled"
+        app:menu="@menu/menu_bottom_nav" />
+    <!-- Thanh điều hướng dưới (Bottom Navigation) -->
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

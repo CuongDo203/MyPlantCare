@@ -2,30 +2,28 @@ package com.example.myplantcare.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
+
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.ui.AppBarConfiguration;
 
 import com.example.myplantcare.R;
+import com.example.myplantcare.databinding.ActivityMainBinding;
 import com.example.myplantcare.fragments.HomeFragment;
+import com.example.myplantcare.fragments.NoteFragment;
 import com.example.myplantcare.fragments.PlantFragment;
 import com.example.myplantcare.fragments.ScheduleFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import androidx.appcompat.app.AppCompatActivity;
 
 import android.view.View;
 
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
-import com.example.myplantcare.databinding.ActivityMainBinding;
-
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.ImageView;
-import android.widget.Toast;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -71,7 +69,8 @@ public class MainActivity extends AppCompatActivity {
             } else if (itemId == R.id.nav_plant) {
                 fragment = new PlantFragment();
             } else if (itemId == R.id.nav_note) {
-                fragment = new Note;
+
+                fragment = new NoteFragment();
             }
             else if (itemId == R.id.nav_statics){
                 fragment = null;
@@ -97,8 +96,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
-
     }
+
     private void loadFragment(Fragment fragment) {
         getSupportFragmentManager()
                 .beginTransaction()

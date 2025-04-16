@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/noteFragment">
+
+    <fragment
+        android:id="@+id/noteFragment"
+        android:name="com.example.myplantcare.fragments.NoteFragment"
+        android:label="Ghi chú"
+        tools:layout="@layout/fragment_note" >
+        <action
+            android:id="@+id/action_noteFragment_to_detailNoteFragment"
+            app:destination="@id/recycler_detail_notes" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/recycler_detail_notes"
+        android:name="com.example.myplantcare.fragments.DetailNoteFragment"
+        android:label="Ghi chú"
+        tools:layout="@layout/fragment_detail_note" />
+</navigation>
