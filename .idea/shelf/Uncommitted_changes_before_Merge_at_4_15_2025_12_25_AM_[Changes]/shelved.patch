@@ -1,0 +1,279 @@
+Index: app/src/main/res/layout/activity_notification.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    android:id=\"@+id/notification_layout\"\r\n    android:layout_width=\"match_parent\"\r\n    android:layout_height=\"match_parent\"\r\n    android:orientation=\"vertical\"\r\n    android:background=\"#FFFFFF\"\r\n    android:padding=\"16dp\">\r\n\r\n    <!-- Header -->\r\n    <LinearLayout\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:orientation=\"horizontal\"\r\n        android:gravity=\"center_vertical\"\r\n        android:paddingBottom=\"8dp\">\r\n\r\n        <!-- Back icon (placeholder) -->\r\n        <ImageView\r\n            android:layout_width=\"24dp\"\r\n            android:layout_height=\"24dp\"\r\n            android:src=\"@drawable/arrow_notification\" />\r\n\r\n        <LinearLayout\r\n            android:layout_width=\"0dp\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:layout_weight=\"1\"\r\n            android:orientation=\"vertical\"\r\n            android:gravity=\"center\">\r\n\r\n            <ImageView\r\n                android:layout_width=\"40dp\"\r\n                android:layout_height=\"40dp\"\r\n                android:src=\"@drawable/logo\"\r\n                android:layout_marginBottom=\"4dp\" />\r\n\r\n            <TextView\r\n                android:layout_width=\"wrap_content\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:text=\"PlantCare\"\r\n                android:textColor=\"#007F5F\"\r\n                android:textStyle=\"bold\"\r\n                android:textSize=\"16sp\" />\r\n        </LinearLayout>\r\n\r\n        <!-- Placeholder for right space -->\r\n        <View\r\n            android:layout_width=\"24dp\"\r\n            android:layout_height=\"24dp\" />\r\n    </LinearLayout>\r\n\r\n    <!-- Title -->\r\n    <TextView\r\n        android:layout_width=\"wrap_content\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:text=\"Thông báo\"\r\n        android:textSize=\"18sp\"\r\n        android:textStyle=\"bold\"\r\n        android:textColor=\"#000000\"\r\n        android:layout_marginBottom=\"8dp\" />\r\n\r\n    <ScrollView\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"0dp\"\r\n        android:layout_weight=\"1\">\r\n\r\n        <LinearLayout\r\n            android:id=\"@+id/notificationContainer\"\r\n            android:layout_width=\"match_parent\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:orientation=\"vertical\" />\r\n    </ScrollView>\r\n\r\n\r\n    <!-- Button Xóa tất cả -->\r\n    <Button\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:text=\"Xóa tất cả thông báo\"\r\n        android:backgroundTint=\"#007F5F\"\r\n        android:textColor=\"#FFFFFF\"\r\n        android:textStyle=\"bold\"\r\n        android:layout_marginTop=\"12dp\"\r\n        android:layout_marginBottom=\"4dp\" />\r\n</LinearLayout>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/activity_notification.xml b/app/src/main/res/layout/activity_notification.xml
+--- a/app/src/main/res/layout/activity_notification.xml	(revision b9491641bc7bf9e959017d774fcfbb753fe1b6a4)
++++ b/app/src/main/res/layout/activity_notification.xml	(date 1744651495039)
+@@ -74,6 +74,7 @@
+ 
+     <!-- Button Xóa tất cả -->
+     <Button
++        android:id="@+id/clear_button_notification"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:text="Xóa tất cả thông báo"
+Index: app/src/main/java/com/example/myplantcare/activities/NotificationActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.myplantcare.activities;\r\nimport android.content.DialogInterface;\r\nimport android.os.Bundle;\r\nimport android.view.View;\r\nimport android.widget.Button;\r\nimport android.widget.LinearLayout;\r\nimport android.widget.TextView;\r\nimport android.widget.Toast;\r\n\r\nimport androidx.activity.EdgeToEdge;\r\nimport androidx.appcompat.app.AlertDialog;\r\nimport androidx.appcompat.app.AppCompatActivity;\r\nimport androidx.core.graphics.Insets;\r\nimport androidx.core.view.ViewCompat;\r\nimport androidx.core.view.WindowInsetsCompat;\r\nimport com.example.myplantcare.R;\r\npublic class NotificationActivity extends AppCompatActivity {\r\n\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        EdgeToEdge.enable(this);\r\n        setContentView(R.layout.activity_notification);\r\n        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.notification_layout), (v, insets) -> {\r\n            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());\r\n            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);\r\n            return insets;\r\n        });\r\n        LinearLayout container = findViewById(R.id.notificationContainer);\r\n        View itemView = getLayoutInflater().inflate(R.layout.item_notification, container, false);\r\n\r\n        TextView tvMessage = itemView.findViewById(R.id.tvContent);\r\n        TextView tvTime = itemView.findViewById(R.id.tvTime);\r\n        TextView tvCount = itemView.findViewById(R.id.tvNumber);\r\n\r\n        tvMessage.setText(\"Cây xương rồng cần được tưới nước.\");\r\n        tvTime.setText(\"Vừa xong\");\r\n        tvCount.setText(\"1\");\r\n\r\n        container.addView(itemView);\r\n\r\n        Button clear = findViewById(R.id.notification_layout);\r\n    }\r\n    // Gọi hàm này khi bạn muốn mở hộp thoại xác nhận\r\n    private void showDeleteConfirmationDialog() {\r\n        AlertDialog.Builder builder = new AlertDialog.Builder(this);\r\n        builder.setTitle(\"Xác nhận xóa\");\r\n        builder.setMessage(\"Bạn có chắc chắn muốn xóa không?\");\r\n\r\n        // Nút Quay lại\r\n        builder.setNegativeButton(\"Quay lại\", new DialogInterface.OnClickListener() {\r\n            @Override\r\n            public void onClick(DialogInterface dialog, int which) {\r\n                dialog.dismiss(); // Đóng dialog\r\n            }\r\n        });\r\n\r\n        // Nút Đồng ý\r\n        builder.setPositiveButton(\"Đồng ý\", new DialogInterface.OnClickListener() {\r\n            @Override\r\n            public void onClick(DialogInterface dialog, int which) {\r\n                // Xử lý xóa dữ liệu tại đây\r\n                Toast.makeText(NotificationActivity.this, \"Đã xóa\", Toast.LENGTH_SHORT).show();\r\n            }\r\n        });\r\n\r\n        AlertDialog dialog = builder.create();\r\n        dialog.show();\r\n    }\r\n\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/myplantcare/activities/NotificationActivity.java b/app/src/main/java/com/example/myplantcare/activities/NotificationActivity.java
+--- a/app/src/main/java/com/example/myplantcare/activities/NotificationActivity.java	(revision b9491641bc7bf9e959017d774fcfbb753fe1b6a4)
++++ b/app/src/main/java/com/example/myplantcare/activities/NotificationActivity.java	(date 1744651495036)
+@@ -39,7 +39,13 @@
+ 
+         container.addView(itemView);
+ 
+-        Button clear = findViewById(R.id.notification_layout);
++        Button clear = findViewById(R.id.clear_button_notification);
++        clear.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View v) {
++                showDeleteConfirmationDialog();
++            }
++        });
+     }
+     // Gọi hàm này khi bạn muốn mở hộp thoại xác nhận
+     private void showDeleteConfirmationDialog() {
+Index: app/src/main/res/layout/activity_care_instruction.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    xmlns:app=\"http://schemas.android.com/apk/res-auto\"\r\n    android:layout_width=\"match_parent\"\r\n    android:layout_height=\"match_parent\"\r\n    android:orientation=\"vertical\"\r\n    android:background=\"#F5F5F5\">\r\n\r\n    <!-- Thanh tiêu đề -->\r\n    <LinearLayout\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"207dp\"\r\n        android:gravity=\"center_vertical\"\r\n        android:orientation=\"horizontal\"\r\n        android:paddingStart=\"16dp\"\r\n        android:paddingTop=\"16dp\"\r\n        android:paddingEnd=\"16dp\"\r\n        android:paddingBottom=\"8dp\">\r\n\r\n        <!-- Spinner \"Chọn cây của bạn\" -->\r\n\r\n        <ImageView\r\n            android:id=\"@+id/backButton\"\r\n            android:layout_width=\"wrap_content\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:layout_marginEnd=\"8dp\"\r\n            android:contentDescription=\"Quay lại\"\r\n            android:src=\"@drawable/arrow_notification\" />\r\n\r\n        <Spinner\r\n            android:id=\"@+id/plantCategorySpinner\"\r\n            android:layout_width=\"0dp\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:layout_weight=\"1\"\r\n            android:entries=\"@array/plant_categories\"\r\n            android:prompt=\"@string/choose_plant_category\"\r\n            android:spinnerMode=\"dropdown\" />\r\n\r\n        <ImageView\r\n            android:layout_width=\"wrap_content\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:layout_marginStart=\"8dp\"\r\n            android:contentDescription=\"Dropdown\"\r\n            android:src=\"@drawable/ic_dropdown_arrow_dark\" />\r\n    </LinearLayout>\r\n\r\n    <!-- CardView chứa thông tin cây -->\r\n    <androidx.cardview.widget.CardView\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_marginStart=\"16dp\"\r\n        android:layout_marginEnd=\"16dp\"\r\n        android:layout_marginTop=\"8dp\"\r\n        app:cardCornerRadius=\"20dp\"\r\n        app:cardBackgroundColor=\"#F0FDF4\">\r\n\r\n        <LinearLayout\r\n            android:layout_width=\"match_parent\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:orientation=\"vertical\"\r\n            android:padding=\"16dp\">\r\n\r\n            <TextView\r\n                android:layout_width=\"wrap_content\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:text=\"Indoor\"\r\n                android:textSize=\"14sp\"\r\n                android:textColor=\"#00425A\"\r\n                android:alpha=\"0.7\"/>\r\n\r\n            <TextView\r\n                android:id=\"@+id/plantNameTextView\"\r\n                android:layout_width=\"wrap_content\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:text=\"Monstera\\nAdansonii\"\r\n                android:textSize=\"32sp\"\r\n                android:textColor=\"#00425A\"\r\n                android:textStyle=\"bold\"\r\n                android:layout_marginTop=\"4dp\"/>\r\n\r\n            <LinearLayout\r\n                android:layout_width=\"match_parent\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:orientation=\"horizontal\"\r\n                android:layout_marginTop=\"16dp\">\r\n\r\n                <LinearLayout\r\n                    android:layout_width=\"0dp\"\r\n                    android:layout_height=\"wrap_content\"\r\n                    android:layout_weight=\"1\"\r\n                    android:orientation=\"vertical\">\r\n\r\n                    <TextView\r\n                        android:layout_width=\"wrap_content\"\r\n                        android:layout_height=\"wrap_content\"\r\n                        android:text=\"AGE\"\r\n                        android:textSize=\"14sp\"\r\n                        android:textColor=\"#00425A\"\r\n                        android:alpha=\"0.7\"/>\r\n\r\n                    <TextView\r\n                        android:id=\"@+id/plantAgeTextView\"\r\n                        android:layout_width=\"wrap_content\"\r\n                        android:layout_height=\"wrap_content\"\r\n                        android:text=\"2w\"\r\n                        android:textSize=\"20sp\"\r\n                        android:textColor=\"#00425A\"\r\n                        android:textStyle=\"bold\"\r\n                        android:layout_marginTop=\"4dp\"/>\r\n                </LinearLayout>\r\n\r\n                <LinearLayout\r\n                    android:layout_width=\"0dp\"\r\n                    android:layout_height=\"wrap_content\"\r\n                    android:layout_weight=\"1\"\r\n                    android:orientation=\"vertical\"\r\n                    android:layout_marginStart=\"24dp\">\r\n\r\n                    <TextView\r\n                        android:layout_width=\"wrap_content\"\r\n                        android:layout_height=\"wrap_content\"\r\n                        android:text=\"SIZE\"\r\n                        android:textSize=\"14sp\"\r\n                        android:textColor=\"#00425A\"\r\n                        android:alpha=\"0.7\"/>\r\n\r\n                    <TextView\r\n                        android:id=\"@+id/plantSizeTextView\"\r\n                        android:layout_width=\"wrap_content\"\r\n                        android:layout_height=\"wrap_content\"\r\n                        android:text=\"30 cm\"\r\n                        android:textSize=\"20sp\"\r\n                        android:textColor=\"#00425A\"\r\n                        android:textStyle=\"bold\"\r\n                        android:layout_marginTop=\"4dp\"/>\r\n                </LinearLayout>\r\n\r\n                <ImageView\r\n                    android:id=\"@+id/plantImageView\"\r\n                    android:layout_width=\"130dp\"\r\n                    android:layout_height=\"130dp\"\r\n                    android:scaleType=\"centerCrop\"\r\n                    android:src=\"@drawable/monstera_adansonii\"\r\n                    android:contentDescription=\"Hình ảnh cây\"\r\n                    android:layout_gravity=\"center_vertical\"\r\n                    android:layout_marginStart=\"16dp\"/>\r\n            </LinearLayout>\r\n        </LinearLayout>\r\n    </androidx.cardview.widget.CardView>\r\n\r\n    <!-- Các Spinner chọn mùa và khu vực -->\r\n    <LinearLayout\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:orientation=\"horizontal\"\r\n        android:paddingStart=\"16dp\"\r\n        android:paddingEnd=\"16dp\"\r\n        android:layout_marginTop=\"24dp\">\r\n\r\n        <!-- Spinner \"Chọn Mùa\" -->\r\n        <LinearLayout\r\n            android:layout_width=\"0dp\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:layout_weight=\"1\"\r\n            android:background=\"@drawable/spinner_background_gray\"\r\n            android:paddingStart=\"16dp\"\r\n            android:paddingEnd=\"16dp\"\r\n            android:paddingTop=\"12dp\"\r\n            android:paddingBottom=\"12dp\"\r\n            android:gravity=\"center_vertical\">\r\n\r\n            <Spinner\r\n                android:id=\"@+id/seasonSpinner\"\r\n                android:layout_width=\"0dp\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:layout_weight=\"1\"\r\n                android:spinnerMode=\"dropdown\"\r\n                android:prompt=\"@string/choose_season\"\r\n                android:entries=\"@array/seasons\"\r\n                android:background=\"@android:color.transparent\"\r\n                android:textColor=\"#00425A\"\r\n                android:textSize=\"16sp\"\r\n                android:textStyle=\"normal\"\r\n                />\r\n        </LinearLayout>\r\n\r\n    </LinearLayout>\r\n\r\n    <LinearLayout\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:orientation=\"horizontal\"\r\n        android:paddingStart=\"16dp\"\r\n        android:paddingEnd=\"16dp\"\r\n        android:layout_marginTop=\"8dp\">\r\n\r\n        <!-- Spinner \"Chọn Khu vực\" -->\r\n        <LinearLayout\r\n            android:layout_width=\"0dp\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:layout_weight=\"1\"\r\n            android:background=\"@drawable/spinner_background_gray\"\r\n            android:paddingStart=\"16dp\"\r\n            android:paddingEnd=\"16dp\"\r\n            android:paddingTop=\"12dp\"\r\n            android:paddingBottom=\"12dp\"\r\n            android:gravity=\"center_vertical\">\r\n\r\n            <Spinner\r\n                android:id=\"@+id/citySpinner\"\r\n                android:layout_width=\"0dp\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:layout_weight=\"1\"\r\n                android:spinnerMode=\"dropdown\"\r\n                android:prompt=\"@string/choose_city\"\r\n                android:entries=\"@array/cities\"\r\n                android:background=\"@android:color.transparent\"\r\n                android:textColor=\"#00425A\"\r\n                android:textSize=\"16sp\"\r\n                android:textStyle=\"normal\"\r\n                />\r\n        </LinearLayout>\r\n    </LinearLayout>\r\n\r\n    <!-- Nút \"Tạo hướng dẫn\" -->\r\n    <Button\r\n        android:id=\"@+id/createGuideButton\"\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_marginStart=\"16dp\"\r\n        android:layout_marginEnd=\"16dp\"\r\n        android:layout_marginTop=\"32dp\"\r\n        android:text=\"Tạo hướng dẫn\"\r\n        android:textAllCaps=\"false\"\r\n        android:textColor=\"#FFFFFF\"\r\n        android:backgroundTint=\"#16A34A\"\r\n        android:insetTop=\"0dp\"\r\n        android:insetBottom=\"0dp\"/>\r\n</LinearLayout>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/activity_care_instruction.xml b/app/src/main/res/layout/activity_care_instruction.xml
+--- a/app/src/main/res/layout/activity_care_instruction.xml	(revision b9491641bc7bf9e959017d774fcfbb753fe1b6a4)
++++ b/app/src/main/res/layout/activity_care_instruction.xml	(date 1744651495038)
+@@ -1,5 +1,6 @@
+ <?xml version="1.0" encoding="utf-8"?>
+ <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
++    android:id="@+id/care_layout"
+     xmlns:app="http://schemas.android.com/apk/res-auto"
+     android:layout_width="match_parent"
+     android:layout_height="match_parent"
+@@ -8,16 +9,15 @@
+ 
+     <!-- Thanh tiêu đề -->
+     <LinearLayout
++        android:id="@+id/headerLayout"
+         android:layout_width="match_parent"
+-        android:layout_height="207dp"
+-        android:gravity="center_vertical"
++        android:layout_height="wrap_content"
+         android:orientation="horizontal"
++        android:gravity="center_vertical"
+         android:paddingStart="16dp"
+         android:paddingTop="16dp"
+         android:paddingEnd="16dp"
+-        android:paddingBottom="8dp">
+-
+-        <!-- Spinner "Chọn cây của bạn" -->
++        android:paddingBottom="24dp">
+ 
+         <ImageView
+             android:id="@+id/backButton"
+@@ -27,21 +27,23 @@
+             android:contentDescription="Quay lại"
+             android:src="@drawable/arrow_notification" />
+ 
++        <!-- Spinner "Chọn cây của bạn" -->
+         <Spinner
+             android:id="@+id/plantCategorySpinner"
+-            android:layout_width="0dp"
++            android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_weight="1"
+-            android:entries="@array/plant_categories"
+-            android:prompt="@string/choose_plant_category"
+-            android:spinnerMode="dropdown" />
++            android:spinnerMode="dropdown"
++            android:prompt="Choose Plant Category"
++            android:entries="@array/plant_categories" />
++
++
+ 
+         <ImageView
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_marginStart="8dp"
+-            android:contentDescription="Dropdown"
+-            android:src="@drawable/ic_dropdown_arrow_dark" />
++            android:contentDescription="Dropdown"/>
+     </LinearLayout>
+ 
+     <!-- CardView chứa thông tin cây -->
+@@ -140,7 +142,6 @@
+                     android:layout_width="130dp"
+                     android:layout_height="130dp"
+                     android:scaleType="centerCrop"
+-                    android:src="@drawable/monstera_adansonii"
+                     android:contentDescription="Hình ảnh cây"
+                     android:layout_gravity="center_vertical"
+                     android:layout_marginStart="16dp"/>
+@@ -152,22 +153,29 @@
+     <LinearLayout
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+-        android:orientation="horizontal"
++        android:orientation="vertical"
+         android:paddingStart="16dp"
+         android:paddingEnd="16dp"
+         android:layout_marginTop="24dp">
+ 
+         <!-- Spinner "Chọn Mùa" -->
+         <LinearLayout
+-            android:layout_width="0dp"
++            android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+-            android:layout_weight="1"
+-            android:background="@drawable/spinner_background_gray"
++            android:orientation="horizontal"
++            android:gravity="center_vertical"
+             android:paddingStart="16dp"
+             android:paddingEnd="16dp"
+             android:paddingTop="12dp"
+-            android:paddingBottom="12dp"
+-            android:gravity="center_vertical">
++            android:paddingBottom="12dp">
++
++            <TextView
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:text="Mùa:"
++                android:textSize="16sp"
++                android:textColor="#00425A"
++                android:layout_marginEnd="8dp"/> <!-- Added "Mùa:" text -->
+ 
+             <Spinner
+                 android:id="@+id/seasonSpinner"
+@@ -175,36 +183,40 @@
+                 android:layout_height="wrap_content"
+                 android:layout_weight="1"
+                 android:spinnerMode="dropdown"
+-                android:prompt="@string/choose_season"
+-                android:entries="@array/seasons"
+-                android:background="@android:color.transparent"
++
+                 android:textColor="#00425A"
+                 android:textSize="16sp"
+                 android:textStyle="normal"
+-                />
++            />
+         </LinearLayout>
+-
+     </LinearLayout>
+ 
+     <LinearLayout
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+-        android:orientation="horizontal"
++        android:orientation="vertical"
+         android:paddingStart="16dp"
+         android:paddingEnd="16dp"
+         android:layout_marginTop="8dp">
+ 
+         <!-- Spinner "Chọn Khu vực" -->
+         <LinearLayout
+-            android:layout_width="0dp"
++            android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+-            android:layout_weight="1"
+-            android:background="@drawable/spinner_background_gray"
++            android:orientation="horizontal"
++            android:gravity="center_vertical"
+             android:paddingStart="16dp"
+             android:paddingEnd="16dp"
+             android:paddingTop="12dp"
+-            android:paddingBottom="12dp"
+-            android:gravity="center_vertical">
++            android:paddingBottom="12dp">
++
++            <TextView
++                android:layout_width="wrap_content"
++                android:layout_height="wrap_content"
++                android:text="Khu vực:"
++                android:textSize="16sp"
++                android:textColor="#00425A"
++                android:layout_marginEnd="8dp"/> <!-- Added "Khu vực:" text -->
+ 
+             <Spinner
+                 android:id="@+id/citySpinner"
+@@ -212,13 +224,12 @@
+                 android:layout_height="wrap_content"
+                 android:layout_weight="1"
+                 android:spinnerMode="dropdown"
+-                android:prompt="@string/choose_city"
+-                android:entries="@array/cities"
+-                android:background="@android:color.transparent"
++
++
+                 android:textColor="#00425A"
+                 android:textSize="16sp"
+                 android:textStyle="normal"
+-                />
++            />
+         </LinearLayout>
+     </LinearLayout>
+ 
+Index: app/src/main/java/com/example/myplantcare/viewmodels/PlantInfoViewModel.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.myplantcare.viewmodels;\r\n\r\nimport androidx.lifecycle.LiveData;\r\nimport androidx.lifecycle.MutableLiveData;\r\nimport androidx.lifecycle.ViewModel;\r\n\r\nimport com.example.myplantcare.data.repositories.PlantRepository;\r\nimport com.example.myplantcare.data.repositories.PlantRepositoryImpl;\r\nimport com.example.myplantcare.models.PlantModel;\r\nimport com.example.myplantcare.utils.FirestoreCallback;\r\n\r\nimport java.util.List;\r\n\r\npublic class PlantInfoViewModel extends ViewModel {\r\n\r\n    private final PlantRepository plantRepository = new PlantRepositoryImpl(); // Khởi tạo trực tiếp\r\n    private final MutableLiveData<List<PlantModel>> _plants = new MutableLiveData<>();\r\n    public LiveData<List<PlantModel>> plants = _plants;\r\n\r\n    private final MutableLiveData<Boolean> _isLoading = new MutableLiveData<>(false);\r\n    public LiveData<Boolean> isLoading = _isLoading;\r\n\r\n    public PlantInfoViewModel() {\r\n        loadPlants();\r\n    }\r\n\r\n    public void loadPlants() {\r\n        _isLoading.setValue(true);\r\n        plantRepository.getAllPlants(new FirestoreCallback<List<PlantModel>>() {\r\n            @Override\r\n            public void onSuccess(List<PlantModel> result) {\r\n                _plants.setValue(result);\r\n                _isLoading.setValue(false);\r\n            }\r\n\r\n            @Override\r\n            public void onError(Exception e) {\r\n                _isLoading.setValue(false);\r\n                // handle error nếu muốn\r\n            }\r\n        });\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/myplantcare/viewmodels/PlantInfoViewModel.java b/app/src/main/java/com/example/myplantcare/viewmodels/PlantInfoViewModel.java
+--- a/app/src/main/java/com/example/myplantcare/viewmodels/PlantInfoViewModel.java	(revision b9491641bc7bf9e959017d774fcfbb753fe1b6a4)
++++ b/app/src/main/java/com/example/myplantcare/viewmodels/PlantInfoViewModel.java	(date 1744651495038)
+@@ -32,7 +32,6 @@
+                 _plants.setValue(result);
+                 _isLoading.setValue(false);
+             }
+-
+             @Override
+             public void onError(Exception e) {
+                 _isLoading.setValue(false);
+Index: app/src/main/res/values/arrays.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/values/arrays.xml b/app/src/main/res/values/arrays.xml
+new file mode 100644
+--- /dev/null	(date 1744651495039)
++++ b/app/src/main/res/values/arrays.xml	(date 1744651495039)
+@@ -0,0 +1,8 @@
++<resources>
++    <array name="plant_categories">
++        <item>Option 1</item>
++        <item>Option 2</item>
++        <item>Option 3</item>
++        <item>Option 4</item>
++    </array>
++</resources>
+Index: app/src/main/java/com/example/myplantcare/activities/CareInstructionActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.myplantcare.activities;\r\n\r\nimport android.os.Bundle;\r\n\r\nimport androidx.activity.EdgeToEdge;\r\nimport androidx.appcompat.app.AppCompatActivity;\r\nimport androidx.core.graphics.Insets;\r\nimport androidx.core.view.ViewCompat;\r\nimport androidx.core.view.WindowInsetsCompat;\r\n\r\nimport com.example.myplantcare.R;\r\n\r\npublic class CareInstructionActivity extends AppCompatActivity {\r\n\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        EdgeToEdge.enable(this);\r\n        setContentView(R.layout.activity_care_instruction);\r\n        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {\r\n            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());\r\n            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);\r\n            return insets;\r\n        });\r\n\r\n\r\n\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/myplantcare/activities/CareInstructionActivity.java b/app/src/main/java/com/example/myplantcare/activities/CareInstructionActivity.java
+--- a/app/src/main/java/com/example/myplantcare/activities/CareInstructionActivity.java	(revision b9491641bc7bf9e959017d774fcfbb753fe1b6a4)
++++ b/app/src/main/java/com/example/myplantcare/activities/CareInstructionActivity.java	(date 1744651495036)
+@@ -17,7 +17,7 @@
+         super.onCreate(savedInstanceState);
+         EdgeToEdge.enable(this);
+         setContentView(R.layout.activity_care_instruction);
+-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
++        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.care_layout), (v, insets) -> {
+             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+             return insets;

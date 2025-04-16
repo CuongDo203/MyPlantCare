@@ -36,6 +36,7 @@ PlantCare là ứng dụng hỗ trợ người dùng trong việc chăm sóc câ
 ## 👥 Thành Viên
 - **B21DCCN297 - Ngô Hoàng Duy**
 - **B21DCCN189 - Đỗ Ngọc Cường**
+- **B21DCCN692 - Phùng Văn Thịnh**
 
 ## 🚀 Công Nghệ Sử Dụng
 - **Ngôn ngữ lập trình:** Java
@@ -44,7 +45,7 @@ PlantCare là ứng dụng hỗ trợ người dùng trong việc chăm sóc câ
 - **Kiến trúc:** Microservices với REST API
 
 ## 📌 Hướng Dẫn Cài Đặt
-1. Clone repo: `git clone https://github.com/hduy1305/PlantCare.git`
+1. Clone repo: `git clone https://github.com/hduy1305/MyPlantCare.git`
 2. Mở dự án bằng Android Studio.
 3. Build và chạy ứng dụng trên thiết bị ảo hoặc điện thoại thật.
 

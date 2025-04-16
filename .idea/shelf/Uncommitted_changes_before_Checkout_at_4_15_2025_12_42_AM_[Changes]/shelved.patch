@@ -1,0 +1,20 @@
+Index: app/src/main/java/com/example/myplantcare/activities/CareInstructionActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.myplantcare.activities;\r\n\r\nimport android.os.Bundle;\r\n\r\nimport androidx.activity.EdgeToEdge;\r\nimport androidx.appcompat.app.AppCompatActivity;\r\nimport androidx.core.graphics.Insets;\r\nimport androidx.core.view.ViewCompat;\r\nimport androidx.core.view.WindowInsetsCompat;\r\n\r\nimport com.example.myplantcare.R;\r\n\r\npublic class CareInstructionActivity extends AppCompatActivity {\r\n\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        EdgeToEdge.enable(this);\r\n        setContentView(R.layout.activity_care_instruction);\r\n        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.care_instruction_layout), (v, insets) -> {\r\n            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());\r\n            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);\r\n            return insets;\r\n        });\r\n\r\n\r\n\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/myplantcare/activities/CareInstructionActivity.java b/app/src/main/java/com/example/myplantcare/activities/CareInstructionActivity.java
+--- a/app/src/main/java/com/example/myplantcare/activities/CareInstructionActivity.java	(revision 382addecbc0c99d6b546a0e832bc8c85bf600473)
++++ b/app/src/main/java/com/example/myplantcare/activities/CareInstructionActivity.java	(date 1744652473831)
+@@ -22,8 +22,5 @@
+             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+             return insets;
+         });
+-
+-
+-
+     }
+ }
+\ No newline at end of file
