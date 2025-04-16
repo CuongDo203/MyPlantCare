@@ -1,23 +1,21 @@
 package com.example.myplantcare.models;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentId;
+import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.PropertyName;
-
-import java.sql.Time;
-import java.util.Date;
-import java.util.List;
 
 public class ScheduleModel {
     @DocumentId
     private String id;
     private String taskId;
-    private String frequency;
-    private Date startDate;
-    private TaskModel task;
-    private String time;
+    private Integer frequency;
+    private Timestamp startDate;
+    private Timestamp time;
+    @Exclude
+    private String myPlantId;
 
-    public ScheduleModel(String taskName) {
-        this.taskId = taskName;
+    public ScheduleModel() {
     }
 
     public String getId() {
@@ -28,35 +26,28 @@ public class ScheduleModel {
         this.id = id;
     }
 
-    public String getFrequency() {
+    public Integer getFrequency() {
         return frequency;
     }
 
-    public void setFrequency(String frequency) {
+    public void setFrequency(Integer frequency) {
         this.frequency = frequency;
     }
     @PropertyName("start_date")
-    public Date getStartDate() {
+    public Timestamp getStartDate() {
         return startDate;
     }
     @PropertyName("start_date")
-    public void setStartDate(Date startDate) {
+    public void setStartDate(Timestamp startDate) {
         this.startDate = startDate;
     }
-    @PropertyName("taskId")
-    public TaskModel getTask() {
-        return task;
-    }
-    @PropertyName("taskId")
-    public void setTask(TaskModel task) {
-        this.task = task;
-    }
 
-    public String getTime() {
+
+    public Timestamp getTime() {
         return time;
     }
 
-    public void setTime(String time) {
+    public void setTime(Timestamp time) {
         this.time = time;
     }
 
@@ -69,4 +60,14 @@ public class ScheduleModel {
         return taskId;
     }
 
+    @Override
+    public String toString() {
+        return "ScheduleModel{" +
+                "id='" + id + '\'' +
+                ", taskId='" + taskId + '\'' +
+                ", frequency='" + frequency + '\'' +
+                ", startDate=" + startDate +
+                ", time='" + time + '\'' +
+                '}';
+    }
 }

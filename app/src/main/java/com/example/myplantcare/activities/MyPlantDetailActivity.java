@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.example.myplantcare.R;
 
 public class MyPlantDetailActivity extends AppCompatActivity implements View.OnClickListener {
@@ -26,12 +27,13 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
         if (extras != null) {
             myPlantName.setText(extras.getString("plantName"));
             myPlantLocation.setText(extras.getString("location"));
+            Glide.with(this).load(extras.getString("image")).into(myPlantImg);
+            myPlantCreated.setText(extras.getString("my_plant_created"));
+            myPlantUpdated.setText(extras.getString("my_plant_updated"));
             //cap nhat sau, hien tai dang fixed cung
-//            myPlantCreated.setText(extras.getString("my_plant_created"));
-//            myPlantHeight.setText(extras.getString("my_plant_height"));
-//            myPlantType.setText(extras.getString("my_plant_type"));
-//            myPlantStatus.setText(extras.getString("my_plant_status"));
-//            myPlantUpdated.setText(extras.getString("my_plant_updated"));
+            myPlantHeight.setText("--cm");
+            myPlantType.setText(extras.getString("--"));
+            myPlantStatus.setText(extras.getString("--"));
         }
     }
 

@@ -1,6 +1,7 @@
 package com.example.myplantcare.adapters;
 
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,10 +12,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.myplantcare.R;
 import com.example.myplantcare.activities.MyPlantDetailActivity;
 import com.example.myplantcare.activities.PlantLogActivity;
 import com.example.myplantcare.models.MyPlantModel;
+import com.example.myplantcare.utils.DateUtils;
 
 import java.util.List;
 
@@ -39,10 +42,18 @@ public class MyPlantAdapter  extends RecyclerView.Adapter<MyPlantAdapter.MyPlant
         holder.myPlantName.setText(myPlant.getNickname());
         holder.myPlantLocation.setText(myPlant.getLocation());
         holder.myPlantProgress.setText(myPlant.getProgress() + "%");
+        Glide.with(holder.itemView.getContext()).load(myPlant.getImage()).into(holder.myPlantImage);
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(holder.itemView.getContext(), MyPlantDetailActivity.class);
             intent.putExtra("plantName", myPlant.getNickname());
             intent.putExtra("location", myPlant.getLocation());
+            intent.putExtra("progress", myPlant.getProgress());
+            intent.putExtra("image", myPlant.getImage());
+            intent.putExtra("id", myPlant.getPlantId());
+            intent.putExtra("my_plant_created", DateUtils.formatTimestamp(myPlant.getCreatedAt(), DateUtils.DATE_FORMAT_DISPLAY));
+            intent.putExtra("my_plant_updated", DateUtils.formatTimestamp(myPlant.getUpdatedAt(), DateUtils.DATE_FORMAT_DISPLAY));
+            Log.d("MyPlantAdapter", "Ngày tạo: " + DateUtils.formatTimestamp(myPlant.getCreatedAt(), DateUtils.DATE_FORMAT_DISPLAY));
+            Log.d("MyPlantAdapter", "Ngày cập nhật: " + DateUtils.formatTimestamp(myPlant.getUpdatedAt(), DateUtils.DATE_FORMAT_DISPLAY));
             // Thêm thông tin khác sau
             holder.itemView.getContext().startActivity(intent);
         });

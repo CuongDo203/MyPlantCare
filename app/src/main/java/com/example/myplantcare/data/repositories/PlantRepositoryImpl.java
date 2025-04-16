@@ -6,6 +6,7 @@ import com.example.myplantcare.data.responses.PlantResponse;
 import com.example.myplantcare.models.IdealConditionModel;
 import com.example.myplantcare.models.PlantModel;
 import com.example.myplantcare.models.SpeciesModel;
+import com.example.myplantcare.utils.Constants;
 import com.example.myplantcare.utils.FirestoreCallback;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
@@ -25,9 +26,9 @@ import java.util.Set;
 public class PlantRepositoryImpl implements PlantRepository{
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final CollectionReference plantsRef = db.collection("plants");
-    private final CollectionReference speciesRef = db.collection("species");
-    private final CollectionReference conditionsRef = db.collection("ideal_conditions");
+    private final CollectionReference plantsRef = db.collection(Constants.PLANTS_COLLECTION);
+    private final CollectionReference speciesRef = db.collection(Constants.SPECIES_COLLECTION);
+    private final CollectionReference conditionsRef = db.collection(Constants.IDEAL_CONDITIONS_COLLECTION);
     @Override
     public void addPlant(PlantModel plant, FirestoreCallback<Void> callback) {
 

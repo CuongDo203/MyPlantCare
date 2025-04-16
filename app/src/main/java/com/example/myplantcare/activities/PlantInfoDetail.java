@@ -13,6 +13,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.bumptech.glide.Glide;
 import com.example.myplantcare.R;
 import com.example.myplantcare.adapters.ViewPagerPlantInfoAdapter;
 import com.google.android.material.tabs.TabLayout;
@@ -66,6 +67,7 @@ public class PlantInfoDetail extends AppCompatActivity {
         if(intent != null) {
             String plantName = intent.getStringExtra("plantName");
             String speciesName = intent.getStringExtra("speciesName");
+            String plantImage = intent.getStringExtra("plantImage");
             String plantId = intent.getStringExtra("plantId");
             String idealLight = intent.getStringExtra("idealLight");
             double idealTemperatureMin = intent.getDoubleExtra("idealTemperatureMin", 0);
@@ -81,7 +83,11 @@ public class PlantInfoDetail extends AppCompatActivity {
             this.temperatureInfo.setText(String.format("%s - %s C", String.valueOf(idealTemperatureMin), String.valueOf(idealTemperatureMax)));
             this.moistureInfo.setText(String.format("%s - %s %%", String.valueOf(idealMoistureMin), String.valueOf(idealMoistureMax)));
             this.waterInfo.setText(String.format("%s - %s ml", String.valueOf(idealWaterMin), String.valueOf(idealWaterMax)));
-            this.plantImage.setImageResource(R.drawable.plant_sample);
+            Glide.with(this)
+                    .load(plantImage)
+                    .placeholder(R.drawable.plant_sample)
+                    .error(R.drawable.ic_photo_error)
+                    .into(this.plantImage);
         }
     }
 

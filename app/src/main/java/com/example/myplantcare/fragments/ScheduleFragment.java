@@ -3,10 +3,15 @@ package com.example.myplantcare.fragments;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,25 +21,31 @@ import android.widget.Toast;
 import com.example.myplantcare.R;
 import com.example.myplantcare.adapters.DayAdapter;
 import com.example.myplantcare.adapters.ScheduleAdapter;
+import com.example.myplantcare.data.responses.ScheduleWithMyPlantInfo;
 import com.example.myplantcare.models.DayModel;
 import com.example.myplantcare.models.ScheduleModel;
 import com.example.myplantcare.models.TaskModel;
+import com.example.myplantcare.viewmodels.ScheduleViewModel;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Map;
 
 public class ScheduleFragment extends Fragment {
 
     private RecyclerView recyclerViewDays, recyclerViewScheduleUncompleted, recyclerViewScheduleCompleted;
     private DayAdapter dayAdapter;
     private ScheduleAdapter scheduleAdapter;
+    private ScheduleViewModel scheduleViewModel;
     private List<DayModel> dayList;
-    private List<ScheduleModel> scheduleListUncompleted, scheduleListCompleted;
+    private List<Pair<String, List<ScheduleWithMyPlantInfo>>> scheduleListUncompleted, scheduleListCompleted;
     private ImageView btnOpenDatePicker;
     private FloatingActionButton fab;
+//    List<Pair<String, List<ScheduleWithMyPlantInfo>>> todaySchedulesList;
+
 
     // Tạo danh sách ngày
     private List<DayModel> generateDays() {
@@ -66,8 +77,8 @@ public class ScheduleFragment extends Fragment {
         taskList2.add(new TaskModel("Cây C - 10:00 AM - Sân vườn", false));
         taskList2.add(new TaskModel("Cây D - 11:30 AM - Ban công", false));
 
-        schedules.add(new ScheduleModel("Tưới nước"));
-        schedules.add(new ScheduleModel("Bón phân"));
+//        schedules.add(new ScheduleModel("Tưới nước"));
+//        schedules.add(new ScheduleModel("Bón phân"));
 
         return schedules;
     }
@@ -105,7 +116,8 @@ public class ScheduleFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_schedule, container, false);
         initContents(view);
-
+        setupViewModel();
+        observeViewModel();
         fab.setOnClickListener(v -> {
             showAddScheduleDialog();
                 });
@@ -116,17 +128,58 @@ public class ScheduleFragment extends Fragment {
         recyclerViewDays.setAdapter(dayAdapter);
 
         recyclerViewScheduleUncompleted.setLayoutManager(new LinearLayoutManager(getContext()));
-        scheduleListUncompleted = generateSchedules();
+        Log.d("ScheduleFragment", "Size cv can lam o onCreateView: " + scheduleListUncompleted.size());
         scheduleAdapter = new ScheduleAdapter(scheduleListUncompleted);
         recyclerViewScheduleUncompleted.setAdapter(scheduleAdapter);
 
         recyclerViewScheduleCompleted.setLayoutManager(new LinearLayoutManager(getContext()));
-        scheduleListCompleted = generateSchedules();
+
         scheduleAdapter = new ScheduleAdapter(scheduleListCompleted);
         recyclerViewScheduleCompleted.setAdapter(scheduleAdapter);
 
         btnOpenDatePicker.setOnClickListener(v -> openDatePicker());
         return view;
+    }
+
+    private void observeViewModel() {
+        scheduleViewModel.todaySchedules.observe(getViewLifecycleOwner(), groupedSchedules  -> {
+            if (groupedSchedules == null || groupedSchedules.isEmpty()) {
+                Toast.makeText(getContext(), "Không có công việc hôm nay", Toast.LENGTH_SHORT).show();
+                scheduleListUncompleted.clear();
+                scheduleAdapter.notifyDataSetChanged();
+                return;
+            }
+
+            scheduleListUncompleted.clear();
+
+            for (Map.Entry<String, List<ScheduleWithMyPlantInfo>> entry : groupedSchedules.entrySet()) {
+                scheduleListUncompleted.add(new Pair<>(entry.getKey(), entry.getValue()));
+            }
+            Log.d("ScheduleFragment", "Size cv can lam o observeViewModel: " + scheduleListUncompleted.size());
+            scheduleAdapter.notifyDataSetChanged();
+        });
+        scheduleViewModel.errorMessage.observe(getViewLifecycleOwner(), message -> {
+            if (message != null) {
+                Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
+                Log.d("ScheduleFragment", "Lỗi: " + message);
+            }
+        });
+
+        scheduleViewModel.isLoading.observe(getViewLifecycleOwner(), isLoading -> {
+            // Có thể thêm ProgressBar sau nếu bạn muốn
+            Log.d("ScheduleFragment", "Đang tải: " + isLoading);
+        });
+    }
+
+    private void setupViewModel() {
+        String userId = "eoWltJXzlBtC8U8QZx9G";  //tam thoi de hard code
+        scheduleViewModel = new ViewModelProvider(this, new ViewModelProvider.Factory() {
+            @NonNull
+            @Override
+            public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+                return (T) new ScheduleViewModel(userId);
+            }
+        }).get(ScheduleViewModel.class);
     }
 
     private void showAddScheduleDialog() {
@@ -140,5 +193,7 @@ public class ScheduleFragment extends Fragment {
         recyclerViewScheduleCompleted = view.findViewById(R.id.recyclerViewScheduleCompleted);
         btnOpenDatePicker = view.findViewById(R.id.btnOpenDatePicker);
         fab = view.findViewById(R.id.fab_add_schedule);
+        scheduleListUncompleted = new ArrayList<>();
+        scheduleListCompleted = new ArrayList<>();
     }
 }

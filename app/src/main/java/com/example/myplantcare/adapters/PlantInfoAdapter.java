@@ -6,11 +6,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.myplantcare.R;
 import com.example.myplantcare.activities.PlantInfoDetail;
 import com.example.myplantcare.data.responses.PlantResponse;
@@ -40,9 +42,14 @@ public class PlantInfoAdapter extends RecyclerView.Adapter<PlantInfoAdapter.Plan
         holder.plantName.setText(plantInfo.getPlantName());
         holder.speices.setText(plantInfo.getSpeciesName());
         holder.lightInfo.setText(plantInfo.getIdealLight());
-//        holder.temperatureInfo.setText(String.format("%s - %s C", String.valueOf(plantInfo.getIdealTemperatureMin()), String.valueOf(plantInfo.getIdealTemperatureMax())));
-//        holder.moistureInfo.setText(String.format("%s - %s %%", String.valueOf(plantInfo.getIdealMoistureMin()), String.valueOf(plantInfo.getIdealMoistureMax())));
-//        holder.waterInfo.setText(String.format("%s - %s ml", String.valueOf(plantInfo.getIdealWaterMin()), String.valueOf(plantInfo.getIdealWaterMax())));
+        holder.temperatureInfo.setText(String.format("%s - %s C", String.valueOf(plantInfo.getIdealTemperatureMin()), String.valueOf(plantInfo.getIdealTemperatureMax())));
+        holder.moistureInfo.setText(String.format("%s - %s %%", String.valueOf(plantInfo.getIdealMoistureMin()), String.valueOf(plantInfo.getIdealMoistureMax())));
+        holder.waterInfo.setText(String.format("%s - %s ml", String.valueOf(plantInfo.getIdealWaterMin()), String.valueOf(plantInfo.getIdealWaterMax())));
+        Glide.with(holder.itemView.getContext())
+                .load(plantInfo.getPlantImage())
+                .placeholder(R.drawable.plant_sample)
+                .error(R.drawable.ic_photo_error)
+                .into(holder.plantImage);
 
         holder.itemView.setOnClickListener(v -> {
             // xử lý sự kiện khi 1 cây được click -> chuyển sang trang chi tiết về cây đó
@@ -50,6 +57,7 @@ public class PlantInfoAdapter extends RecyclerView.Adapter<PlantInfoAdapter.Plan
             Intent intent = new Intent(context, PlantInfoDetail.class);
             intent.putExtra("plantId", plantInfo.getPlant().getId());
             intent.putExtra("plantName", plantInfo.getPlantName());
+            intent.putExtra("plantImage", plantInfo.getPlantImage());
             intent.putExtra("speciesName", plantInfo.getSpeciesName());
             intent.putExtra("idealLight", plantInfo.getIdealLight());
             intent.putExtra("idealTemperatureMin", plantInfo.getIdealTemperatureMin());
@@ -74,6 +82,7 @@ public class PlantInfoAdapter extends RecyclerView.Adapter<PlantInfoAdapter.Plan
     public static class PlantInfoViewHolder extends RecyclerView.ViewHolder{
 
         TextView plantName, speices, lightInfo, temperatureInfo, moistureInfo, waterInfo  ;
+        ImageView plantImage;
 
         public PlantInfoViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -83,7 +92,7 @@ public class PlantInfoAdapter extends RecyclerView.Adapter<PlantInfoAdapter.Plan
             temperatureInfo = itemView.findViewById(R.id.temperature_info);
             moistureInfo = itemView.findViewById(R.id.moisture_info);
             waterInfo = itemView.findViewById(R.id.water_info);
-
+            plantImage = itemView.findViewById(R.id.plant_image);
         }
     }
 }
