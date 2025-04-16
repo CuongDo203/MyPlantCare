@@ -6,6 +6,12 @@
     <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
+    <string name="note_list_desc">Danh sách ghi chú</string>
+    <string name="search_hint">Nhập vào tên cây ... </string>
+    <string name="recycler_note_desc">Danh sách ghi chú chi tiết</string>
+    <string name="image_content_description">ICON</string>
+    <string name="theme">Chủ đề</string>
+    <string name="back">Quay lại</string>
 
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris

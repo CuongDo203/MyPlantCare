@@ -3,26 +3,26 @@
 
     <item
         android:id="@+id/nav_home"
-        android:icon="@drawable/home"
+        android:icon="@drawable/ic_home"
         android:title="Trang chủ" />
 
     <item
         android:id="@+id/nav_plant"
-        android:icon="@drawable/plant"
+        android:icon="@drawable/ic_plant"
         android:title="Cây của tôi" />
 
     <item
         android:id="@+id/nav_schedule"
-        android:icon="@drawable/schedule"
+        android:icon="@drawable/ic_schedule"
         android:title="Lịch trình" />
 
     <item
         android:id="@+id/nav_note"
-        android:icon="@drawable/note"
+        android:icon="@drawable/ic_note"
         android:title="Ghi chú" />
 
     <item
         android:id="@+id/nav_statics"
-        android:icon="@drawable/statics"
+        android:icon="@drawable/ic_statistic"
         android:title="Thống kê" />
 </menu>
