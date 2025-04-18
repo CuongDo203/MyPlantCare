@@ -29,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
 
+    ImageView ivMenu;
+
     private BottomNavigationView bottomNavigationView;
 
     @Override
@@ -93,6 +95,19 @@ public class MainActivity extends AppCompatActivity {
                 Intent i = new Intent();
                 i.setClass(MainActivity.this, NotificationActivity.class);
                 startActivity(i);
+            }
+        });
+
+        ivMenu = findViewById(R.id.ivMenu);
+
+        // xử lý sidebar và thông tin cá nhân
+
+        ivMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Chuyển sang SideBarActivity
+                Intent intent = new Intent(MainActivity.this, SideBarActivity.class);
+                startActivity(intent);
             }
         });
     }
