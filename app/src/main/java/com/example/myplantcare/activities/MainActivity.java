@@ -34,8 +34,6 @@ public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
-
-
     ImageView ivMenu;
 
     private BottomNavigationView bottomNavigationView;
@@ -84,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
             else if (itemId == R.id.nav_statics){
                 fragment = null;
             }
-
             if (fragment != null) {
                 loadFragment(fragment);
                 return true;
