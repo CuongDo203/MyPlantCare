@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 
 import com.example.myplantcare.R;
 import com.example.myplantcare.adapters.MyPlantAdapter;
+import com.example.myplantcare.data.repositories.MyPlantRepositoryImpl;
 import com.example.myplantcare.models.MyPlantModel;
 import com.example.myplantcare.viewmodels.MyPlantListViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -30,6 +31,7 @@ public class MyPlantFragment extends Fragment {
     private List<MyPlantModel> myPlantList;
     private FloatingActionButton fabAddMyPlant;
     private MyPlantListViewModel myPlantListViewModel;
+    private MyPlantRepositoryImpl repository = new MyPlantRepositoryImpl();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -78,12 +80,20 @@ public class MyPlantFragment extends Fragment {
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
         myPlantList = new ArrayList<>();
-        adapter = new MyPlantAdapter(myPlantList);
+        String userId = "eoWltJXzlBtC8U8QZx9G";  //tam thoi de hard code
+        adapter = new MyPlantAdapter(myPlantList, userId, repository, () -> {
+            // callback sau khi xoá, có thể dùng load lại hoặc log
+            Log.d("MyPlantFragment", "Đã xoá cây và cập nhật giao diện");
+        });
         recyclerView.setAdapter(adapter);
     }
 
     private void showAddPlantDialog() {
         AddPlantDialogFragment dialogFragment = new AddPlantDialogFragment();
+        dialogFragment.setOnSavePlantListener(() -> {
+            myPlantListViewModel.loadMyPlants();
+        });
         dialogFragment.show(getChildFragmentManager(), "AddPlantDialogTag");
     }
+
 }

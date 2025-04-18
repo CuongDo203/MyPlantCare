@@ -2,6 +2,7 @@ package com.example.myplantcare.models;
 
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentId;
+import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.PropertyName;
 import com.google.firebase.firestore.ServerTimestamp;
 
@@ -14,8 +15,10 @@ public class MyPlantModel {
     private String location;
     private double progress; // Tiến độ phát triển (ví dụ: 0.0 - 1.0)
     private String plantId; // Tham chiếu đến Plant template ID
+    @Exclude
     private String userId; // Tham chiếu đến User ID
 
+    private String speciesId;
     private String image;
 
     @ServerTimestamp
@@ -26,10 +29,10 @@ public class MyPlantModel {
     // Constructor rỗng cần thiết cho Firestore
     public MyPlantModel() {}
 
-    public MyPlantModel(String nickname, String location, double progress, String image) {
+    public MyPlantModel(String nickname, String location, String speciesId, String image) {
         this.nickname = nickname;
         this.location = location;
-        this.progress = progress;
+        this.speciesId = speciesId;
         this.image = image;
     }
 

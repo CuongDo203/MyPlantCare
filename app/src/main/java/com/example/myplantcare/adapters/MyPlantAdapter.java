@@ -10,23 +10,32 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.myplantcare.R;
 import com.example.myplantcare.activities.MyPlantDetailActivity;
 import com.example.myplantcare.activities.PlantLogActivity;
+import com.example.myplantcare.data.repositories.MyPlantRepositoryImpl;
 import com.example.myplantcare.models.MyPlantModel;
 import com.example.myplantcare.utils.DateUtils;
+import com.example.myplantcare.utils.FirestoreCallback;
 
 import java.util.List;
 
 public class MyPlantAdapter  extends RecyclerView.Adapter<MyPlantAdapter.MyPlantViewHolder> {
 
     List<MyPlantModel> myPlantList;
+    private String userId;
+    private MyPlantRepositoryImpl repository;
+    private Runnable onDeleteSuccess;
 
-    public MyPlantAdapter(List<MyPlantModel> myPlantList) {
+    public MyPlantAdapter(List<MyPlantModel> myPlantList, String userId, MyPlantRepositoryImpl repository, Runnable onDeleteSuccess) {
         this.myPlantList = myPlantList;
+        this.userId = userId;
+        this.repository = repository;
+        this.onDeleteSuccess = onDeleteSuccess;
     }
 
     @NonNull
@@ -63,6 +72,31 @@ public class MyPlantAdapter  extends RecyclerView.Adapter<MyPlantAdapter.MyPlant
             intent.putExtra("image", myPlant.getImage());
             intent.putExtra("id", myPlant.getPlantId());
             holder.itemView.getContext().startActivity(intent);
+        });
+        holder.btnDeleteMyPlant.setOnClickListener(v -> {
+            new AlertDialog.Builder(holder.itemView.getContext())
+                    .setTitle("Xác nhận xoá")
+                    .setMessage("Bạn có chắc chắn muốn xoá cây \"" + myPlant.getNickname() + "\" không?")
+                    .setPositiveButton("Xoá", (dialog, which) -> {
+                        String plantId = myPlant.getId(); // ID document trong Firestore
+
+                        repository.deleteMyPlant(userId, plantId, new FirestoreCallback<Void>() {
+                            @Override
+                            public void onSuccess(Void result) {
+                                myPlantList.remove(position);
+                                notifyItemRemoved(position);
+                                notifyItemRangeChanged(position, myPlantList.size());
+                                if (onDeleteSuccess != null) onDeleteSuccess.run();
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e("DeletePlant", "Lỗi khi xoá cây: " + e.getMessage());
+                            }
+                        });
+                    })
+                    .setNegativeButton("Huỷ", (dialog, which) -> dialog.dismiss())
+                    .show();
         });
     }
 

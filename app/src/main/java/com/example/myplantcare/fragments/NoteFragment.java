@@ -63,7 +63,7 @@ public class NoteFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 // Gọi phương thức tìm kiếm mỗi khi text thay đổi
-                filterNotes(s.toString());
+//                filterNotes(s.toString());
             }
 
             @Override
@@ -126,20 +126,20 @@ public class NoteFragment extends Fragment {
     }
 
 
-    private void filterNotes(String query) {
-        filteredNoteList.clear();
-        String lowerCaseQuery = query.toLowerCase().trim();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-        for (Note note : originalNoteList) {
-            String formattedDate = note.getDate().format(formatter);
-            if (note.getTitle().toLowerCase().contains(lowerCaseQuery) ||
-                    note.getContent().toLowerCase().contains(lowerCaseQuery) ||
-                    formattedDate.toLowerCase().contains(lowerCaseQuery)) {
-                filteredNoteList.add(note);
-            }
-        }
-        adapter.notifyDataSetChanged();
-    }
+//    private void filterNotes(String query) {
+//        filteredNoteList.clear();
+//        String lowerCaseQuery = query.toLowerCase().trim();
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+//
+//        for (Note note : originalNoteList) {
+//            String formattedDate = note.getDate().format(formatter);
+//            if (note.getTitle().toLowerCase().contains(lowerCaseQuery) ||
+//                    note.getContent().toLowerCase().contains(lowerCaseQuery) ||
+//                    formattedDate.toLowerCase().contains(lowerCaseQuery)) {
+//                filteredNoteList.add(note);
+//            }
+//        }
+//        adapter.notifyDataSetChanged();
+//    }
 
 }
