@@ -3,6 +3,7 @@ package com.example.myplantcare.data.repositories;
 import com.example.myplantcare.models.MyPlantModel;
 import com.example.myplantcare.utils.FirestoreCallback;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -35,8 +36,17 @@ public class MyPlantRepositoryImpl implements MyPlantRepository{
     }
 
     @Override
-    public void addMyPlant(MyPlantModel myPlant, FirestoreCallback<Void> callback) {
+    public void addMyPlant(String userId, MyPlantModel myPlant, FirestoreCallback<Void> callback) {
+        DocumentReference docRef = db.collection("users")
+                .document(userId)
+                .collection("my_plants")
+                .document(); // Tạo ID tự động
 
+        myPlant.setId(docRef.getId()); // Set ID cho model nếu bạn dùng
+
+        docRef.set(myPlant)
+                .addOnSuccessListener(unused -> callback.onSuccess(null))
+                .addOnFailureListener(callback::onError);
     }
 
     @Override
@@ -45,7 +55,14 @@ public class MyPlantRepositoryImpl implements MyPlantRepository{
     }
 
     @Override
-    public void deleteMyPlant(String myPlantId, FirestoreCallback<Void> callback) {
+    public void deleteMyPlant(String userId, String myPlantId, FirestoreCallback<Void> callback) {
+        DocumentReference docRef = db.collection("users")
+                .document(userId)
+                .collection("my_plants")
+                .document(myPlantId);
 
+        docRef.delete()
+                .addOnSuccessListener(unused -> callback.onSuccess(null))
+                .addOnFailureListener(callback::onError);
     }
 }

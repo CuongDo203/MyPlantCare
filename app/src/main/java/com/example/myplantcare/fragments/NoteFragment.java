@@ -3,6 +3,8 @@ package com.example.myplantcare.fragments;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -40,6 +42,7 @@ public class NoteFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_note, container, false);
+        // Trong NoteFragment.java (phương thức onViewCreated)
     }
 
     @Override
@@ -54,10 +57,13 @@ public class NoteFragment extends Fragment {
             }
             @Override public void afterTextChanged(Editable s) {}
         });
+        navController = Navigation.findNavController(view);
 
         androidx.appcompat.widget.Toolbar toolbar = view.findViewById(R.id.insider_toolbar);
         toolbarTitle = toolbar.findViewById(R.id.toolbar_title);
         toolbarBackButton = toolbar.findViewById(R.id.toolbar_back_button);
+
+        // Thiết lập tiêu đề cho trang danh sách ghi chú
         toolbarTitle.setText("Ghi chú");
         toolbarBackButton.setVisibility(View.GONE);
 
@@ -71,6 +77,7 @@ public class NoteFragment extends Fragment {
         adapter = new NoteAdapter(getContext(), filteredNoteList);
         recyclerView.setAdapter(adapter);
 
+        // Xử lý sự kiện click của item để chuyển đến trang chi tiết (ví dụ)
         adapter.setOnItemClickListener(note -> {
             // Gửi dữ liệu sang DetailNoteFragment bằng bundle
             Bundle bundle = new Bundle();
