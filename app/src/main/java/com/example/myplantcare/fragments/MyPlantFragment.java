@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.myplantcare.R;
 import com.example.myplantcare.adapters.MyPlantAdapter;
 import com.example.myplantcare.data.repositories.MyPlantRepositoryImpl;
@@ -32,6 +33,7 @@ public class MyPlantFragment extends Fragment {
     private FloatingActionButton fabAddMyPlant;
     private MyPlantListViewModel myPlantListViewModel;
     private MyPlantRepositoryImpl repository = new MyPlantRepositoryImpl();
+    LottieAnimationView lottieLoadingAnimation;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -42,11 +44,6 @@ public class MyPlantFragment extends Fragment {
         setupViewModel();
         observeViewModel();
         fabAddMyPlant.setOnClickListener(v -> showAddPlantDialog());
-
-//        myPlantList.add(new MyPlantModel("Xương rồng", "Phòng khách", 70, String.valueOf(R.drawable.plant_sample)));
-//        myPlantList.add(new MyPlantModel("Sen đá", "Ban công", 45, String.valueOf(R.drawable.plant_sample)));
-//        adapter.notifyDataSetChanged();
-
         return view;
     }
 
@@ -59,7 +56,16 @@ public class MyPlantFragment extends Fragment {
             adapter.notifyDataSetChanged();
         });
         myPlantListViewModel.isLoading.observe(getViewLifecycleOwner(), isLoading -> {
-
+            if(isLoading) {
+                lottieLoadingAnimation.setVisibility(View.VISIBLE);
+                lottieLoadingAnimation.playAnimation();
+                recyclerView.setVisibility(View.GONE);
+                Log.d("MyPlant", "Loading...");
+            } else {
+                lottieLoadingAnimation.setVisibility(View.GONE);
+                lottieLoadingAnimation.cancelAnimation();
+                recyclerView.setVisibility(View.VISIBLE);
+            }
         });
     }
 
@@ -78,7 +84,7 @@ public class MyPlantFragment extends Fragment {
         fabAddMyPlant = view.findViewById(R.id.fab_add_my_plant);
         recyclerView = view.findViewById(R.id.recycler_my_plant);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
-
+        lottieLoadingAnimation = view.findViewById(R.id.lottie_loading_animation);
         myPlantList = new ArrayList<>();
         String userId = "eoWltJXzlBtC8U8QZx9G";  //tam thoi de hard code
         adapter = new MyPlantAdapter(myPlantList, userId, repository, () -> {

@@ -11,19 +11,21 @@ public class PlantModel {
     private String location;
     private String description;
     private String image;
+    private String instruction;
 
     private String idealConditionId;
 
     public PlantModel() {
     }
 
-    public PlantModel(String name, String speciesId, String location, String description,
+    public PlantModel(String name, String speciesId, String location, String description, String instruction,
                       String image) {
         this.name = name;
         this.speciesId = speciesId;
         this.location = location;
         this.description = description;
         this.image = image;
+        this.instruction = instruction;
     }
 
     public String getName() {
@@ -60,20 +62,12 @@ public class PlantModel {
         this.idealConditionId = idealConditionId;
     }
 
-    public String getType() {
-        return speciesId;
+    public String getInstruction() {
+        return instruction;
     }
 
-    public void setType(String type) {
-        this.speciesId = type;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
+    public void setInstruction(String instruction) {
+        this.instruction = instruction;
     }
 
     public String getDescription() {

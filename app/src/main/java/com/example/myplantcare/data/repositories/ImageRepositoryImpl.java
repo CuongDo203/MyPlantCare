@@ -1,6 +1,7 @@
 package com.example.myplantcare.data.repositories;
 
 import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 
 import com.cloudinary.Cloudinary;
@@ -38,10 +39,18 @@ public class ImageRepositoryImpl implements ImageRepository{
 
     }
 
-    public void uploadImage(File imageFile, FirestoreCallback<String> callback) {
+    public void uploadImage(Uri imageUri, FirestoreCallback<String> callback) {
+        if (imageUri == null) {
+            Log.e("ImageRepository", "Image Uri is null.");
+            callback.onError(new IllegalArgumentException("Image Uri cannot be null"));
+            return;
+        }
+
+        Log.d("ImageRepository", "Attempting to upload Uri: " + imageUri.toString());
 
         String requestId = MediaManager.get()
-                .upload(imageFile.getPath()) // Sử dụng đường dẫn file
+                // Thay đổi .upload(File.getPath()) thành .upload(Uri)
+                .upload(imageUri) // Sử dụng trực tiếp Uri
                 .option("resource_type", "image") // Chỉ định loại resource
                 // .option("folder", "your_folder_name") // Tùy chọn: upload vào một folder cụ thể
                 .callback(new UploadCallback() {
@@ -65,21 +74,25 @@ public class ImageRepositoryImpl implements ImageRepository{
                         Log.d("ImageRepository", "Upload successful: " + requestId);
                         String url = (String) resultData.get("secure_url");
                         if (url != null) {
+                            Log.d("ImageRepository", "Upload URL: " + url);
                             callback.onSuccess(url); // Gọi onSuccess của callback với URL
                         } else {
+                            Log.e("ImageRepository", "Upload successful but secure_url not found in result data.");
                             callback.onError(new Exception("Upload successful but secure_url not found in result."));
                         }
                     }
 
                     @Override
                     public void onError(String requestId, ErrorInfo error) {
-                        Log.e("ImageRepository", "Upload error: " + requestId + " - " + error.getDescription());
-                        callback.onError(new Exception(error.getDescription())); // Gọi onError của callback
+                        String errorMessage = error != null ? error.getDescription() : "Unknown error";
+                        Log.e("ImageRepository", "Upload error: " + requestId + " - " + errorMessage);
+                        callback.onError(new Exception(errorMessage)); // Gọi onError của callback
                     }
 
                     @Override
                     public void onReschedule(String requestId, ErrorInfo error) {
-                        Log.w("ImageRepository", "Upload rescheduled: " + requestId + " - " + error.getDescription());
+                        String errorMessage = error != null ? error.getDescription() : "Unknown error";
+                        Log.w("ImageRepository", "Upload rescheduled: " + requestId + " - " + errorMessage);
                         // Tùy chọn: xử lý khi upload bị reschedule
                     }
                 })

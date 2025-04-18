@@ -1,40 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".fragments.MyPlantFragment"
-    >
-        <RelativeLayout
+    tools:context=".fragments.MyPlantFragment">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp">
+
+        <ImageView
+            android:id="@+id/ic_filter_myplant"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="6dp"
+            android:src="@drawable/ic_filter" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_my_plant"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
-            >
-
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/ic_filter"
-                android:layout_alignParentEnd="true"
-                android:layout_marginTop="10dp"
-                android:id="@+id/ic_filter_myplant"
-                android:layout_marginEnd="6dp"
-                />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_my_plant"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/ic_filter_myplant"
-                android:layout_marginTop="10dp"
-                android:clipToPadding="false"
-                android:paddingBottom="100dp"
-                tools:listitem="@layout/item_my_plant"
-                />
+            android:layout_below="@+id/ic_filter_myplant"
+            android:layout_marginTop="10dp"
+            android:clipToPadding="false"
+            android:paddingBottom="100dp"
+            tools:listitem="@layout/item_my_plant" />
 
 
-        </RelativeLayout>
+    </RelativeLayout>
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottie_loading_animation"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center"
+        android:elevation="10dp"
+        android:visibility="gone"
+        app:lottie_autoPlay="true"
+        app:lottie_rawRes="@raw/loading_animation"
+        app:lottie_speed="1.5"
+        app:lottie_loop="true"
+
+        />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_my_plant"
         android:layout_width="wrap_content"
@@ -44,6 +56,5 @@
         android:contentDescription="Thêm"
         android:src="@drawable/ic_plus"
         app:backgroundTint="@color/fab_bg"
-        app:tint="@color/white"
-        />
+        app:tint="@color/white" />
 </FrameLayout>
