@@ -3,8 +3,6 @@ package com.example.myplantcare.fragments;
 import android.os.Build;
 import android.os.Bundle;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -13,10 +11,10 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Button;
 import com.example.myplantcare.R;
 import com.example.myplantcare.adapters.NoteAdapter;
 import com.example.myplantcare.models.Note;
@@ -42,7 +40,6 @@ public class NoteFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_note, container, false);
-        // Trong NoteFragment.java (phương thức onViewCreated)
     }
 
     @Override
@@ -57,13 +54,10 @@ public class NoteFragment extends Fragment {
             }
             @Override public void afterTextChanged(Editable s) {}
         });
-        navController = Navigation.findNavController(view);
 
         androidx.appcompat.widget.Toolbar toolbar = view.findViewById(R.id.insider_toolbar);
         toolbarTitle = toolbar.findViewById(R.id.toolbar_title);
         toolbarBackButton = toolbar.findViewById(R.id.toolbar_back_button);
-
-        // Thiết lập tiêu đề cho trang danh sách ghi chú
         toolbarTitle.setText("Ghi chú");
         toolbarBackButton.setVisibility(View.GONE);
 
@@ -77,9 +71,8 @@ public class NoteFragment extends Fragment {
         adapter = new NoteAdapter(getContext(), filteredNoteList);
         recyclerView.setAdapter(adapter);
 
-        // Xử lý sự kiện click của item để chuyển đến trang chi tiết (ví dụ)
+        // Xử lý khi bấm vào ghi chú trong danh sách
         adapter.setOnItemClickListener(note -> {
-            // Gửi dữ liệu sang DetailNoteFragment bằng bundle
             Bundle bundle = new Bundle();
             bundle.putString("noteTitle", note.getTitle());
             bundle.putString("noteContent", note.getContent());
@@ -95,6 +88,7 @@ public class NoteFragment extends Fragment {
                     .commit();
         });
 
+        // Gộp thêm: xử lý nút tạo ghi chú mới
         Button btnCreateNote = view.findViewById(R.id.btnCreateNote); // đảm bảo ID này có trong layout
         btnCreateNote.setOnClickListener(v -> {
             DetailNoteFragment detailFragment = new DetailNoteFragment();
