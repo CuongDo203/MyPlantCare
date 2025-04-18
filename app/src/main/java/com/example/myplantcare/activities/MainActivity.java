@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
 
+
     ImageView ivMenu;
 
     private BottomNavigationView bottomNavigationView;
@@ -76,7 +77,9 @@ public class MainActivity extends AppCompatActivity {
             } else if (itemId == R.id.nav_plant) {
                 fragment = new PlantFragment();
             } else if (itemId == R.id.nav_note) {
-                fragment = new NoteFragment();
+                Intent intent = new Intent(MainActivity.this, NoteActivity.class);
+                startActivity(intent);
+                return true;
             }
             else if (itemId == R.id.nav_statics){
                 fragment = null;
@@ -115,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
     }
 
     private void loadFragment(Fragment fragment) {
