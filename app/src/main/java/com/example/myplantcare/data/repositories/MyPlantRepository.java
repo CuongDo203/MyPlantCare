@@ -15,13 +15,13 @@ public interface MyPlantRepository {
     void getMyPlantById(String myPlantId, FirestoreCallback<MyPlantModel> callback);
 
     // Thêm cây mới
-    void addMyPlant(MyPlantModel myPlant, FirestoreCallback<Void> callback);
+    void addMyPlant(String userId, MyPlantModel myPlant, FirestoreCallback<Void> callback);
 
     // Cập nhật cây
     void updateMyPlant(MyPlantModel myPlant, FirestoreCallback<Void> callback);
 
     // Xóa cây
-    void deleteMyPlant(String myPlantId, FirestoreCallback<Void> callback);
+    void deleteMyPlant(String userId, String myPlantId, FirestoreCallback<Void> callback);
 
     // Các hàm cho Growth, Note, CustomInstruction...
 //    void getNotesForPlant(String myPlantId, FirestoreCallback<List<Note>> callback);

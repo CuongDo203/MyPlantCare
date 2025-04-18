@@ -9,6 +9,8 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Thông tin chi tiết về cây" />
+        android:text="Thông tin chi tiết về cây"
+        android:id="@+id/mota_cay"
+        />
 
 </FrameLayout>

@@ -25,7 +25,7 @@
             >
 
             <ImageView
-                android:id="@+id/ivMenu"
+                android:id="@+id/ivReturn"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:src="@drawable/ic_return"
@@ -64,13 +64,13 @@
 
 
             <!-- Biểu tượng cài đặt / hồ sơ (alignEnd) -->
-            <ImageView
-                android:id="@+id/ivNotification"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_gravity="right|center_vertical"
-                android:src="@drawable/notification"
-                android:contentDescription="Notification" />
+<!--            <ImageView-->
+<!--                android:id="@+id/ivNotification"-->
+<!--                android:layout_width="30dp"-->
+<!--                android:layout_height="30dp"-->
+<!--                android:layout_gravity="right|center_vertical"-->
+<!--                android:src="@drawable/notification"-->
+<!--                android:contentDescription="Notification" />-->
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 

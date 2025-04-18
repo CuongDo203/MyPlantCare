@@ -2,6 +2,7 @@ package com.example.myplantcare.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 
@@ -12,6 +13,11 @@ import androidx.navigation.ui.AppBarConfiguration;
 
 import com.example.myplantcare.R;
 import com.example.myplantcare.databinding.ActivityMainBinding;
+
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.Toast;
 import com.example.myplantcare.fragments.HomeFragment;
 import com.example.myplantcare.fragments.NoteFragment;
 import com.example.myplantcare.fragments.PlantFragment;
@@ -28,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
+
+
+    ImageView ivMenu;
 
     private BottomNavigationView bottomNavigationView;
 
@@ -68,8 +77,9 @@ public class MainActivity extends AppCompatActivity {
             } else if (itemId == R.id.nav_plant) {
                 fragment = new PlantFragment();
             } else if (itemId == R.id.nav_note) {
-
-                fragment = new NoteFragment();
+                Intent intent = new Intent(MainActivity.this, NoteActivity.class);
+                startActivity(intent);
+                return true;
             }
             else if (itemId == R.id.nav_statics){
                 fragment = null;
@@ -95,6 +105,20 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
+
+        ivMenu = findViewById(R.id.ivMenu);
+
+        // xử lý sidebar và thông tin cá nhân
+
+        ivMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Chuyển sang SideBarActivity
+                Intent intent = new Intent(MainActivity.this, SideBarActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
     private void loadFragment(Fragment fragment) {

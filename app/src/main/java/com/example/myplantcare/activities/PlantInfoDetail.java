@@ -70,6 +70,7 @@ public class PlantInfoDetail extends AppCompatActivity {
             String plantImage = intent.getStringExtra("plantImage");
             String plantId = intent.getStringExtra("plantId");
             String idealLight = intent.getStringExtra("idealLight");
+//            String description = intent.getStringExtra("description");
             double idealTemperatureMin = intent.getDoubleExtra("idealTemperatureMin", 0);
             double idealTemperatureMax = intent.getDoubleExtra("idealTemperatureMax", 0);
             double idealMoistureMin = intent.getDoubleExtra("idealMoistureMin", 0);
