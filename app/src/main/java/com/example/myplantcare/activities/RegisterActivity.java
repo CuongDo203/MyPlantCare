@@ -2,16 +2,20 @@ package com.example.myplantcare.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.myplantcare.R;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -24,6 +28,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     private boolean isAgreeChecked = false;
     private ImageView ivTogglePassword, ivToggleConfirmPassword;
 
+
+    private FirebaseAuth mAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,13 +50,15 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         ivToggleConfirmPassword = findViewById(R.id.ivToggleConfirmPassword);
         ivTogglePassword.setOnClickListener(this);
         ivToggleConfirmPassword.setOnClickListener(this);
+        mAuth = FirebaseAuth.getInstance();
     }
 
     @Override
     public void onClick(View v) {
         if(v.getId() == R.id.btnRegister) {
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
+//            Intent intent = new Intent(this, MainActivity.class);
+//            startActivity(intent);
+            registerUser();
         }
         else if(v.getId() == R.id.login_now) {
             Intent intent = new Intent(this, LoginActivity.class);
@@ -63,46 +71,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             togglePasswordVisibility(false);
         }
     }
-
-//    private void togglePasswordVisibility(boolean isPassword) {
-//        if (isPassword) {
-//            if (isPasswordVisible) {
-//                // Ẩn mật khẩu
-//                etPassword.setTransformationMethod(new android.text.method.PasswordTransformationMethod());
-//                etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-//                ivTogglePassword.setImageResource(R.drawable.splash_eye); // Icon mắt đóng
-//
-//            } else {
-//                // Hiển thị mật khẩu
-//                etPassword.setTransformationMethod(null);
-//                etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-//                ivTogglePassword.setImageResource(R.drawable.mdi_eye);
-//
-//            }
-//            // Giữ con trỏ ở cuối văn bản
-//            etPassword.setSelection(etPassword.getText().length());
-//            // Đảo trạng thái hiển thị mật khẩu
-//            isPasswordVisible = !isPasswordVisible;
-//        }
-//        else {
-//            if (isConfirmPasswordVisible) {
-//                // Ẩn mật khẩu
-//                etConfirmPassword.setTransformationMethod(new android.text.method.PasswordTransformationMethod());
-//                etConfirmPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-//                ivToggleConfirmPassword.setImageResource(R.drawable.splash_eye); //
-//            } else {
-//                // Hiển thị mật khẩu
-//                etConfirmPassword.setTransformationMethod(null);
-//                etConfirmPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-//                ivToggleConfirmPassword.setImageResource(R.drawable.mdi_eye);
-//            }
-//            // Giữ con trỏ ở cuối văn bản
-//            etConfirmPassword.setSelection(etConfirmPassword.getText().length());
-//            // Đảo trạng thái hiển thị mật khẩu
-//            isConfirmPasswordVisible = !isConfirmPasswordVisible;
-//        }
-//
-//    }
 
     private void togglePasswordVisibility(boolean isPassword) {
         if (isPassword) {
@@ -129,5 +97,50 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             isConfirmPasswordVisible = !isConfirmPasswordVisible;
         }
     }
+    private void registerUser() {
+        String email = etEmail.getText().toString().trim();
+        String password = etPassword.getText().toString().trim();
+        String confirmPassword = etConfirmPassword.getText().toString().trim();
 
+        // Kiểm tra các trường nhập liệu
+        if (TextUtils.isEmpty(email) || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            Toast.makeText(this, "Vui lòng nhập email hợp lệ", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (TextUtils.isEmpty(password)) {
+            Toast.makeText(this, "Vui lòng nhập mật khẩu", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (TextUtils.isEmpty(confirmPassword)) {
+            Toast.makeText(this, "Vui lòng xác nhận mật khẩu", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!password.equals(confirmPassword)) {
+            Toast.makeText(this, "Mật khẩu không khớp", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!cbAgree.isChecked()) {
+            Toast.makeText(this, "Bạn phải đồng ý với điều khoản sử dụng", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Đăng ký người dùng với Firebase
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        // Đăng ký thành công
+                        Toast.makeText(RegisterActivity.this, "Đăng ký thành công", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        // Đăng ký thất bại
+                        Toast.makeText(RegisterActivity.this, "Đăng ký thất bại: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
 }
