@@ -174,10 +174,11 @@
 
     <ImageView
         android:id="@+id/plant_image"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="260dp"
         android:src="@drawable/plant_sample"
         android:layout_gravity="center_vertical"
+        android:scaleType="centerCrop"
         />
 
 </LinearLayout>

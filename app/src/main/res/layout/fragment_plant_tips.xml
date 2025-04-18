@@ -3,12 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="16dp"
     tools:context=".fragments.PlantTipsFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Tips chăm sóc cây" />
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/tips_cham_soc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            tools:text="Đây là nơi hiển thị các mẹo và hướng dẫn chăm sóc cây." />
+    </ScrollView>
 
 </FrameLayout>
