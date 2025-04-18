@@ -1,6 +1,7 @@
 package com.example.myplantcare.data.repositories;
 
 import com.example.myplantcare.models.MyPlantModel;
+import com.example.myplantcare.utils.Constants;
 import com.example.myplantcare.utils.FirestoreCallback;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -15,8 +16,8 @@ public class MyPlantRepositoryImpl implements MyPlantRepository{
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     @Override
     public void getAllMyPlants(String userId, FirestoreCallback<List<MyPlantModel>> callback) {
-        CollectionReference myPLantsRef = db.collection("users")
-                .document(userId).collection("my_plants");
+        CollectionReference myPLantsRef = db.collection(Constants.USERS_COLLECTION)
+                .document(userId).collection(Constants.MY_PLANTS_COLLECTION);
         myPLantsRef.get().addOnSuccessListener(queryDocumentSnapshots -> {
             List<MyPlantModel> myPlants = new ArrayList<>();
             for(QueryDocumentSnapshot doc : queryDocumentSnapshots){
@@ -37,9 +38,9 @@ public class MyPlantRepositoryImpl implements MyPlantRepository{
 
     @Override
     public void addMyPlant(String userId, MyPlantModel myPlant, FirestoreCallback<Void> callback) {
-        DocumentReference docRef = db.collection("users")
+        DocumentReference docRef = db.collection(Constants.USERS_COLLECTION)
                 .document(userId)
-                .collection("my_plants")
+                .collection(Constants.MY_PLANTS_COLLECTION)
                 .document(); // Tạo ID tự động
 
         myPlant.setId(docRef.getId()); // Set ID cho model nếu bạn dùng
@@ -56,9 +57,9 @@ public class MyPlantRepositoryImpl implements MyPlantRepository{
 
     @Override
     public void deleteMyPlant(String userId, String myPlantId, FirestoreCallback<Void> callback) {
-        DocumentReference docRef = db.collection("users")
+        DocumentReference docRef = db.collection(Constants.USERS_COLLECTION)
                 .document(userId)
-                .collection("my_plants")
+                .collection(Constants.MY_PLANTS_COLLECTION)
                 .document(myPlantId);
 
         docRef.delete()

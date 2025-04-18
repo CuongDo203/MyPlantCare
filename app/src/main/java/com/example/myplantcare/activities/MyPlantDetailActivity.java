@@ -23,6 +23,7 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
         setContentView(R.layout.activity_my_plant_detail);
         initContents();
         btnBack.setOnClickListener(this);
+        btnDelete.setOnClickListener(this);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             myPlantName.setText(extras.getString("plantName"));
@@ -56,6 +57,9 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
     public void onClick(View v) {
         if(v.getId() == R.id.ivBack){
             finish();
+        }
+        else if(v.getId() == R.id.btn_delete_my_plant_detail){
+
         }
     }
 }

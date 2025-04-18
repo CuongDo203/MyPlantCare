@@ -5,6 +5,7 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -18,11 +19,17 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.myplantcare.R;
+import com.example.myplantcare.models.MyPlantModel;
+import com.example.myplantcare.viewmodels.MyPlantListViewModel;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 public class AddScheduleDialogFragment extends DialogFragment {
@@ -34,6 +41,9 @@ public class AddScheduleDialogFragment extends DialogFragment {
     private ImageButton buttonCloseDialog;
 
     private Calendar selectedDateCalendar = Calendar.getInstance();
+    private MyPlantListViewModel myPlantListViewModel;
+    private List<MyPlantModel> userPlants = new ArrayList<>();
+    private String userId = "eoWltJXzlBtC8U8QZx9G";
 
     @NonNull
     @Override
@@ -42,6 +52,18 @@ public class AddScheduleDialogFragment extends DialogFragment {
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.dialog_add_schedule, null);
         initContents(view);
+
+        myPlantListViewModel = new ViewModelProvider(requireActivity(), new ViewModelProvider.Factory() {
+            @NonNull
+            @Override
+            public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+                return (T)new MyPlantListViewModel(userId);
+            }
+        }).get(MyPlantListViewModel.class);
+        myPlantListViewModel.myPlants.observe(this, plants -> {
+            userPlants = plants;
+            updatePlantSpinner(userPlants);
+        });
         setupSpinners();
 
         buttonCloseDialog.setOnClickListener(v -> dismiss());
@@ -58,6 +80,25 @@ public class AddScheduleDialogFragment extends DialogFragment {
         }
 
         return dialog;
+    }
+
+    private void updatePlantSpinner(List<MyPlantModel> plants) {
+        List<String> plantNames = new ArrayList<>();
+        plantNames.add("Chọn 1 cây..."); // Thêm item gợi ý/placeholder đầu tiên
+
+        if (plants != null && !plants.isEmpty()) {
+            for (MyPlantModel plant : plants) {
+                plantNames.add(plant.getNickname()); // Giả sử MyPlantModel có phương thức getName()
+            }
+        } else {
+            // Trường hợp không có cây nào hoặc lỗi tải dữ liệu
+            Log.d("AddScheduleDialogFragment", "No plants found or error loading plants.");
+        }
+
+
+        ArrayAdapter<String> plantAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, plantNames);
+        plantAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerPlant.setAdapter(plantAdapter);
     }
 
     private void addPlant() {
