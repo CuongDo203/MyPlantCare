@@ -133,9 +133,8 @@ public class ScheduleFragment extends Fragment {
         recyclerViewScheduleUncompleted.setAdapter(scheduleAdapter);
 
         recyclerViewScheduleCompleted.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        scheduleAdapter = new ScheduleAdapter(scheduleListCompleted);
-        recyclerViewScheduleCompleted.setAdapter(scheduleAdapter);
+        ScheduleAdapter completedAdapter = new ScheduleAdapter(scheduleListCompleted);
+        recyclerViewScheduleCompleted.setAdapter(completedAdapter);
 
         btnOpenDatePicker.setOnClickListener(v -> openDatePicker());
         return view;
