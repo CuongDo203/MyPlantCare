@@ -24,10 +24,19 @@ import com.example.myplantcare.fragments.PlantFragment;
 import com.example.myplantcare.fragments.ScheduleFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import android.view.View;
+
+
+import android.widget.ImageView;
+
+
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
+
+
+    ImageView ivMenu;
 
     private BottomNavigationView bottomNavigationView;
 
@@ -68,7 +77,9 @@ public class MainActivity extends AppCompatActivity {
             } else if (itemId == R.id.nav_plant) {
                 fragment = new PlantFragment();
             } else if (itemId == R.id.nav_note) {
-                fragment = new NoteFragment();
+                Intent intent = new Intent(MainActivity.this, NoteActivity.class);
+                startActivity(intent);
+                return true;
             }
             else if (itemId == R.id.nav_statics){
                 fragment = null;
@@ -95,7 +106,21 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        ivMenu = findViewById(R.id.ivMenu);
+
+        // xử lý sidebar và thông tin cá nhân
+
+        ivMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Chuyển sang SideBarActivity
+                Intent intent = new Intent(MainActivity.this, SideBarActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
+
     private void loadFragment(Fragment fragment) {
         getSupportFragmentManager()
                 .beginTransaction()

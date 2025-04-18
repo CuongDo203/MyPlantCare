@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.activity.result.ActivityResultLauncher;
@@ -12,8 +13,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.myplantcare.adapters.DetailNoteAdapter;
@@ -21,7 +20,6 @@ import com.example.myplantcare.models.DetailNote;
 import com.example.myplantcare.R;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class DetailNoteFragment extends Fragment {
 
@@ -29,7 +27,6 @@ public class DetailNoteFragment extends Fragment {
     private DetailNoteAdapter adapter;
     private ArrayList<DetailNote> noteList;
     private int selectedPosition = -1;
-    private NavController navController;
     private TextView toolbarTitle;
     private ImageButton toolbarBackButton;
 
@@ -52,44 +49,46 @@ public class DetailNoteFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        navController = Navigation.findNavController(view);
 
-        // Ánh xạ các view từ layout
+        // Thiết lập Toolbar
+        androidx.appcompat.widget.Toolbar toolbar = view.findViewById(R.id.insider_toolbar);
+        toolbarTitle = toolbar.findViewById(R.id.toolbar_title);
+        toolbarBackButton = toolbar.findViewById(R.id.toolbar_back_button);
+        toolbarTitle.setText("Chi tiết ghi chú");
+        toolbarBackButton.setVisibility(View.VISIBLE);
+        toolbarBackButton.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().popBackStack();
+        });
+
+        // Nhận dữ liệu từ Bundle (nếu có)
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            String noteTitle = bundle.getString("noteTitle", "Tiêu đề ghi chú");
+            String noteContent = bundle.getString("noteContent", "Nội dung ghi chú");
+            String noteDate = bundle.getString("noteDate", "Ngày tạo");
+
+            // Ánh xạ các view hiển thị tiêu đề và ngày
+            TextView tvNoteTitle = view.findViewById(R.id.tv_note_title);
+            TextView tvNoteDate = view.findViewById(R.id.tv_note_date);
+            EditText etNoteContent = view.findViewById(R.id.tv_note_content);
+
+            // Cập nhật nội dung hiển thị
+            tvNoteTitle.setText(noteTitle);
+            tvNoteDate.setText(noteDate);
+            etNoteContent.setText(noteContent);
+        }
+
+        // Thiết lập RecyclerView
         recyclerView = view.findViewById(R.id.recycler_detail_notes);
-        androidx.appcompat.widget.Toolbar toolbar = view.findViewById(R.id.insider_toolbar); // ID của Toolbar bạn đã include
-        toolbarTitle = toolbar.findViewById(R.id.toolbar_title); // ID của TextView tiêu đề trong Toolbar
-        toolbarBackButton = toolbar.findViewById(R.id.toolbar_back_button); // ID của ImageButton back trong Toolbar
-
-        // Khởi tạo danh sách ghi chú
         noteList = new ArrayList<>();
-        // Thêm một ghi chú ban đầu (hoặc bạn có thể tải dữ liệu thực tế ở đây)
-        noteList.add(new DetailNote());
-        // Nếu bạn muốn sử dụng dữ liệu mẫu (chỉ để test UI), bạn có thể thêm như sau:
-        // loadSampleNotes();
+        noteList.add(new DetailNote()); // Ghi chú trống khởi tạo ban đầu
 
-        // Khởi tạo Adapter
         adapter = new DetailNoteAdapter(requireContext(), noteList, position -> {
             selectedPosition = position;
             imagePickerLauncher.launch("image/*");
         });
 
-        // Thiết lập Layout Manager và Adapter cho RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(adapter);
-
-        // Thiết lập tiêu đề cho Toolbar
-        toolbarTitle.setText("Chi tiết ghi chú");
-
-        // Thiết lập nút back trên Toolbar
-        toolbarBackButton.setVisibility(View.VISIBLE);
-        toolbarBackButton.setOnClickListener(v -> navController.popBackStack());
-    }
-
-    // Phương thức để tải dữ liệu mẫu (tùy chọn)
-    private void loadSampleNotes() {
-        noteList.add(new DetailNote(Uri.parse("android.resource://com.example.myplantcare/" + R.drawable.ic_add), "Nội dung 1"));
-        noteList.add(new DetailNote(null, ""));
-        noteList.add(new DetailNote(Uri.parse("android.resource://com.example.myplantcare/" + R.drawable.ic_add), "Thêm nội dung khác"));
-        // ... thêm dữ liệu mẫu của bạn
     }
 }

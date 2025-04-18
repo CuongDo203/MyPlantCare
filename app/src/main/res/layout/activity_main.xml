@@ -6,8 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     tools:context=".activities.MainActivity"
-    android:background="@color/white"
-    >
+    android:background="@color/white">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -21,9 +20,7 @@
             android:layout_height="match_parent"
             android:background="@color/white"
             android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-
-            >
+            android:paddingEnd="16dp">
 
             <ImageView
                 android:id="@+id/ivMenu"
@@ -36,8 +33,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_gravity="center_horizontal"
-                >
+                android:layout_gravity="center_horizontal">
 
                 <!-- Logo PlantCare -->
                 <ImageView
@@ -46,8 +42,7 @@
                     android:layout_height="40dp"
                     android:src="@drawable/logo"
                     android:contentDescription="Logo"
-                    android:layout_gravity="center_horizontal"
-                    />
+                    android:layout_gravity="center_horizontal" />
 
                 <!-- Tên ứng dụng -->
                 <TextView
@@ -59,7 +54,6 @@
                     android:textColor="@color/green_button"
                     android:textSize="22sp"
                     android:textStyle="bold" />
-
             </LinearLayout>
 
             <ImageView
@@ -72,16 +66,14 @@
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
+    <!-- Nội dung chính của ứng dụng -->
     <FrameLayout
         android:id="@+id/frame_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/bottomNavigation"
         android:background="@color/white"
         android:layout_marginTop="?attr/actionBarSize"
-        android:layout_marginBottom="@dimen/bottom_nav_height"
-        />
-         >
+        android:layout_marginBottom="@dimen/bottom_nav_height" />
 
     <!-- Thanh điều hướng dưới (Bottom Navigation) -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -94,6 +86,5 @@
         app:menu="@menu/menu_bottom_nav"
         app:itemIconTint="@color/nav_item_color_state"
         app:itemTextColor="@color/nav_item_color_state"
-        android:elevation="8dp"
-        />
+        android:elevation="8dp" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

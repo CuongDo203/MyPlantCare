@@ -5,11 +5,8 @@ import java.util.Date;
 public class Notification {
 
     private String title;
-
-
     private String count;
     private String content;
-
     private String created_At;
 
     private String type;
@@ -42,29 +39,24 @@ public class Notification {
     public String getCreated_At() {
         return created_At;
     }
-
     public String getType() {
         return type;
     }
     public void setTitle(String title) {
         this.title = title;
     }
-
     public void setContent(String content) {
         this.content = content;
     }
-
     public void setCreated_At(String created_At) {
         this.created_At = created_At;
     }
-
     public void setType(String type) {
         this.type = type;
     }
     public String getCount() {
         return count;
     }
-
     public void setCount(String count) {
         this.count = count;
     }

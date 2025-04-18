@@ -10,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.example.myplantcare.R;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
