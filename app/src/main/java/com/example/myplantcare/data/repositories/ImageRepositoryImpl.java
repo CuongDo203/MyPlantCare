@@ -8,20 +8,18 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.android.MediaManager;
 import com.cloudinary.android.callback.ErrorInfo;
 import com.cloudinary.android.callback.UploadCallback;
-import com.cloudinary.utils.ObjectUtils;
 import com.example.myplantcare.utils.FirestoreCallback;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ImageRepositoryImpl implements ImageRepository{
+public class ImageRepositoryImpl implements ImageRepository {
 
     private Cloudinary cloudinary;
     private String cloudName = "djugptpce";
 
     public ImageRepositoryImpl(Context context) {
-        initCloudinary(context);
+//        initCloudinary(context);
     }
 
     private void initCloudinary(Context context) {
@@ -31,11 +29,13 @@ public class ImageRepositoryImpl implements ImageRepository{
 //                "api_secret", "iK5cmT1V3lWXIsvSTjrq0TMxOcg"
 //        ));
 
-            Map<String, String> config = new HashMap<>();
-            config.put("cloud_name", cloudName);
-            config.put("api_key", "949566295821873");
-            config.put("api_secret", "iK5cmT1V3lWXIsvSTjrq0TMxOcg");
-            MediaManager.init(context, config);
+
+        Map<String, String> config = new HashMap<>();
+        config.put("cloud_name", cloudName);
+        config.put("api_key", "949566295821873");
+        config.put("api_secret", "iK5cmT1V3lWXIsvSTjrq0TMxOcg");
+        MediaManager.init(context, config);
+
 
     }
 
@@ -64,7 +64,7 @@ public class ImageRepositoryImpl implements ImageRepository{
                     @Override
                     public void onProgress(String requestId, long bytes, long totalBytes) {
                         double progress = (double) bytes / totalBytes;
-                        Log.d("ImageRepository", "Upload progress: " + requestId + " " + (int)(progress * 100) + "%");
+                        Log.d("ImageRepository", "Upload progress: " + requestId + " " + (int) (progress * 100) + "%");
                         // Tùy chọn: thông báo tiến trình upload
                         // callback.onProgress(progress); // Nếu callback của bạn có onProgress
                     }

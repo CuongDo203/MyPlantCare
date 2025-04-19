@@ -1,7 +1,7 @@
 package com.example.myplantcare.adapters;
 
 import android.content.Intent;
-import android.util.Log;
+import android.util.Log; // Import Log
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,33 +10,65 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog; // Import AlertDialog nếu vẫn cần cho xác nhận xóa (tùy UI)
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.myplantcare.R;
 import com.example.myplantcare.activities.MyPlantDetailActivity;
+import com.example.myplantcare.activities.NoteActivity;
 import com.example.myplantcare.activities.PlantLogActivity;
-import com.example.myplantcare.data.repositories.MyPlantRepositoryImpl;
+// Import các lớp khác nếu cần cho model hoặc utils
 import com.example.myplantcare.models.MyPlantModel;
-import com.example.myplantcare.utils.DateUtils;
-import com.example.myplantcare.utils.FirestoreCallback;
+import com.example.myplantcare.utils.DateUtils; // Import DateUtils nếu dùng
 
+import java.util.ArrayList; // Import ArrayList
 import java.util.List;
 
-public class MyPlantAdapter  extends RecyclerView.Adapter<MyPlantAdapter.MyPlantViewHolder> {
+public class MyPlantAdapter extends RecyclerView.Adapter<MyPlantAdapter.MyPlantViewHolder> {
 
-    List<MyPlantModel> myPlantList;
-    private String userId;
-    private MyPlantRepositoryImpl repository;
-    private Runnable onDeleteSuccess;
+    private static final String TAG = "MyPlantAdapter"; // Thêm TAG
 
-    public MyPlantAdapter(List<MyPlantModel> myPlantList, String userId, MyPlantRepositoryImpl repository, Runnable onDeleteSuccess) {
-        this.myPlantList = myPlantList;
-        this.userId = userId;
-        this.repository = repository;
-        this.onDeleteSuccess = onDeleteSuccess;
+    private List<MyPlantModel> myPlantList = new ArrayList<>(); // Khởi tạo rỗng mặc định
+    private OnPlantItemClickListener listener; // Biến lưu listener
+
+    // Interface listener (giữ nguyên hoặc định nghĩa lại tùy nhu cầu chính xác của Fragment)
+    public interface OnPlantItemClickListener {
+        void onPlantClick(MyPlantModel plant); // Xử lý click vào item
+        void onDeleteClick(MyPlantModel plant); // Xử lý click vào nút xóa
+        // Thêm các sự kiện click khác nếu cần (ví dụ: click nút Logs, click nút Notes)
+        // void onLogsClick(MyPlantModel plant);
+        // void onNotesClick(MyPlantModel plant);
     }
+
+    // Constructor mới: nhận danh sách ban đầu và listener
+    public MyPlantAdapter(List<MyPlantModel> myPlantList, OnPlantItemClickListener listener) {
+        // Gán danh sách. Sử dụng bản sao hoặc danh sách rỗng nếu danh sách đầu vào null
+        this.myPlantList = myPlantList != null ? myPlantList : new ArrayList<>();
+        this.listener = listener;
+        Log.d(TAG, "Adapter initialized with " + this.myPlantList.size() + " plants and listener.");
+    }
+
+    // Constructor cũ có thể giữ lại tạm thời nếu còn nơi sử dụng chưa sửa
+    /*
+    public MyPlantAdapter(List<MyPlantModel> myPlantList, String userId, MyPlantRepositoryImpl repository, Runnable onDeleteSuccess) {
+         this.myPlantList = myPlantList != null ? myPlantList : new ArrayList<>();
+         // Các tham số userId, repository, onDeleteSuccess sẽ không được sử dụng trong adapter này
+         // vì logic được chuyển lên Fragment/ViewModel.
+         // Cần cảnh báo hoặc ghi log nếu các tham số này không được sử dụng.
+         Log.w(TAG, "Using deprecated constructor. userId, repository, onDeleteSuccess are ignored.");
+         // Nếu bạn vẫn cần xác nhận xóa AlertDialog trong Adapter, bạn có thể giữ lại repository TẠM THỜI,
+         // nhưng logic gọi repository.deleteMyPlant() nên ở Fragment/ViewModel.
+    }
+    */
+
+    // Phương thức để cập nhật dữ liệu cho Adapter (đã có và sử dụng tốt)
+    public void setMyPlants(List<MyPlantModel> newPlantList) {
+        this.myPlantList = newPlantList != null ? newPlantList : new ArrayList<>();
+        notifyDataSetChanged(); // Thông báo cho RecyclerView cập nhật toàn bộ
+        Log.d(TAG, "Adapter data updated. New size: " + this.myPlantList.size());
+    }
+
 
     @NonNull
     @Override
@@ -48,65 +80,83 @@ public class MyPlantAdapter  extends RecyclerView.Adapter<MyPlantAdapter.MyPlant
     @Override
     public void onBindViewHolder(@NonNull MyPlantViewHolder holder, int position) {
         MyPlantModel myPlant = myPlantList.get(position);
+
+        // Bind dữ liệu lên Views trong item
         holder.myPlantName.setText(myPlant.getNickname());
         holder.myPlantLocation.setText(myPlant.getLocation());
-        holder.myPlantProgress.setText(myPlant.getProgress() + "%");
-        Glide.with(holder.itemView.getContext()).load(myPlant.getImage()).into(holder.myPlantImage);
+        // Kiểm tra null trước khi sử dụng các giá trị double/Timestamp
+        holder.myPlantProgress.setText(String.format("%d%%", (int) myPlant.getProgress())); // Ép kiểu int nếu progress là double
+        Glide.with(holder.itemView.getContext())
+                .load(myPlant.getImage())
+                .placeholder(R.drawable.plant_sample)
+                .error(R.drawable.ic_photo_error)
+                .into(holder.myPlantImage);
+
+        // TODO: Bind các thông tin khác nếu cần
+        // Định dạng và hiển thị ngày tháng nếu cần trong item layout
+        // if (myPlant.getCreatedAt() != null) {
+        //     holder.myPlantCreated.setText(DateUtils.formatTimestamp(myPlant.getCreatedAt(), DateUtils.DATE_FORMAT_DISPLAY));
+        // }
+        // if (myPlant.getUpdatedAt() != null) {
+        //     holder.myPlantUpdated.setText(DateUtils.formatTimestamp(myPlant.getUpdatedAt(), DateUtils.DATE_FORMAT_DISPLAY));
+        // }
+
+
+        // --- Thiết lập Click Listener cho item View ---
         holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(holder.itemView.getContext(), MyPlantDetailActivity.class);
-            intent.putExtra("plantName", myPlant.getNickname());
-            intent.putExtra("location", myPlant.getLocation());
-            intent.putExtra("progress", myPlant.getProgress());
-            intent.putExtra("image", myPlant.getImage());
-            intent.putExtra("id", myPlant.getPlantId());
-            intent.putExtra("my_plant_created", DateUtils.formatTimestamp(myPlant.getCreatedAt(), DateUtils.DATE_FORMAT_DISPLAY));
-            intent.putExtra("my_plant_updated", DateUtils.formatTimestamp(myPlant.getUpdatedAt(), DateUtils.DATE_FORMAT_DISPLAY));
-            Log.d("MyPlantAdapter", "Ngày tạo: " + DateUtils.formatTimestamp(myPlant.getCreatedAt(), DateUtils.DATE_FORMAT_DISPLAY));
-            Log.d("MyPlantAdapter", "Ngày cập nhật: " + DateUtils.formatTimestamp(myPlant.getUpdatedAt(), DateUtils.DATE_FORMAT_DISPLAY));
-            // Thêm thông tin khác sau
-            holder.itemView.getContext().startActivity(intent);
+            if (listener != null) {
+                listener.onPlantClick(myPlant); // Gọi phương thức onPlantClick của listener
+                Log.d(TAG, "Item clicked for plant ID: " + myPlant.getId());
+            } else {
+                Log.w(TAG, "OnPlantItemClickListener is null. Item click not handled.");
+            }
         });
+
+        // --- Thiết lập Click Listener cho nút Xóa ---
+        holder.btnDeleteMyPlant.setOnClickListener(v -> {
+            if (listener != null) {
+                // Thay vì tự xử lý xóa, gọi phương thức onDeleteClick của listener
+                listener.onDeleteClick(myPlant);
+                Log.d(TAG, "Delete clicked for plant ID: " + myPlant.getId());
+            } else {
+                Log.w(TAG, "OnPlantItemClickListener is null. Delete click not handled.");
+                // Tùy chọn: Vẫn hiển thị AlertDialog xác nhận nếu listener null
+                // showDeleteConfirmationDialog(holder.itemView.getContext(), myPlant); // Cần implement hàm này
+            }
+        });
+
+        // --- Thiết lập Click Listener cho nút Logs ---
         holder.btnMyPlantLogs.setOnClickListener(v -> {
+            // Nếu bạn muốn Fragment xử lý, thêm vào listener interface và gọi listener.onLogsClick(myPlant)
+            // Nếu Adapter tự mở Activity, giữ nguyên code dưới đây:
+            Log.d(TAG, "Logs clicked for plant ID: " + myPlant.getId());
             Intent intent = new Intent(holder.itemView.getContext(), PlantLogActivity.class);
             intent.putExtra("plantName", myPlant.getNickname());
             intent.putExtra("image", myPlant.getImage());
-            intent.putExtra("id", myPlant.getPlantId());
+            intent.putExtra("id", myPlant.getId());
             holder.itemView.getContext().startActivity(intent);
         });
-        holder.btnDeleteMyPlant.setOnClickListener(v -> {
-            new AlertDialog.Builder(holder.itemView.getContext())
-                    .setTitle("Xác nhận xoá")
-                    .setMessage("Bạn có chắc chắn muốn xoá cây \"" + myPlant.getNickname() + "\" không?")
-                    .setPositiveButton("Xoá", (dialog, which) -> {
-                        String plantId = myPlant.getId(); // ID document trong Firestore
 
-                        repository.deleteMyPlant(userId, plantId, new FirestoreCallback<Void>() {
-                            @Override
-                            public void onSuccess(Void result) {
-                                myPlantList.remove(position);
-                                notifyItemRemoved(position);
-                                notifyItemRangeChanged(position, myPlantList.size());
-                                if (onDeleteSuccess != null) onDeleteSuccess.run();
-                            }
-
-                            @Override
-                            public void onError(Exception e) {
-                                Log.e("DeletePlant", "Lỗi khi xoá cây: " + e.getMessage());
-                            }
-                        });
-                    })
-                    .setNegativeButton("Huỷ", (dialog, which) -> dialog.dismiss())
-                    .show();
+        // --- Thiết lập Click Listener cho nút Notes ---
+        holder.btnMyPlantNotes.setOnClickListener(v -> {
+            // Nếu bạn muốn Fragment xử lý, thêm vào listener interface và gọi listener.onNotesClick(myPlant)
+            // Nếu Adapter tự mở Activity, giữ nguyên code dưới đây:
+            Log.d(TAG, "Notes clicked for plant ID: " + myPlant.getId());
+            Intent intent = new Intent(holder.itemView.getContext(), NoteActivity.class);
+            intent.putExtra("plantName", myPlant.getNickname());
+            intent.putExtra("image", myPlant.getImage());
+            intent.putExtra("id", myPlant.getId()); // Dùng ID của MyPlantModel, không phải Plant template ID
+            holder.itemView.getContext().startActivity(intent);
         });
     }
 
     @Override
     public int getItemCount() {
-        return myPlantList != null ? myPlantList.size() : 0;
+        return myPlantList.size(); // Sử dụng size() trực tiếp, trả về 0 nếu list rỗng/null (do khởi tạo rỗng)
     }
 
-    public static  class MyPlantViewHolder extends RecyclerView.ViewHolder {
-
+    // --- ViewHolder Class (giữ nguyên) ---
+    public static class MyPlantViewHolder extends RecyclerView.ViewHolder {
         ImageView myPlantImage;
         ImageView btnDeleteMyPlant;
         TextView myPlantName;
@@ -114,7 +164,6 @@ public class MyPlantAdapter  extends RecyclerView.Adapter<MyPlantAdapter.MyPlant
         TextView myPlantProgress;
         LinearLayout btnMyPlantNotes;
         LinearLayout btnMyPlantLogs;
-
         public MyPlantViewHolder(View itemView) {
             super(itemView);
             myPlantImage = itemView.findViewById(R.id.img_my_plant);
@@ -125,7 +174,24 @@ public class MyPlantAdapter  extends RecyclerView.Adapter<MyPlantAdapter.MyPlant
             btnMyPlantNotes = itemView.findViewById(R.id.btn_my_plant_notes);
             btnMyPlantLogs = itemView.findViewById(R.id.btn_my_plant_logs);
         }
-
     }
+
+    // TODO: Hàm xác nhận xóa nếu bạn quyết định xử lý AlertDialog trong Adapter
+     /*
+     private void showDeleteConfirmationDialog(Context context, MyPlantModel plantToDelete) {
+          new AlertDialog.Builder(context)
+                     .setTitle("Xác nhận xoá")
+                     .setMessage("Bạn có chắc chắn muốn xoá cây \"" + plantToDelete.getNickname() + "\" không?")
+                     .setPositiveButton("Xoá", (dialog, which) -> {
+                         // Vẫn gọi listener ở đây sau khi người dùng xác nhận
+                         if (listener != null) {
+                             listener.onDeleteClick(plantToDelete);
+                             Log.d(TAG, "User confirmed delete for plant ID: " + plantToDelete.getId());
+                         }
+                     })
+                     .setNegativeButton("Huỷ", (dialog, which) -> dialog.dismiss())
+                     .show();
+     }
+     */
 
 }

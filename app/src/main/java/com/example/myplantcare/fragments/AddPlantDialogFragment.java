@@ -213,7 +213,7 @@ public class AddPlantDialogFragment extends DialogFragment {
         MyPlantModel myPlantToSave = new MyPlantModel(); // Sử dụng constructor rỗng nếu có setters
         myPlantToSave.setNickname(plantName); // Giả sử nickname là tên cây nhập vào
         myPlantToSave.setLocation(location);
-        myPlantToSave.setPlantId(speciesId); // Lưu speciesId vào trường plantId trong MyPlantModel
+        myPlantToSave.setSpeciesId(speciesId); // Lưu speciesId vào trường plantId trong MyPlantModel
         myPlantToSave.setUserId(userId);
         // myPlantToSave.setProgress(0); // Set progress nếu cần
         // TODO: Set plantingDateCalendar vào MyPlantModel
