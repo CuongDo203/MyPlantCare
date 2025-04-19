@@ -2,36 +2,46 @@ package com.example.myplantcare.activities;
 
 import android.Manifest;
 import android.app.Activity; // Import Activity
+import android.content.DialogInterface;
 import android.content.Intent; // Import Intent
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.bumptech.glide.Glide;
 import com.example.myplantcare.R;
+import com.example.myplantcare.adapters.MyPlantScheduleAdapter;
 import com.example.myplantcare.data.repositories.MyPlantRepository;
 import com.example.myplantcare.data.repositories.MyPlantRepositoryImpl;
 import com.example.myplantcare.fragments.AddScheduleDialogFragment;
 import com.example.myplantcare.models.MyPlantModel;
+import com.example.myplantcare.models.ScheduleModel;
 import com.example.myplantcare.utils.DateUtils;
 import com.example.myplantcare.utils.FirestoreCallback;
 import com.example.myplantcare.viewmodels.ImageViewModel;
+import com.example.myplantcare.viewmodels.MyPlantDetailViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -55,6 +65,12 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
     private ActivityResultLauncher<Intent> updateActivityLauncher;
     private ImageViewModel imageViewModel;
     private MyPlantRepository myPlantRepository;
+    private RecyclerView recyclerViewSchedules;
+    private MyPlantScheduleAdapter myPlantScheduleAdapter;
+    private MyPlantDetailViewModel myPlantDetailViewModel;
+    private LottieAnimationView lottieNoSchedule;
+    private ProgressBar progressBarSchedules; // Tham chiếu ProgressBar
+    private LinearLayout emptySchedulesView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +91,17 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
 //        }
          currentUserId = "eoWltJXzlBtC8U8QZx9G"; // Xóa hardcode này khi có Auth thật
 
-
+        Intent intent = getIntent();
+        if (intent != null && intent.getExtras() != null) {
+            myPlantId = intent.getExtras().getString("id"); // Lấy ID từ Intent, key phải khớp
+        }
+        if (TextUtils.isEmpty(currentUserId) || TextUtils.isEmpty(myPlantId)) {
+            Log.e(TAG, "User ID (" + currentUserId + ") or MyPlant ID (" + myPlantId + ") is null or empty. Cannot proceed.");
+            Toast.makeText(this, "Lỗi: Không tìm thấy thông tin cây.", Toast.LENGTH_SHORT).show();
+            finish(); // Đóng Activity nếu thiếu ID quan trọng
+            return; // Rời khỏi onCreate
+        }
+        myPlantDetailViewModel = new ViewModelProvider(this, new MyPlantDetailViewModel.Factory(currentUserId, myPlantId)).get(MyPlantDetailViewModel.class);
         imageViewModel = new ViewModelProvider(this, new ViewModelProvider.Factory() {
             @NonNull
             @Override
@@ -87,17 +113,58 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
             }
         }).get(ImageViewModel.class);
 
-
         initContents();
+        setupRecyclerViews();
         registerActivityResults();
+        setupObservers();
+        setupClickListeners();
+        getAndDisplayPlantData();
+    }
 
+    private void setupClickListeners() {
         btnBack.setOnClickListener(this);
         btnDelete.setOnClickListener(this);
         btnChangeImage.setOnClickListener(this);
         btnUpdate.setOnClickListener(this);
         btnAddSchedule.setOnClickListener(this);
+    }
 
-        getAndDisplayPlantData();
+    private void setupObservers() {
+        myPlantDetailViewModel.schedules.observe(this, schedules -> {
+            if (!isFinishing() && !isDestroyed()) {
+                Log.d(TAG, "Schedules LiveData updated. Size: " + (schedules != null ? schedules.size() : "null"));
+
+                // *** LOGIC HIỂN THỊ DỮ LIỆU/EMPTY STATE/LOADING ***
+                if (schedules == null || schedules.isEmpty()) {
+                    // Danh sách rỗng hoặc null
+                    recyclerViewSchedules.setVisibility(View.GONE);
+                    emptySchedulesView.setVisibility(View.VISIBLE); // Hiển thị layout rỗng
+                    // Ensure Lottie animation starts if it was paused
+                    lottieNoSchedule.playAnimation(); // Bắt đầu animation
+                } else {
+                    // Có dữ liệu
+                    emptySchedulesView.setVisibility(View.GONE); // Ẩn layout rỗng
+                    recyclerViewSchedules.setVisibility(View.VISIBLE); // Hiển thị RecyclerView
+                    myPlantScheduleAdapter.setSchedules(schedules); // Cập nhật Adapter
+
+                }
+                // Ẩn ProgressBar sau khi dữ liệu (rỗng hoặc không rỗng) đã được xử lý
+                progressBarSchedules.setVisibility(View.GONE);
+
+            } else {
+                Log.d(TAG, "Ignoring schedules update, Activity is finishing.");
+            }
+        });
+        myPlantDetailViewModel.isLoadingSchedules.observe(this, isLoading -> {
+            Log.d(TAG, "isLoadingSchedules updated: " + isLoading);
+        });
+        myPlantDetailViewModel.operationResult.observe(this, result -> {
+            if (result != null && !result.isEmpty()) {
+                Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "Operation result message: " + result);
+//                myPlantDetailViewModel.clearOperationResult();
+            }
+        });
     }
 
     private void registerActivityResults() {
@@ -243,6 +310,10 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
         btnChangeImage = findViewById(R.id.change_my_plant_image);
         btnBack = findViewById(R.id.ivBack);
         btnAddSchedule = findViewById(R.id.btn_them_lich_trinh);
+        recyclerViewSchedules = findViewById(R.id.recycler_view_schedules);
+        lottieNoSchedule = findViewById(R.id.lottie_no_schedule);
+        progressBarSchedules = findViewById(R.id.progress_bar_schedules);
+        emptySchedulesView = findViewById(R.id.empty_schedules_view);
     }
 
     @Override
@@ -264,6 +335,7 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
             intent.putExtra("status", myPlantStatus.getText().toString());
             updateActivityLauncher.launch(intent);
         } else if (id == R.id.btn_them_lich_trinh) {
+
             Log.d(TAG, "Add Schedule button clicked.");
             if (currentUserId != null && myPlantId != null) {
                 // Tạo instance của DialogFragment bằng newInstance() factory method
@@ -345,15 +417,7 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
                 showLoading(false);
                 // Cập nhật ảnh hiển thị trên UI ngay lập tức
                 Glide.with(MyPlantDetailActivity.this).load(imageUrl).into(myPlantImg);
-
-                // *** ĐẶT KẾT QUẢ TRẢ VỀ LÀ OK TRƯỚC KHI FINISH ***
                 setResult(Activity.RESULT_OK); // Đặt kết quả thành công
-                // TODO: Nếu bạn muốn truyền ID cây về, bạn có thể bỏ extra vào Intent:
-                // Intent resultIntent = new Intent();
-                // resultIntent.putExtra("updatedPlantId", plantId);
-                // setResult(Activity.RESULT_OK, resultIntent);
-
-                // finish(); // Activity sẽ tự đóng khi quay lại Fragment
             }
 
             @Override
@@ -368,28 +432,87 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
 
     private void showLoading(boolean isLoading) {
         btnChangeImage.setEnabled(!isLoading);
-        // TODO: btnSave có thể không tồn tại, cần kiểm tra null hoặc thêm vào initContents
-        // if (btnSave != null) {
-        //    btnSave.setEnabled(!isLoading);
-        // }
-        // TODO: Thêm ProgressBar vào layout và điều khiển visibility ở đây
     }
 
-    // TODO: Cần thêm các phương thức xử lý sự kiện click khác (Delete, Update, Add Schedule)
 
-    // Thêm phương thức này nếu bạn cần xử lý khi Activity đóng (ví dụ: khi nhấn Back)
-    // Nếu bạn dùng setResult(Activity.RESULT_OK) trong onSuccess và finish() sau đó,
-    // MyPlantFragment sẽ nhận được kết quả OK. Nếu người dùng nhấn nút Back
-    // trước khi update xong, kết quả mặc định là CANCELED, MyPlantFragment sẽ không refresh.
-    // Điều này thường là hành vi mong muốn.
+    private void setupRecyclerViews() {
+        // Setup RecyclerView cho Lịch trình
+        myPlantScheduleAdapter = new MyPlantScheduleAdapter(new MyPlantScheduleAdapter.OnScheduleItemClickListener() {
+            @Override
+            public void onDeleteClick(ScheduleModel schedule) {
+                // Xử lý click nút xóa trong item lịch trình
 
-    // @Override
-    // public void finish() {
-    //     // Kiểm tra xem đã đặt kết quả chưa. Nếu chưa, đặt kết quả mặc định là CANCELED.
-    //     // int resultCode = getCallingActivity() != null ? RESULT_CANCELED : RESULT_OK; // Logic phức tạp hơn
-    //     // setResult(resultCode); // Có thể cần logic phức tạp hơn để đặt CANCELED đúng lúc
-    //     super.finish();
-    // }
+            }
+            // TODO: Implement các click listener khác của ScheduleAdapter nếu có
+        });
+        recyclerViewSchedules.setLayoutManager(new LinearLayoutManager(this)); // LayoutManager (ví dụ: dọc)
+        recyclerViewSchedules.setAdapter(myPlantScheduleAdapter);
 
+    }
 
+    private void showDeletePlantConfirmationDialog() {
+        // TODO: Triển khai AlertDialog xác nhận xóa cây chính
+        new AlertDialog.Builder(this)
+                .setTitle("Xác nhận xoá cây")
+                .setMessage("Bạn có chắc chắn muốn xoá cây này không?")
+                .setPositiveButton("Xoá", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Gọi repository để xóa
+                        if (!TextUtils.isEmpty(currentUserId) && !TextUtils.isEmpty(myPlantId)) {
+                            myPlantRepository.deleteMyPlant(currentUserId, myPlantId, new FirestoreCallback<Void>() {
+                                @Override
+                                public void onSuccess(Void data) {
+                                    if (!isFinishing() && !isDestroyed()) { // <-- KIỂM TRA TRẠNG THÁI
+                                        Toast.makeText(MyPlantDetailActivity.this, "Đã xóa cây.", Toast.LENGTH_SHORT).show();
+                                        // Sau khi xóa thành công, quay về màn hình danh sách cây
+                                        finish(); // Đóng Activity chi tiết
+                                    } else {
+                                        Log.d(TAG, "Ignoring delete success callback, Activity is finishing.");
+                                    }
+                                }
+
+                                @Override
+                                public void onError(Exception e) {
+                                    if (!isFinishing() && !isDestroyed()) { // <-- KIỂM TRA TRẠNG THÁI
+                                        Log.e(TAG, "Lỗi khi xoá cây:", e);
+                                        Toast.makeText(MyPlantDetailActivity.this, "Lỗi xóa cây: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Log.d(TAG, "Ignoring delete error callback, Activity is finishing.");
+                                    }
+                                }
+                            });
+                        } else {
+                            Log.e(TAG, "Cannot delete plant: userId or plantId is missing.");
+                        }
+                    }
+                })
+                .setNegativeButton("Huỷ", null)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
+
+    private void showDeleteScheduleConfirmationDialog(ScheduleModel scheduleToDelete) {
+        // TODO: Triển khai AlertDialog xác nhận xóa lịch trình
+        if (scheduleToDelete == null || TextUtils.isEmpty(scheduleToDelete.getId())) {
+            Log.w(TAG, "Cannot show delete schedule dialog, invalid schedule.");
+            return;
+        }
+        new AlertDialog.Builder(this)
+                .setTitle("Xác nhận xoá lịch trình")
+                .setMessage("Bạn có chắc chắn muốn xoá lịch trình \"" + scheduleToDelete.getTaskId() + "\" không?") // Hiển thị tên task
+                // TODO: Lấy tên task thân thiện thay vì Task ID
+                .setPositiveButton("Xoá", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Gọi ViewModel để xóa lịch trình
+                        if (!TextUtils.isEmpty(scheduleToDelete.getId())) {
+                            myPlantDetailViewModel.deleteSchedule(scheduleToDelete.getId());
+                        } else {
+                            Log.w(TAG, "Cannot delete schedule, schedule ID is missing.");
+                        }
+                    }
+                })
+                .setNegativeButton("Huỷ", null)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
 }

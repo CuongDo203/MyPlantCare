@@ -10,5 +10,6 @@ import java.util.Map;
 public interface ScheduleRepository {
 
     void getTodaySchedulesGroupedByTask(String userId, FirestoreCallback<Map<String, List<ScheduleWithMyPlantInfo>>> callback);
-
+    void getSchedulesByMyPlantId(String userId, String myPlantId, FirestoreCallback<List<ScheduleModel>> callback);
+    void deleteSchedule(String userId, String myPlantId, String scheduleId, FirestoreCallback<Void> callback);
 }

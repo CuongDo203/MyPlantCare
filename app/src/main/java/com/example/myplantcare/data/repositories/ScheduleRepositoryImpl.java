@@ -11,13 +11,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -25,13 +24,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ScheduleRepositoryImpl implements ScheduleRepository{
+public class ScheduleRepositoryImpl implements ScheduleRepository {
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CollectionReference userRef = db.collection(Constants.USERS_COLLECTION);
     private CollectionReference schedulesRef = db.collection(Constants.SCHEDULES_COLLECTION);
     private CollectionReference tasksRef = db.collection(Constants.TASKS_COLLECTION);
     private CollectionReference myPlantsRef;
+
     @Override
     public void getTodaySchedulesGroupedByTask(String userId, FirestoreCallback<Map<String, List<ScheduleWithMyPlantInfo>>> callback) { // Cập nhật kiểu Callback
         CollectionReference myPlantsRef = db.collection(Constants.USERS_COLLECTION).document(userId).collection(Constants.MY_PLANTS_COLLECTION);
@@ -174,6 +174,59 @@ public class ScheduleRepositoryImpl implements ScheduleRepository{
         });
     }
 
+    @Override
+    public void getSchedulesByMyPlantId(String userId, String myPlantId, FirestoreCallback<List<ScheduleModel>> callback) {
+        if (userId == null || myPlantId == null) {
+            callback.onError(new Exception("Invalid parameters"));
+        } else {
+            CollectionReference schedulesRef = db.collection(Constants.USERS_COLLECTION)
+                    .document(userId)
+                    .collection(Constants.MY_PLANTS_COLLECTION)
+                    .document(myPlantId)
+                    .collection(Constants.SCHEDULES_COLLECTION);
+
+            schedulesRef.orderBy("start_date", Query.Direction.ASCENDING)
+                    .get().addOnSuccessListener(queryDocumentSnapshots -> {
+                        List<ScheduleModel> schedules = new ArrayList<>();
+                        for(QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                            ScheduleModel schedule = doc.toObject(ScheduleModel.class);
+                            schedule.setId(doc.getId());
+                            schedules.add(schedule);
+                        }
+                        Log.d("ScheduleRepository", "Fetched " + schedules.size() + " schedules for plant ID: " + myPlantId);
+                        callback.onSuccess(schedules);
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("ScheduleRepository", "Error fetching schedules for plant ID: " + myPlantId, e);
+                        callback.onError(e);
+                    });
+        }
+    }
+
+    @Override
+    public void deleteSchedule(String userId, String myPlantId, String scheduleId, FirestoreCallback<Void> callback) {
+        if (userId == null || myPlantId == null || scheduleId == null) {
+            Log.w("ScheduleRepository", "deleteSchedule: userId, myPlantId, or scheduleId is null");
+            callback.onError(new IllegalArgumentException("userId, myPlantId, and scheduleId must not be null"));
+            return;
+        }
+        DocumentReference scheduleRef = db.collection(Constants.USERS_COLLECTION)
+                .document(userId)
+                .collection(Constants.MY_PLANTS_COLLECTION)
+                .document(myPlantId)
+                .collection(Constants.SCHEDULES_COLLECTION)
+                .document(scheduleId);
+
+        scheduleRef.delete()
+                .addOnSuccessListener(unused -> {
+                    Log.d("ScheduleRepository", "Schedule deleted successfully for ID: " + scheduleId);
+                    callback.onSuccess(null);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("ScheduleRepository", "Error deleting schedule for ID: " + scheduleId, e);
+                    callback.onError(e);
+                });
+    }
     private boolean shouldDoToday(ScheduleModel schedule) {
         if (schedule.getStartDate() == null) return false;
         Date start = schedule.getStartDate().toDate();
