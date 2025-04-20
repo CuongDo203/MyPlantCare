@@ -1,3 +1,4 @@
+// File: com.example.myplantcare.activities/PlantInfoDetail.java
 package com.example.myplantcare.activities;
 
 import android.content.Intent;
@@ -5,6 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,96 +17,133 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.bumptech.glide.Glide;
 import com.example.myplantcare.R;
-import com.example.myplantcare.adapters.ViewPagerPlantInfoAdapter;
+import com.example.myplantcare.adapters.ViewPagerPlantInfoAdapter; // Import Adapter
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator; // Import TabLayoutMediator
+
+import java.util.Locale;
 
 public class PlantInfoDetail extends AppCompatActivity {
 
+    private static final String TAG = "PlantInfoDetail"; // Thêm TAG
+
     private ViewPager2 viewPager;
     private TabLayout tabLayout;
-    private ViewPagerPlantInfoAdapter viewPagerAdapter;
     private ImageView btnBack;
-    private TextView plantName, speciesName, lightInfo, temperatureInfo, moistureInfo, waterInfo;
-    ImageView plantImage;
+    private TextView plantNameTextView, speciesNameTextView, lightInfoTextView, temperatureInfoTextView, moistureInfoTextView, waterInfoTextView; // Đổi tên biến để tránh trùng với String extra
+    ImageView plantImageView; // Đổi tên biến
+
+    // Biến để lưu dữ liệu từ Intent
+    private String plantDescription;
+    private String plantInstruction;
+    private String currentPlantName; // Lưu tên cây nếu cần dùng sau này
+    private String currentSpeciesName; // Lưu tên loài nếu cần dùng sau này
+    private String currentPlantImage; // Lưu url ảnh nếu cần dùng sau này
+    private String currentPlantId;
+    private String currentIdealLight;
+    private double currentIdealTemperatureMin, currentIdealTemperatureMax;
+    private double currentIdealMoistureMin, currentIdealMoistureMax;
+    private double currentIdealWaterMin, currentIdealWaterMax;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_plant_info_detail);
 
-        initContents();
-        getPlantData();
+        initViews(); // Đổi tên hàm tìm views
+        getPlantData(); // Lấy dữ liệu từ Intent và lưu vào biến
+        setupViewPagerWithTabs(); // Setup ViewPager và TabLayout sau khi có dữ liệu
+
         btnBack.setOnClickListener(v -> {
-            finish();
+            finish(); // Quay lại màn hình trước
         });
+    }
 
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                viewPager.setCurrentItem(tab.getPosition());
-            }
+    // Đổi tên hàm từ initContents thành initViews cho rõ ràng
+    private void initViews() {
+        viewPager = findViewById(R.id.view_pager_plant);
+        tabLayout = findViewById(R.id.tab_info);
+        btnBack = findViewById(R.id.ivBack);
+        plantImageView = findViewById(R.id.plant_image); // Sử dụng tên mới
+        plantNameTextView = findViewById(R.id.plant_name); // Sử dụng tên mới
+        speciesNameTextView = findViewById(R.id.species); // Sử dụng tên mới
+        lightInfoTextView = findViewById(R.id.light_info); // Sử dụng tên mới
+        temperatureInfoTextView = findViewById(R.id.temperature_info); // Sử dụng tên mới
+        moistureInfoTextView = findViewById(R.id.moisture_info); // Sử dụng tên mới
+        waterInfoTextView = findViewById(R.id.water_info); // Sử dụng tên mới
 
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {}
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {}
-        });
-
-        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-            @Override
-            public void onPageSelected(int position) {
-                super.onPageSelected(position);
-                if (tabLayout.getTabCount() > position && tabLayout.getTabAt(position) != null) {
-                    tabLayout.getTabAt(position).select();
-                }
-            }
-        });
+        // Adapter sẽ được khởi tạo sau khi có dữ liệu
+        // viewPagerAdapter = new ViewPagerPlantInfoAdapter(this);
+        // viewPager.setAdapter(viewPagerAdapter); // Chưa set adapter ở đây
     }
 
     private void getPlantData() {
         Intent intent = getIntent();
         if(intent != null) {
-            String plantName = intent.getStringExtra("plantName");
-            String speciesName = intent.getStringExtra("speciesName");
-            String plantImage = intent.getStringExtra("plantImage");
-            String plantId = intent.getStringExtra("plantId");
-            String idealLight = intent.getStringExtra("idealLight");
-//            String description = intent.getStringExtra("description");
-            double idealTemperatureMin = intent.getDoubleExtra("idealTemperatureMin", 0);
-            double idealTemperatureMax = intent.getDoubleExtra("idealTemperatureMax", 0);
-            double idealMoistureMin = intent.getDoubleExtra("idealMoistureMin", 0);
-            double idealMoistureMax = intent.getDoubleExtra("idealMoistureMax", 0);
-            double idealWaterMin = intent.getDoubleExtra("idealWaterMin", 0);
-            double idealWaterMax = intent.getDoubleExtra("idealWaterMax", 0);
+            // Lưu dữ liệu vào biến thành viên
+            currentPlantName = intent.getStringExtra("plantName");
+            currentSpeciesName = intent.getStringExtra("speciesName");
+            currentPlantImage = intent.getStringExtra("plantImage");
+            currentPlantId = intent.getStringExtra("plantId");
+            currentIdealLight = intent.getStringExtra("idealLight");
+            plantDescription = intent.getStringExtra("description"); // Lấy description
+            plantInstruction = intent.getStringExtra("instruction"); // Lấy instruction
+            currentIdealTemperatureMin = intent.getDoubleExtra("idealTemperatureMin", 0);
+            currentIdealTemperatureMax = intent.getDoubleExtra("idealTemperatureMax", 0);
+            currentIdealMoistureMin = intent.getDoubleExtra("idealMoistureMin", 0);
+            currentIdealMoistureMax = intent.getDoubleExtra("idealMoistureMax", 0);
+            currentIdealWaterMin = intent.getDoubleExtra("idealWaterMin", 0);
+            currentIdealWaterMax = intent.getDoubleExtra("idealWaterMax", 0);
 
-            this.plantName.setText(plantName);
-            this.speciesName.setText(speciesName);
-            this.lightInfo.setText(idealLight);
-            this.temperatureInfo.setText(String.format("%s - %s C", String.valueOf(idealTemperatureMin), String.valueOf(idealTemperatureMax)));
-            this.moistureInfo.setText(String.format("%s - %s %%", String.valueOf(idealMoistureMin), String.valueOf(idealMoistureMax)));
-            this.waterInfo.setText(String.format("%s - %s ml", String.valueOf(idealWaterMin), String.valueOf(idealWaterMax)));
+            Log.d(TAG, "Received Data:");
+            Log.d(TAG, "Name: " + currentPlantName);
+            Log.d(TAG, "Species: " + currentSpeciesName);
+            Log.d(TAG, "Description: " + plantDescription); // Log để kiểm tra
+            Log.d(TAG, "Instruction: " + plantInstruction); // Log để kiểm tra
+            // Log các dữ liệu khác nếu cần
+
+            // Hiển thị dữ liệu lên Views của Activity
+            plantNameTextView.setText(currentPlantName);
+            speciesNameTextView.setText(currentSpeciesName);
+            lightInfoTextView.setText(currentIdealLight);
+            temperatureInfoTextView.setText(String.format(Locale.getDefault(), "%.1f - %.1f °C", currentIdealTemperatureMin, currentIdealTemperatureMax)); // Sử dụng định dạng float và Locale
+            moistureInfoTextView.setText(String.format(Locale.getDefault(), "%.0f - %.0f %%", currentIdealMoistureMin, currentIdealMoistureMax)); // Định dạng % không có thập phân
+            waterInfoTextView.setText(String.format(Locale.getDefault(), "%.0f - %.0f ml", currentIdealWaterMin, currentIdealWaterMax)); // Định dạng ml không có thập phân
+
             Glide.with(this)
-                    .load(plantImage)
+                    .load(currentPlantImage)
                     .placeholder(R.drawable.plant_sample)
                     .error(R.drawable.ic_photo_error)
-                    .into(this.plantImage);
+                    .into(plantImageView); // Sử dụng tên mới
+        } else {
+            Log.w(TAG, "Intent is null, no plant data received.");
+            // Xử lý trường hợp không nhận được dữ liệu (ví dụ: hiển thị thông báo lỗi và đóng Activity)
+            Toast.makeText(this, "Không nhận được dữ liệu cây", Toast.LENGTH_SHORT).show();
+            finish();
         }
     }
 
-    private void initContents() {
-        viewPager = findViewById(R.id.view_pager_plant);
-        tabLayout = findViewById(R.id.tab_info);
-        btnBack = findViewById(R.id.ivBack);
-        plantImage = findViewById(R.id.plant_image);
-        plantName = findViewById(R.id.plant_name);
-        speciesName = findViewById(R.id.species);
-        lightInfo = findViewById(R.id.light_info);
-        temperatureInfo = findViewById(R.id.temperature_info);
-        moistureInfo = findViewById(R.id.moisture_info);
-        waterInfo = findViewById(R.id.water_info);
-
-        viewPagerAdapter = new ViewPagerPlantInfoAdapter(this);
+    // Hàm setup ViewPager và TabLayout sau khi đã có dữ liệu
+    private void setupViewPagerWithTabs() {
+        // Khởi tạo Adapter, truyền dữ liệu description và instruction vào đây
+        ViewPagerPlantInfoAdapter viewPagerAdapter = new ViewPagerPlantInfoAdapter(this, plantDescription, plantInstruction);
         viewPager.setAdapter(viewPagerAdapter);
+
+        // Liên kết ViewPager2 với TabLayout
+        new TabLayoutMediator(tabLayout, viewPager,
+                (tab, position) -> {
+                    // Đặt tên cho các tab
+                    switch (position) {
+                        case 0:
+                            tab.setText("Chi tiết");
+                            break;
+                        case 1:
+                            tab.setText("Mẹo");
+                            break;
+                    }
+                }).attach();
+
     }
+
 }

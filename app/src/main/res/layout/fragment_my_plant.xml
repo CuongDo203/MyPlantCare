@@ -1,40 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".fragments.MyPlantFragment"
-    >
+    tools:context=".fragments.MyPlantFragment">
+
+    <!-- Main vertical layout for content -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- Header / Toolbar area -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
-            >
+            android:paddingHorizontal="16dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="4dp">
 
             <ImageView
+                android:id="@+id/ic_filter_myplant"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:src="@drawable/ic_filter"
                 android:layout_alignParentEnd="true"
-                android:layout_marginTop="10dp"
-                android:id="@+id/ic_filter_myplant"
-                android:layout_marginEnd="6dp"
-                />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_my_plant"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/ic_filter_myplant"
-                android:layout_marginTop="10dp"
-                android:clipToPadding="false"
-                android:paddingBottom="100dp"
-                tools:listitem="@layout/item_my_plant"
-                />
-
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:contentDescription="Filter"
+                android:focusable="true"
+                android:src="@drawable/ic_filter" />
 
         </RelativeLayout>
+
+
+        <!-- >>> FILTERING UI SECTION <<< -->
+        <LinearLayout
+            android:id="@+id/layout_filter_options"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
+            android:background="#F0F0F0"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:visibility="gone"> <!-- Match margin with header -->
+
+            <!-- Search by Name -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="Tìm theo tên:"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/edit_text_search_plant_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/edittext_background"
+                android:drawableEnd="@drawable/ic_clear"
+                android:drawablePadding="8dp"
+                android:drawableTint="@android:color/darker_gray"
+                android:hint="Nhập tên cây..."
+                android:inputType="textCapWords"
+                android:padding="12dp" />
+
+            <!-- Filter by Type -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="Lọc theo loại:"
+                android:textSize="16sp" />
+
+            <Spinner
+                android:id="@+id/spinner_filter_plant_type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/spinner_background"
+                android:padding="12dp" />
+
+            <Button
+                android:id="@+id/button_hide_filter"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginTop="12dp"
+                android:text="Ẩn bộ lọc" />
+
+        </LinearLayout>
+        <!-- >>> END FILTERING UI SECTION <<< -->
+
+
+        <!-- RecyclerView for Plants -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_my_plant"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:padding="8dp"
+            tools:listitem="@layout/item_my_plant" />
+
+    </LinearLayout>
+
+    <!-- >>> EMPTY STATE UI SECTION <<< -->
+    <LinearLayout
+        android:id="@+id/layout_empty_plants"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottie_empty_plants_animation"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/rolling" />
+
+        <TextView
+            android:id="@+id/text_empty_plants_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Không tìm thấy cây nào."
+            android:textColor="@android:color/darker_gray"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+    <!-- >>> END EMPTY STATE UI SECTION <<< -->
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottie_loading_animation"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="center"
+        android:elevation="10dp"
+        android:visibility="gone"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/loading_animation"
+        app:lottie_speed="1.5" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_my_plant"
         android:layout_width="wrap_content"
@@ -43,7 +155,7 @@
         android:layout_margin="16dp"
         android:contentDescription="Thêm"
         android:src="@drawable/ic_plus"
-        app:backgroundTint="@color/fab_bg"
-        app:tint="@color/white"
-        />
+        app:backgroundTint="@color/green_button"
+        app:tint="@color/white" />
+
 </FrameLayout>

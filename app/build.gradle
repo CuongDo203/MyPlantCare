@@ -56,4 +56,7 @@ dependencies {
     implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation ("com.google.code.gson:gson:2.13.0")
     implementation ("com.cloudinary:cloudinary-android:3.0.2")
+    implementation ("com.cloudinary:cloudinary-android-download:3.0.2")
+    implementation ("com.cloudinary:cloudinary-android-preprocess:3.0.2")
+    implementation ("com.airbnb.android:lottie:6.6.6")
 }

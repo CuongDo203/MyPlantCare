@@ -67,6 +67,7 @@ public class PlantInfoAdapter extends RecyclerView.Adapter<PlantInfoAdapter.Plan
             intent.putExtra("idealWaterMin", plantInfo.getIdealWaterMin());
             intent.putExtra("idealWaterMax", plantInfo.getIdealWaterMax());
             intent.putExtra("description", plantInfo.getPlant().getDescription());
+            intent.putExtra("instruction", plantInfo.getPlant().getInstruction());
             Log.d("PlantInfoAdapter", "plantId: " + plantInfo.getPlant().getId());
 
             context.startActivity(intent);

@@ -1,6 +1,7 @@
 package com.example.myplantcare.models;
 
 import com.google.firebase.firestore.DocumentId;
+import com.google.firebase.firestore.Exclude;
 
 import java.util.Date;
 
@@ -12,6 +13,7 @@ public class TaskLogModel {
     private Date date;
     private String taskName;
     private boolean status;
+    @Exclude
     private String userPhotoUrl;
 
     public String getId() {

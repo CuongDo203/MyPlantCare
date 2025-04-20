@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_dialog_rounded"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="24dp">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="24dp">
 
         <TextView
             android:layout_width="wrap_content"
@@ -18,7 +20,7 @@
             android:layout_centerVertical="true"
             android:text="Thêm lịch trình chăm sóc"
             android:textColor="@android:color/black"
-            android:textSize="24sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <ImageButton
@@ -29,57 +31,65 @@
             android:layout_centerVertical="true"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Đóng"
-            android:src="@drawable/ic_close" />
+            android:src="@drawable/ic_close"
+            app:tint="@android:color/holo_red_dark" />
     </RelativeLayout>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
+        android:layout_marginBottom="8dp"
         android:text="Chọn cây"
-        android:textSize="18sp" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:orientation="horizontal"
-        android:padding="10dp">
-
-        <Spinner
-            android:id="@+id/spinner_plant"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_weight="1" />
-
-        <Button
-            android:id="@+id/button_add_plant"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/bg_selected_day"
-            android:text="Thêm cây"
-            android:textAllCaps="false" />
-    </LinearLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        android:text="Nhắc nhở"
-        android:textSize="18sp" />
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <Spinner
+            android:id="@+id/spinner_plant"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:layout_weight="1"
+            android:background="@drawable/spinner_background"
+            android:padding="12dp"
+            android:spinnerMode="dropdown" />
+
+        <Button
+            android:id="@+id/button_add_plant"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/green_button"
+            android:text="Thêm cây"
+            android:textAllCaps="false"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="Chi tiết lịch trình"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:background="@android:color/white"
         android:orientation="vertical"
         android:padding="16dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="12dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -87,18 +97,23 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minWidth="90dp"
-                android:text="Công việc:" />
+                android:text="Công việc:"
+                android:textSize="16sp" />
 
             <Spinner
                 android:id="@+id/spinner_task"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/spinner_background"
+                android:padding="12dp"
+                android:spinnerMode="dropdown" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="12dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -106,24 +121,28 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minWidth="90dp"
-                android:text="Ngày bắt đầu:" />
+                android:text="Ngày bắt đầu:"
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/text_view_start_date"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:drawableEnd="@drawable/ic_calendar"
+                android:drawableTint="@android:color/darker_gray"
                 android:focusable="true"
-                android:padding="8dp"
-                android:text="Chọn ngày" />
+                android:gravity="center_vertical|end"
+                android:padding="12dp"
+                tools:text="Chọn ngày" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="12dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -131,24 +150,28 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minWidth="90dp"
-                android:text="Giờ:" />
+                android:text="Giờ:"
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/text_view_start_time"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:drawableEnd="@drawable/ic_clock"
+                android:drawableTint="@android:color/darker_gray"
                 android:focusable="true"
-                android:padding="8dp"
-                android:text="Chọn giờ" />
+                android:gravity="center_vertical|end"
+                android:padding="12dp"
+                tools:text="Chọn giờ" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="12dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -156,18 +179,61 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minWidth="90dp"
-                android:text="Tần suất:" />
+                android:text="Tần suất:"
+                android:textSize="16sp" />
 
             <Spinner
                 android:id="@+id/spinner_frequency"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/spinner_background"
+                android:padding="12dp"
+                android:spinnerMode="dropdown" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_custom_frequency_days"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="90dp"
+                android:text="Mỗi:"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/edit_text_custom_frequency_days"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/edittext_background"
+                android:hint="Số ngày"
+                android:inputType="number"
+                android:maxLines="1"
+                android:minEms="3"
+                android:padding="12dp"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="ngày"
+                android:textSize="16sp" />
+
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="0dp"
             android:gravity="top"
             android:orientation="horizontal">
 
@@ -175,17 +241,22 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minWidth="90dp"
-                android:text="Ghi chú:" />
+                android:text="Ghi chú:"
+                android:textSize="16sp" />
 
             <EditText
                 android:id="@+id/edit_text_note"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:background="@android:drawable/editbox_background"
+                android:layout_weight="1"
+                android:background="@drawable/edittext_background"
                 android:gravity="top"
                 android:hint="Nhập ghi chú..."
                 android:inputType="textMultiLine"
-                android:minLines="2" />
+                android:minLines="3"
+                android:padding="12dp"
+                android:scrollbars="vertical"
+                android:textSize="16sp" />
         </LinearLayout>
 
     </LinearLayout>
@@ -196,6 +267,8 @@
         android:layout_height="wrap_content"
         android:backgroundTint="@color/green_button"
         android:padding="12dp"
-        android:text="LƯU"
-        android:textSize="18sp" />
+        android:text="LƯU LỊCH TRÌNH"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 </LinearLayout>
