@@ -157,15 +157,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
                         if (user != null) {
-
-
                             if (newUser) {
-                                // Dùng biến đã "effectively final"
                                 String uid = user.getUid();
                                 Map<String, Object> userInfo = new HashMap<>();
                                 userInfo.put("name", "Nguyễn Văn A");
                                 userInfo.put("email", trimmedEmail);
-                                userInfo.put("id", uid);
                                 userInfo.put("phone", "");
                                 userInfo.put("dob", "");
                                 userInfo.put("role", "");
