@@ -1,8 +1,14 @@
 package com.example.myplantcare.utils;
+import android.content.Context;
+import android.content.Intent;
+import android.widget.Toast;
+
+import com.example.myplantcare.activities.LoginActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.AuthResult;
+
 
 public class FirebaseAuthHelper {
     private FirebaseAuth mAuth;
@@ -42,4 +48,19 @@ public class FirebaseAuthHelper {
     public FirebaseUser getCurrentUser() {
         return mAuth.getCurrentUser();
     }
+    // Phương thức logout
+    public static void logoutUser(Context context) {
+        if(context == null) return;
+        // Đảm bảo FirebaseAuth được lấy đúng instance
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        mAuth.signOut();  // Đăng xuất khỏi Firebase Authentication
+
+        // Thông báo đăng xuất thành công
+        Toast.makeText(context, "Đăng xuất thành công", Toast.LENGTH_SHORT).show();
+
+        // Chuyển hướng về màn hình đăng nhập
+        Intent intent = new Intent(context, LoginActivity.class);
+        context.startActivity(intent);
+    }
+
 }
