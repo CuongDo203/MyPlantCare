@@ -1,5 +1,4 @@
 package com.example.myplantcare.activities;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
@@ -19,7 +18,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 import java.util.Map;
-
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     private Button btnLogin;
@@ -140,8 +138,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         // Hiển thị dialog
         dialog.show();
     }
-
-
     private void loginUser(String email, String password, boolean newUser) {
         String trimmedEmail = email.trim();
         String trimmedPassword = password.trim();
@@ -187,18 +183,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     }
                 });
     }
-
     // Hàm reset mật khẩu
     private void resetPassword(String email) {
         mAuth.sendPasswordResetEmail(email)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(LoginActivity.this, "Email khôi phục mật khẩu đã được gửi", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(LoginActivity.this, "Lỗi: Không thể gửi email khôi phục mật khẩu", Toast.LENGTH_SHORT).show();
-                    }
-                });
+            .addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Toast.makeText(LoginActivity.this, "Email khôi phục mật khẩu đã được gửi", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(LoginActivity.this, "Lỗi: Không thể gửi email khôi phục mật khẩu", Toast.LENGTH_SHORT).show();
+                }
+            });
     }
-
-
 }

@@ -22,7 +22,6 @@ import com.example.myplantcare.models.Notification;
 import java.util.ArrayList;
 
 public class NotificationActivity extends AppCompatActivity {
-
     private RecyclerView recyclerView;
     private NotificationAdapter adapter;
     private FirebaseFirestore db;
