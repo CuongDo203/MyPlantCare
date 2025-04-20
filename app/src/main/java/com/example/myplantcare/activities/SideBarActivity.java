@@ -7,10 +7,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.example.myplantcare.R;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
@@ -118,14 +116,14 @@ public class SideBarActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(SideBarActivity.this);
 
         // Inflater layout vào dialog
-        final View dialogView = getLayoutInflater().inflate(R.layout.change_password_dialog, null);
+        View dialogView = getLayoutInflater().inflate(R.layout.change_password_dialog, null);
         builder.setView(dialogView);
 
         // Lấy các view trong dialog
         EditText etCurrentPassword = dialogView.findViewById(R.id.CurrentPassword);
         EditText etNewPassword = dialogView.findViewById(R.id.NewPassword);
         Button btnChangePassword = dialogView.findViewById(R.id.btnChangePassword);
-        final AlertDialog dialog = builder.create();
+        AlertDialog dialog = builder.create();
 
         // Thiết lập hành động cho nút thay đổi mật khẩu
         btnChangePassword.setOnClickListener(v -> {
@@ -149,13 +147,13 @@ public class SideBarActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(SideBarActivity.this);
 
         // Inflater layout vào dialog
-        final View dialogView = getLayoutInflater().inflate(R.layout.logout_confirmation_dialog, null);
+        View dialogView = getLayoutInflater().inflate(R.layout.logout_confirmation_dialog, null);
         builder.setView(dialogView);
 
         // Lấy các view trong dialog
         Button btnYes = dialogView.findViewById(R.id.btnYes);
         Button btnNo = dialogView.findViewById(R.id.btnNo);
-        final AlertDialog dialog = builder.create();
+        AlertDialog dialog = builder.create();
 
         // Hiển thị dialog
         dialog.show();

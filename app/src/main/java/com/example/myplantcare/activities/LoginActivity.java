@@ -15,6 +15,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.myplantcare.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -27,6 +31,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private TextView btnForgetPassword;
     // Firebase Authentication instance
     private FirebaseAuth mAuth;
+    FirebaseFirestore db;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +42,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         ivTogglePassword.setOnClickListener(this);
         btnForgetPassword.setOnClickListener(this);
         mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+        // Lấy intent được gửi sang
+        Intent intent = getIntent();
+        String email = intent.getStringExtra("email");
+        String password = intent.getStringExtra("password");
+        boolean isNewUser = intent.getBooleanExtra("isNewUser", false);
+        // Kiểm tra xem có cần gọi hàm không
+        if (isNewUser) {
+            loginUser(email, password, isNewUser);
+        }
     }
 
     private void initContents() {
@@ -73,7 +88,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.btnLogin) {
-            loginUser();  // Gọi hàm đăng nhập
+            loginUser(etUsername.getText().toString(), etPassword.getText().toString(), false);  // Gọi hàm đăng nhập
         }
         else if(v.getId() == R.id.register_now){
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
@@ -127,31 +142,56 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
 
-    private void loginUser() {
-        String username = etUsername.getText().toString().trim();
-        String password = etPassword.getText().toString().trim();
+    private void loginUser(String email, String password, boolean newUser) {
+        String trimmedEmail = email.trim();
+        String trimmedPassword = password.trim();
 
-        if (username.isEmpty() || password.isEmpty()) {
+        if (trimmedEmail.isEmpty() || trimmedPassword.isEmpty()) {
             Toast.makeText(LoginActivity.this, "Vui lòng nhập tên người dùng và mật khẩu", Toast.LENGTH_SHORT).show();
-        } else {
-            // Firebase login process
-            mAuth.signInWithEmailAndPassword(username, password)
-                    .addOnCompleteListener(this, task -> {
-                        if (task.isSuccessful()) {
-                            // Đăng nhập thành công
-                            Toast.makeText(LoginActivity.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                            startActivity(intent);
-
-                            finish();  // Kết thúc LoginActivity
-                        } else {
-                            // Thông báo lỗi đăng nhập
-                            Toast.makeText(LoginActivity.this, "Sai tên người dùng hoặc mật khẩu", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+            return;
         }
+
+        // Dùng trimmedEmail trong các bước tiếp theo:
+        mAuth.signInWithEmailAndPassword(trimmedEmail, trimmedPassword)
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+
+
+                            if (newUser) {
+                                // Dùng biến đã "effectively final"
+                                String uid = user.getUid();
+                                Map<String, Object> userInfo = new HashMap<>();
+                                userInfo.put("name", "Nguyễn Văn A");
+                                userInfo.put("email", trimmedEmail);
+                                userInfo.put("id", uid);
+                                userInfo.put("phone", "");
+                                userInfo.put("dob", "");
+                                userInfo.put("role", "");
+                                userInfo.put("cityId", "");
+
+                                db.collection("users").document(uid)
+                                        .set(userInfo)
+                                        .addOnSuccessListener(aVoid -> {
+                                            Toast.makeText(LoginActivity.this, "Lưu thông tin người dùng thành công", Toast.LENGTH_SHORT).show();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Toast.makeText(LoginActivity.this, "Không thể lưu thông tin người dùng", Toast.LENGTH_SHORT).show();
+                                        });
+                            } else {
+                                // Tài khoản cũ → chuyển tiếp luôn
+                                Toast.makeText(LoginActivity.this, "Đăng nhập thành công", Toast.LENGTH_SHORT).show();
+                                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                finish();
+                            }
+                        }
+                    } else {
+                        Toast.makeText(LoginActivity.this, "Sai tên người dùng hoặc mật khẩu", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
+
     // Hàm reset mật khẩu
     private void resetPassword(String email) {
         mAuth.sendPasswordResetEmail(email)
@@ -163,4 +203,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     }
                 });
     }
+
+
 }
