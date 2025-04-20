@@ -82,7 +82,9 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
             else if (itemId == R.id.nav_statics){
-                fragment = null;
+                Intent intent = new Intent(MainActivity.this, StatisticActivity.class);
+                startActivity(intent);
+                return true;
             }
 
             if (fragment != null) {

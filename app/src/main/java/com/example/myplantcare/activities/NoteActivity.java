@@ -89,6 +89,16 @@ public class NoteActivity extends AppCompatActivity {
             noteList.add(new Note("Cây lam", "Setup chỗ mới cho cây...", LocalDate.of(2025, 2, 5)));
             noteList.add(new Note("EFG ngày đầu về nhà", "Setup ánh sáng...", LocalDate.of(2025, 1, 29)));
             noteList.add(new Note("Mua cây ACB", "Ngày đầu tiên mua cây...", LocalDate.of(2024, 11, 25)));
+            noteList.add(new Note("Cây EFG đang phát triển tốt", "Những thứ cần mua tiếp theo...", LocalDate.of(2025, 2, 28)));
+            noteList.add(new Note("BCD", "Lá có dấu hiệu nhạt màu...", LocalDate.of(2025, 2, 16)));
+            noteList.add(new Note("Cây lam", "Setup chỗ mới cho cây...", LocalDate.of(2025, 2, 5)));
+            noteList.add(new Note("EFG ngày đầu về nhà", "Setup ánh sáng...", LocalDate.of(2025, 1, 29)));
+            noteList.add(new Note("Mua cây ACB", "Ngày đầu tiên mua cây...", LocalDate.of(2024, 11, 25)));
+            noteList.add(new Note("Cây EFG đang phát triển tốt", "Những thứ cần mua tiếp theo...", LocalDate.of(2025, 2, 28)));
+            noteList.add(new Note("BCD", "Lá có dấu hiệu nhạt màu...", LocalDate.of(2025, 2, 16)));
+            noteList.add(new Note("Cây lam", "Setup chỗ mới cho cây...", LocalDate.of(2025, 2, 5)));
+            noteList.add(new Note("EFG ngày đầu về nhà", "Setup ánh sáng...", LocalDate.of(2025, 1, 29)));
+            noteList.add(new Note("Mua cây ACB", "Ngày đầu tiên mua cây...", LocalDate.of(2024, 11, 25)));
         }
     }
 
