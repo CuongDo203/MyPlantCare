@@ -70,12 +70,12 @@ public class ScheduleFragment extends Fragment {
         List<ScheduleModel> schedules = new ArrayList<>();
 
         List<TaskModel> taskList1 = new ArrayList<>();
-        taskList1.add(new TaskModel("Cây A - 8:00 AM - Ban công", false));
-        taskList1.add(new TaskModel("Cây B - 9:30 AM - Phòng khách", false));
+        taskList1.add(new TaskModel("Cây A - 8:00 AM - Ban công", ""));
+        taskList1.add(new TaskModel("Cây B - 9:30 AM - Phòng khách", ""));
 
         List<TaskModel> taskList2 = new ArrayList<>();
-        taskList2.add(new TaskModel("Cây C - 10:00 AM - Sân vườn", false));
-        taskList2.add(new TaskModel("Cây D - 11:30 AM - Ban công", false));
+        taskList2.add(new TaskModel("Cây C - 10:00 AM - Sân vườn", ""));
+        taskList2.add(new TaskModel("Cây D - 11:30 AM - Ban công", ""));
 
 //        schedules.add(new ScheduleModel("Tưới nước"));
 //        schedules.add(new ScheduleModel("Bón phân"));

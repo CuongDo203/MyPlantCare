@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myplantcare.R;
+import com.example.myplantcare.data.responses.ScheduleDisplayItem;
 import com.example.myplantcare.models.ScheduleModel;
 import com.example.myplantcare.utils.DateUtils;
 
@@ -20,11 +21,11 @@ import java.util.List;
 public class MyPlantScheduleAdapter extends RecyclerView.Adapter<MyPlantScheduleAdapter.MyPlantScheduleViewHolder> {
 
     private static final String TAG = "MyPlantScheduleAdapter";
-    private List<ScheduleModel> scheduleList = new ArrayList<>();
+    private List<ScheduleDisplayItem> scheduleList = new ArrayList<>();
     private OnScheduleItemClickListener listener;
 
     public interface OnScheduleItemClickListener {
-        void onDeleteClick(ScheduleModel schedule); // Xử lý click nút xóa
+        void onDeleteClick(ScheduleDisplayItem schedule); // Xử lý click nút xóa
         // Thêm các sự kiện click khác nếu cần
     }
 
@@ -32,7 +33,7 @@ public class MyPlantScheduleAdapter extends RecyclerView.Adapter<MyPlantSchedule
         this.listener = listener;
     }
 
-    public void setSchedules(List<ScheduleModel> newScheduleList) {
+    public void setSchedules(List<ScheduleDisplayItem> newScheduleList) {
         this.scheduleList = newScheduleList != null ? newScheduleList : new ArrayList<>();
         notifyDataSetChanged();
         Log.d(TAG, "ScheduleAdapter data updated. New size: " + this.scheduleList.size());
@@ -47,8 +48,8 @@ public class MyPlantScheduleAdapter extends RecyclerView.Adapter<MyPlantSchedule
 
     @Override
     public void onBindViewHolder(@NonNull MyPlantScheduleViewHolder holder, int position) {
-        ScheduleModel schedule = scheduleList.get(position);
-//        holder.taskName.setText(schedule.getTaskName());
+        ScheduleDisplayItem schedule = scheduleList.get(position);
+        holder.taskName.setText(schedule.getTaskName());
         holder.frequency.setText(convertFrequencyToText(schedule.getFrequency()));
         String formatTime = DateUtils.formatTimestampToTimeString(schedule.getTime());
         holder.time.setText(formatTime);
@@ -64,7 +65,7 @@ public class MyPlantScheduleAdapter extends RecyclerView.Adapter<MyPlantSchedule
         holder.btnDelete.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onDeleteClick(schedule);
-                Log.d(TAG, "Delete clicked for schedule ID: " + schedule.getId());
+                Log.d(TAG, "Delete clicked for schedule ID: " + schedule.getScheduleId());
             }
             else {
                 Log.w(TAG, "OnScheduleItemClickListener is null. Delete click not handled.");

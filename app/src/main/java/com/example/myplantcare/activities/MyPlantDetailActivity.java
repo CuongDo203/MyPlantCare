@@ -35,6 +35,7 @@ import com.example.myplantcare.R;
 import com.example.myplantcare.adapters.MyPlantScheduleAdapter;
 import com.example.myplantcare.data.repositories.MyPlantRepository;
 import com.example.myplantcare.data.repositories.MyPlantRepositoryImpl;
+import com.example.myplantcare.data.responses.ScheduleDisplayItem;
 import com.example.myplantcare.fragments.AddScheduleDialogFragment;
 import com.example.myplantcare.models.MyPlantModel;
 import com.example.myplantcare.models.ScheduleModel;
@@ -439,7 +440,7 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
         // Setup RecyclerView cho Lịch trình
         myPlantScheduleAdapter = new MyPlantScheduleAdapter(new MyPlantScheduleAdapter.OnScheduleItemClickListener() {
             @Override
-            public void onDeleteClick(ScheduleModel schedule) {
+            public void onDeleteClick(ScheduleDisplayItem schedule) {
                 // Xử lý click nút xóa trong item lịch trình
 
             }
@@ -491,9 +492,9 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
                 .show();
     }
 
-    private void showDeleteScheduleConfirmationDialog(ScheduleModel scheduleToDelete) {
+    private void showDeleteScheduleConfirmationDialog(ScheduleDisplayItem scheduleToDelete) {
         // TODO: Triển khai AlertDialog xác nhận xóa lịch trình
-        if (scheduleToDelete == null || TextUtils.isEmpty(scheduleToDelete.getId())) {
+        if (scheduleToDelete == null || TextUtils.isEmpty(scheduleToDelete.getScheduleId())) {
             Log.w(TAG, "Cannot show delete schedule dialog, invalid schedule.");
             return;
         }
@@ -504,8 +505,8 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
                 .setPositiveButton("Xoá", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // Gọi ViewModel để xóa lịch trình
-                        if (!TextUtils.isEmpty(scheduleToDelete.getId())) {
-                            myPlantDetailViewModel.deleteSchedule(scheduleToDelete.getId());
+                        if (!TextUtils.isEmpty(scheduleToDelete.getScheduleId())) {
+                            myPlantDetailViewModel.deleteSchedule(scheduleToDelete.getScheduleId());
                         } else {
                             Log.w(TAG, "Cannot delete schedule, schedule ID is missing.");
                         }

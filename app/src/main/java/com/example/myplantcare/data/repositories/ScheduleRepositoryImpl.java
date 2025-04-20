@@ -33,6 +33,41 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     private CollectionReference myPlantsRef;
 
     @Override
+    public void addSchedule(String userId, String myPlantId, ScheduleModel schedule, FirestoreCallback<Void> callback) {
+        // Kiểm tra các tham số đầu vào
+        if (userId == null || userId.isEmpty() || myPlantId == null || myPlantId.isEmpty() || schedule == null) {
+            Log.e("ScheduleRepository", "addSchedule failed: userId, myPlantId, or schedule is null/empty.");
+            if (callback != null) {
+                callback.onError(new IllegalArgumentException("User ID, Plant ID, or Schedule object is invalid."));
+            }
+            return;
+        }
+
+        // Lấy tham chiếu đến subcollection 'schedules' dưới cây của người dùng
+        CollectionReference schedulesCollectionRef = userRef
+                .document(userId)
+                .collection(Constants.MY_PLANTS_COLLECTION) // Constants.MY_PLANTS_COLLECTION = "my_plants"
+                .document(myPlantId)
+                .collection(Constants.SCHEDULES_COLLECTION); // Constants.SCHEDULES_COLLECTION = "schedules"
+
+        // Thêm đối tượng schedule vào collection. Firestore sẽ tự tạo ID.
+        schedulesCollectionRef.add(schedule)
+                .addOnSuccessListener(documentReference -> {
+                    // documentReference chứa tham chiếu đến document mới được tạo
+                    Log.d("ScheduleRepository", "Schedule added with ID: " + documentReference.getId() + " for plant: " + myPlantId);
+                    if (callback != null) {
+                        callback.onSuccess(null); // Thông báo thành công
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("ScheduleRepository", "Error adding schedule for plant: " + myPlantId, e);
+                    if (callback != null) {
+                        callback.onError(e); // Thông báo thất bại kèm Exception
+                    }
+                });
+    }
+
+    @Override
     public void getTodaySchedulesGroupedByTask(String userId, FirestoreCallback<Map<String, List<ScheduleWithMyPlantInfo>>> callback) { // Cập nhật kiểu Callback
         CollectionReference myPlantsRef = db.collection(Constants.USERS_COLLECTION).document(userId).collection(Constants.MY_PLANTS_COLLECTION);
 
