@@ -125,6 +125,7 @@ public class AddScheduleDialogFragment extends DialogFragment {
         textViewStartTime.setOnClickListener(v -> showTimePickerDialog());
         buttonSaveSchedule.setOnClickListener(v -> saveSchedule());
         buttonAddPlant.setOnClickListener(v -> addPlant());
+
     }
 
     private void setupObservers() {

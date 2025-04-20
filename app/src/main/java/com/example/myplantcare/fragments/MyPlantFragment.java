@@ -1,12 +1,23 @@
 package com.example.myplantcare.fragments;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -22,6 +33,7 @@ import com.example.myplantcare.R;
 import com.example.myplantcare.activities.MyPlantDetailActivity;
 import com.example.myplantcare.adapters.MyPlantAdapter;
 import com.example.myplantcare.models.MyPlantModel;
+import com.example.myplantcare.models.SpeciesModel;
 import com.example.myplantcare.utils.DateUtils;
 import com.example.myplantcare.viewmodels.MyPlantListViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -34,18 +46,23 @@ public class MyPlantFragment extends Fragment {
 
     private static final String TAG = "MyPlantFragment"; // Sử dụng TAG nhất quán
 
+    //Filter
+    private LinearLayout layoutFilterOptions;
+    private EditText editTextSearchPlantName;
+    private Spinner spinnerFilterPlantType;
+    private Button buttonHideFilter;
+    private ImageView clearSearchIcon;
+
     private RecyclerView recyclerView;
     private MyPlantAdapter adapter;
     private List<MyPlantModel> myPlantList;
     private FloatingActionButton fabAddMyPlant;
     private MyPlantListViewModel myPlantListViewModel;
-    // Repository nên được khởi tạo trong ViewModel hoặc Factory của ViewModel
-    // private MyPlantRepositoryImpl repository = new MyPlantRepositoryImpl(); // Khởi tạo ở đây không đúng MVVM lắm
     LottieAnimationView lottieLoadingAnimation;
-
+    private ImageView btnFilter;
     // Khai báo Activity Result Launcher
     private ActivityResultLauncher<Intent> detailActivityLauncher;
-
+    private List<SpeciesModel> speciesList = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -58,15 +75,21 @@ public class MyPlantFragment extends Fragment {
         registerActivityResults(); // Đăng ký Launchers
 
         fabAddMyPlant.setOnClickListener(v -> showAddPlantDialog());
-
+        btnFilter.setOnClickListener(v -> toggleFilterOptionsVisibility());
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // loadMyPlants() có thể gọi ở đây nếu ViewModel không tự load trong constructor
-        // myPlantListViewModel.loadMyPlants();
+        setupFilterListeners();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        myPlantListViewModel.loadMyPlants();
+        Log.d(TAG, "onResume: Calling loadMyPlants() to refresh data.");
     }
 
     private void registerActivityResults() {
@@ -91,9 +114,6 @@ public class MyPlantFragment extends Fragment {
     private void observeViewModel() {
         myPlantListViewModel.myPlants.observe(getViewLifecycleOwner(), myPlants -> {
             Log.d(TAG, "myPlants LiveData updated. Size: " + (myPlants != null ? myPlants.size() : "null"));
-            // myPlantList.clear(); // Không cần clear nếu adapter có phương thức setMyPlants
-            // myPlantList.addAll(myPlants); // Adapter nên làm việc trực tiếp với danh sách mới
-
             if (myPlants != null && !myPlants.isEmpty()) {
                 adapter.setMyPlants(myPlants); // Sử dụng phương thức setMyPlants của adapter
                 recyclerView.setVisibility(View.VISIBLE);
@@ -103,9 +123,6 @@ public class MyPlantFragment extends Fragment {
                 recyclerView.setVisibility(View.GONE); // Ẩn RecyclerView
                 // TODO: Hiển thị TextView "Không có cây nào" nếu có
             }
-
-            // adapter.notifyDataSetChanged(); // setMyPlants() nên tự gọi các notify phù hợp (hoặc bạn có thể gọi ở đây)
-            // notifyDataSetChanged() là đơn giản nhất nhưng kém hiệu quả
         });
 
         myPlantListViewModel.isLoading.observe(getViewLifecycleOwner(), isLoading -> {
@@ -121,7 +138,62 @@ public class MyPlantFragment extends Fragment {
                 // Visibility của RecyclerView/TextViewNoPlants sẽ được xử lý bởi observer myPlants
             }
         });
-        // TODO: Observe error LiveData nếu có
+
+        myPlantListViewModel.getSpeciesList().observe(getViewLifecycleOwner(), species -> {
+            if (species != null) {
+                speciesList = species; // Lưu danh sách species gốc
+                // Tạo Adapter cho Spinner loại cây
+                List<String> typesList = new ArrayList<>();
+                typesList.add("Tất cả loại"); // Thêm tùy chọn "Tất cả" ở đầu (Index 0)
+
+                for (SpeciesModel spec : species) {
+                    typesList.add(spec.getName()); // Sử dụng tên hiển thị của SpeciesModel
+                }
+
+                ArrayAdapter<String> typeAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, typesList);
+                typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerFilterPlantType.setAdapter(typeAdapter);
+
+                // --- THIẾT LẬP LISTENER CHO SPINNER LỌC THEO LOẠI SAU KHI SET ADAPTER ---
+                spinnerFilterPlantType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        String selectedTypeDisplayName = (String) parent.getItemAtPosition(position);
+                        String filterSpeciesId = null; // Species ID để lọc (null cho "Tất cả")
+
+                        // Nếu không phải "Tất cả loại" (tức là position > 0)
+                        if (position > 0 && position - 1 < speciesList.size()) {
+                            // Lấy SpeciesModel tương ứng và lấy ID của nó
+                            SpeciesModel selectedSpecies = speciesList.get(position - 1); // Điều chỉnh index vì có item "Tất cả" ở đầu
+                            filterSpeciesId = selectedSpecies.getId();
+                        }
+
+                        Log.d(TAG, "Filter by type selected: " + selectedTypeDisplayName + " -> Species ID: " + filterSpeciesId);
+                        // Áp dụng bộ lọc trong ViewModel
+                        myPlantListViewModel.applyFilter(editTextSearchPlantName.getText().toString(), filterSpeciesId);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                        // Áp dụng filter với species ID null (tất cả loại)
+                        myPlantListViewModel.applyFilter(editTextSearchPlantName.getText().toString(), null);
+                    }
+                });
+
+                // Mặc định chọn "Tất cả loại" (index 0)
+                spinnerFilterPlantType.setSelection(0);
+
+
+            } else {
+                Log.w(TAG, "Species list data is null.");
+                List<String> typesList = new ArrayList<>();
+                typesList.add("Lỗi tải loại cây"); // Thông báo lỗi
+                ArrayAdapter<String> emptyAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, typesList);
+                emptyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinnerFilterPlantType.setAdapter(emptyAdapter);
+                spinnerFilterPlantType.setEnabled(false); // Vô hiệu hóa spinner khi lỗi
+            }
+        });
     }
 
     private void setupViewModel() {
@@ -150,21 +222,21 @@ public class MyPlantFragment extends Fragment {
         }).get(MyPlantListViewModel.class);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void initContents(View view) {
         fabAddMyPlant = view.findViewById(R.id.fab_add_my_plant);
         recyclerView = view.findViewById(R.id.recycler_my_plant);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         lottieLoadingAnimation = view.findViewById(R.id.lottie_loading_animation);
-        // myPlantList = new ArrayList<>(); // ViewModel sẽ cung cấp danh sách, không cần quản lý thủ công ở đây
-
+        btnFilter = view.findViewById(R.id.ic_filter_myplant);
         // TODO: Cần lấy userId thật ở đây hoặc truyền từ ViewModel/Activity
         String userIdForAdapter = "eoWltJXzlBtC8U8QZx9G"; // Tạm thời hardcode
 
-        // Adapter cần một callback khi item cây được click để mở MyPlantDetailActivity
-        // Adapter cũng cần biết userId và Repository để xử lý delete (nếu logic delete nằm trong Adapter)
-        // Tốt hơn hết là Adapter chỉ phát ra sự kiện click và Fragment/ViewModel xử lý delete/open detail.
+        layoutFilterOptions = view.findViewById(R.id.layout_filter_options);
+        editTextSearchPlantName = view.findViewById(R.id.edit_text_search_plant_name);
+        spinnerFilterPlantType = view.findViewById(R.id.spinner_filter_plant_type);
+        buttonHideFilter = view.findViewById(R.id.button_hide_filter);
 
-        // Truyền lambda/interface vào Adapter để xử lý click item
         adapter = new MyPlantAdapter(new ArrayList<>(), // Adapter bắt đầu với danh sách rỗng
                 new MyPlantAdapter.OnPlantItemClickListener() {
                     @Override
@@ -176,15 +248,60 @@ public class MyPlantFragment extends Fragment {
                     @Override
                     public void onDeleteClick(MyPlantModel plant) {
                         // Xử lý delete click (có thể gọi ViewModel ở đây)
-                        // myPlantListViewModel.deleteMyPlant(plant.getId()); // Cần thêm phương thức deleteMyPlant vào ViewModel
+                        // myPlantListViewModel.deleteMyPlant(plant.getId());
                     }
                 });
-
-
         recyclerView.setAdapter(adapter);
+
+        editTextSearchPlantName.setOnTouchListener((v, event) -> {
+            final int DRAWABLE_RIGHT = 2;
+            if(event.getAction() == MotionEvent.ACTION_UP) {
+                if(editTextSearchPlantName.getCompoundDrawables()[DRAWABLE_RIGHT] != null) {
+                    // Check if click is within the bounds of the drawable
+                    if(event.getRawX() >= (editTextSearchPlantName.getRight() - editTextSearchPlantName.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                        // Clear text and apply filter
+                        editTextSearchPlantName.setText("");
+                        // applyFilter is called by TextWatcher when text changes
+                        return true; // Consume the event
+                    }
+                }
+            }
+            return false;
+        });
     }
 
-    // Hàm mở MyPlantDetailActivity bằng launcher
+    private void toggleFilterOptionsVisibility() {
+        if(layoutFilterOptions.getVisibility() == View.GONE) {
+            layoutFilterOptions.setVisibility(View.VISIBLE);
+        } else {
+            layoutFilterOptions.setVisibility(View.GONE);
+        }
+    }
+
+    private void setupFilterListeners() {
+        editTextSearchPlantName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                Log.d(TAG, "Search text changed: " + s.toString());
+                // Apply filter when text changes
+                // Pass current search text and selected spinner item
+                String selectedType = spinnerFilterPlantType.getSelectedItemPosition() > 0 ?
+                        (String) spinnerFilterPlantType.getSelectedItem() : null;
+                myPlantListViewModel.applyFilter(s.toString(), selectedType);
+            }
+        });
+
+        if (buttonHideFilter != null) {
+            buttonHideFilter.setOnClickListener(v -> toggleFilterOptionsVisibility());
+        }
+    }
+
     private void openPlantDetailActivity(MyPlantModel plant) {
         Intent intent = new Intent(requireContext(), MyPlantDetailActivity.class);
         // Đóng gói dữ liệu cây vào Intent
@@ -206,7 +323,6 @@ public class MyPlantFragment extends Fragment {
         Log.d(TAG, "Launched MyPlantDetailActivity with launcher for plant ID: " + plant.getId());
     }
 
-
     private void showAddPlantDialog() {
         AddPlantDialogFragment dialogFragment = new AddPlantDialogFragment();
         dialogFragment.setOnSavePlantListener(() -> {
@@ -224,11 +340,7 @@ public class MyPlantFragment extends Fragment {
         if (myPlantListViewModel != null) {
             myPlantListViewModel.isLoading.removeObservers(getViewLifecycleOwner());
             myPlantListViewModel.myPlants.removeObservers(getViewLifecycleOwner());
-            // TODO: Hủy các observer lỗi nếu có
         }
     }
 
-    // TODO: Cần cập nhật MyPlantAdapter để có interface OnPlantItemClickListener
-    // và constructor/setter để nhận listener này. Adapter sẽ gọi listener.onPlantClick()
-    // khi một item được click.
 }

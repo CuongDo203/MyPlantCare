@@ -441,8 +441,7 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
         myPlantScheduleAdapter = new MyPlantScheduleAdapter(new MyPlantScheduleAdapter.OnScheduleItemClickListener() {
             @Override
             public void onDeleteClick(ScheduleDisplayItem schedule) {
-                // Xử lý click nút xóa trong item lịch trình
-
+                showDeleteScheduleConfirmationDialog(schedule);
             }
             // TODO: Implement các click listener khác của ScheduleAdapter nếu có
         });
@@ -500,7 +499,7 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
         }
         new AlertDialog.Builder(this)
                 .setTitle("Xác nhận xoá lịch trình")
-                .setMessage("Bạn có chắc chắn muốn xoá lịch trình \"" + scheduleToDelete.getTaskId() + "\" không?") // Hiển thị tên task
+                .setMessage("Bạn có chắc chắn muốn xoá lịch trình \"" + scheduleToDelete.getTaskName() + "\" không?") // Hiển thị tên task
                 // TODO: Lấy tên task thân thiện thay vì Task ID
                 .setPositiveButton("Xoá", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
