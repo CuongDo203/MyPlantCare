@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -59,6 +60,11 @@ public class MyPlantFragment extends Fragment {
     private FloatingActionButton fabAddMyPlant;
     private MyPlantListViewModel myPlantListViewModel;
     LottieAnimationView lottieLoadingAnimation;
+
+    // Empty state UI elements
+    private LinearLayout layoutEmptyPlants;
+    private LottieAnimationView lottieEmptyPlantsAnimation;
+    private TextView textEmptyPlantsMessage;
     private ImageView btnFilter;
     // Khai báo Activity Result Launcher
     private ActivityResultLauncher<Intent> detailActivityLauncher;
@@ -115,13 +121,15 @@ public class MyPlantFragment extends Fragment {
         myPlantListViewModel.myPlants.observe(getViewLifecycleOwner(), myPlants -> {
             Log.d(TAG, "myPlants LiveData updated. Size: " + (myPlants != null ? myPlants.size() : "null"));
             if (myPlants != null && !myPlants.isEmpty()) {
-                adapter.setMyPlants(myPlants); // Sử dụng phương thức setMyPlants của adapter
+                adapter.setMyPlants(myPlants); // Update adapter
                 recyclerView.setVisibility(View.VISIBLE);
-                // TODO: Ẩn TextView "Không có cây nào" nếu có
+                layoutEmptyPlants.setVisibility(View.GONE); // Hide empty state
+                lottieEmptyPlantsAnimation.pauseAnimation();
             } else {
-                adapter.setMyPlants(new ArrayList<>()); // Cập nhật adapter với danh sách rỗng
-                recyclerView.setVisibility(View.GONE); // Ẩn RecyclerView
-                // TODO: Hiển thị TextView "Không có cây nào" nếu có
+                adapter.setMyPlants(new ArrayList<>()); // Clear adapter
+                recyclerView.setVisibility(View.GONE); // Hide RecyclerView
+                layoutEmptyPlants.setVisibility(View.VISIBLE); // Show empty state
+                lottieEmptyPlantsAnimation.playAnimation();
             }
         });
 
@@ -131,11 +139,12 @@ public class MyPlantFragment extends Fragment {
                 lottieLoadingAnimation.setVisibility(View.VISIBLE);
                 lottieLoadingAnimation.playAnimation();
                 recyclerView.setVisibility(View.GONE);
-                // TODO: Ẩn TextView "Không có cây nào"
+                layoutFilterOptions.setVisibility(View.GONE);
+                layoutEmptyPlants.setVisibility(View.GONE);
+                lottieEmptyPlantsAnimation.pauseAnimation();
             } else {
                 lottieLoadingAnimation.setVisibility(View.GONE);
                 lottieLoadingAnimation.cancelAnimation();
-                // Visibility của RecyclerView/TextViewNoPlants sẽ được xử lý bởi observer myPlants
             }
         });
 
@@ -236,6 +245,11 @@ public class MyPlantFragment extends Fragment {
         editTextSearchPlantName = view.findViewById(R.id.edit_text_search_plant_name);
         spinnerFilterPlantType = view.findViewById(R.id.spinner_filter_plant_type);
         buttonHideFilter = view.findViewById(R.id.button_hide_filter);
+
+        layoutEmptyPlants = view.findViewById(R.id.layout_empty_plants);
+        lottieEmptyPlantsAnimation = view.findViewById(R.id.lottie_empty_plants_animation);
+        textEmptyPlantsMessage = view.findViewById(R.id.text_empty_plants_message);
+
 
         adapter = new MyPlantAdapter(new ArrayList<>(), // Adapter bắt đầu với danh sách rỗng
                 new MyPlantAdapter.OnPlantItemClickListener() {

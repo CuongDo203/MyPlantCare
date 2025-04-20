@@ -12,6 +12,7 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -70,6 +71,9 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
     private MyPlantScheduleAdapter myPlantScheduleAdapter;
     private MyPlantDetailViewModel myPlantDetailViewModel;
     private LottieAnimationView lottieNoSchedule;
+
+    private FrameLayout plantImageContainer; // Container around image and Lottie
+    private LottieAnimationView lottieImageLoading;
     private ProgressBar progressBarSchedules; // Tham chiếu ProgressBar
     private LinearLayout emptySchedulesView;
 
@@ -163,7 +167,7 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
             if (result != null && !result.isEmpty()) {
                 Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "Operation result message: " + result);
-//                myPlantDetailViewModel.clearOperationResult();
+                myPlantDetailViewModel.clearOperationResult();
             }
         });
     }
@@ -315,6 +319,8 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
         lottieNoSchedule = findViewById(R.id.lottie_no_schedule);
         progressBarSchedules = findViewById(R.id.progress_bar_schedules);
         emptySchedulesView = findViewById(R.id.empty_schedules_view);
+        plantImageContainer = findViewById(R.id.plant_image_container);
+        lottieImageLoading = findViewById(R.id.lottie_image_loading);
     }
 
     @Override
@@ -433,6 +439,16 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
 
     private void showLoading(boolean isLoading) {
         btnChangeImage.setEnabled(!isLoading);
+        if(isLoading) {
+            myPlantImg.setVisibility(View.GONE);
+            lottieImageLoading.setVisibility(View.VISIBLE);
+            lottieImageLoading.playAnimation();
+        }
+        else {
+            myPlantImg.setVisibility(View.VISIBLE);
+            lottieImageLoading.setVisibility(View.GONE);
+            lottieImageLoading.cancelAnimation();
+        }
     }
 
 
