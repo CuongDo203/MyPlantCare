@@ -20,10 +20,13 @@ public class MyPlantModel {
 
     private String speciesId;
     private String image;
+    private String status;
 
     @ServerTimestamp
+    @PropertyName("created_at")
     private Timestamp createdAt; // Tự động lấy timestamp từ server khi tạo
     @ServerTimestamp
+    @PropertyName("updated_at")
     private Timestamp updatedAt; // Tự động lấy timestamp từ server khi cập nhật
 
     // Constructor rỗng cần thiết cho Firestore
@@ -61,4 +64,35 @@ public class MyPlantModel {
     public void setProgress(double progress) { this.progress = progress; }
     public String getImage() { return image; }
     public void setImage(String image) { this.image = image; }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getSpeciesId() {
+        return speciesId;
+    }
+
+    public void setSpeciesId(String speciesId) {
+        this.speciesId = speciesId;
+    }
+
+    @Override
+    public String toString() {
+        return "MyPlantModel{" +
+                "id='" + id + '\'' +
+                ", nickname='" + nickname + '\'' +
+                ", location='" + location + '\'' +
+                ", progress=" + progress +
+                ", speciesId='" + speciesId + '\'' +
+                ", image='" + image + '\'' +
+                ", status='" + status + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
 }

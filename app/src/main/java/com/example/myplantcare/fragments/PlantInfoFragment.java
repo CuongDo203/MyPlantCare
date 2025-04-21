@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.myplantcare.R;
 import com.example.myplantcare.adapters.PlantInfoAdapter;
 import com.example.myplantcare.data.responses.PlantResponse;
@@ -27,6 +28,7 @@ public class PlantInfoFragment extends Fragment {
     private PlantInfoAdapter plantInfoAdapter;
     private PlantInfoViewModel plantInfoViewModel;
     List<PlantResponse> plantInfos;
+    private LottieAnimationView lottieLoadingAnimation;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,8 +53,16 @@ public class PlantInfoFragment extends Fragment {
         });
 
         plantInfoViewModel.isLoading.observe(getViewLifecycleOwner(), isLoading -> {
-            // Nếu muốn xử lý hiển thị loading indicator thì xử lý ở đây
-            // Ví dụ: hiển thị ProgressBar
+            if(isLoading) {
+                recyclerView.setVisibility(View.GONE);
+                lottieLoadingAnimation.setVisibility(View.VISIBLE);
+                lottieLoadingAnimation.playAnimation();
+                Log.d("PlantInfo", "Loading...");
+            } else {
+                recyclerView.setVisibility(View.VISIBLE);
+                lottieLoadingAnimation.setVisibility(View.GONE);
+                lottieLoadingAnimation.cancelAnimation();
+            }
         });
     }
 
@@ -62,5 +72,6 @@ public class PlantInfoFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         plantInfoAdapter = new PlantInfoAdapter(plantInfos);
         recyclerView.setAdapter(plantInfoAdapter);
+        lottieLoadingAnimation = view.findViewById(R.id.lottie_loading_animation);
     }
 }

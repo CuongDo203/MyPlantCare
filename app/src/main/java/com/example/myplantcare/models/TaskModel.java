@@ -8,11 +8,11 @@ public class TaskModel {
 
     private String name;
 
-    private boolean description;
+    private String description;
 
     public TaskModel() {}
 
-    public TaskModel(String name, boolean description) {
+    public TaskModel(String name, String description) {
         this.name = name;
         this.description = description;
     }
@@ -21,8 +21,24 @@ public class TaskModel {
         return name;
     }
 
-    public boolean isDescription() {
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
         return description;
     }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }

@@ -3,14 +3,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.PlantInfoDetailFragment">
+    tools:context=".fragments.PlantInfoDetailFragment"
+    android:padding="16dp"
+    >
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Thông tin chi tiết về cây"
-        android:id="@+id/mota_cay"
-        />
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/mota_cay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:textSize="16sp"
+            android:textColor="@android:color/black"
+            tools:text="Đây là nơi hiển thị mô tả chi tiết về cây." />
+    </ScrollView>
 
 </FrameLayout>
