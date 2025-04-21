@@ -370,7 +370,12 @@ public class MyPlantFragment extends Fragment {
 
         AddPlantDialogFragment dialogFragment = AddPlantDialogFragment.newInstance(null, userIdForDialog); // null vì thêm cây mới
         dialogFragment.setOnSavePlantListener(() -> {
-            Log.d(TAG, "AddPlantDialog closed. Refreshing plants.");
+            if (myPlantListViewModel != null) { // Kiểm tra ViewModel null
+                myPlantListViewModel.loadMyPlants(); // <-- Gọi phương thức tải lại dữ liệu
+                Log.d(TAG, "Called loadMyPlants() after successful plant save.");
+            } else {
+                Log.w(TAG, "ViewModel is null, cannot load plants after successful save.");
+            }
         });
         dialogFragment.show(getChildFragmentManager(), "AddPlantDialogTag");
     }

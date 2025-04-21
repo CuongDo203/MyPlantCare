@@ -87,7 +87,7 @@ public class AddPlantDialogFragment extends DialogFragment {
     }
 
     public AddPlantDialogFragment() {
-        // Required empty public constructor
+
     }
 
     @Override
