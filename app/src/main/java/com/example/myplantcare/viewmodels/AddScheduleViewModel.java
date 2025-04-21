@@ -146,7 +146,6 @@ public class AddScheduleViewModel extends ViewModel {
         _saveResult.postValue(null);
     }
 
-    // Phương thức để xóa thông báo lỗi sau khi đã hiển thị
     public void clearErrorMessage() {
         _errorMessage.postValue(null);
     }

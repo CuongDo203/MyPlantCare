@@ -301,9 +301,6 @@ public class MyPlantDetailViewModel extends ViewModel {
             Log.w(TAG, "Cannot add schedule: invalid input");
             return;
         }
-        // Có thể set cờ loading riêng cho thao tác thêm schedule
-        // _isLoadingSchedules.setValue(true); // Hoặc một cờ loading riêng
-
         scheduleRepository.addSchedule(userId, myPlantId, schedule, new FirestoreCallback<Void>() {
             @Override
             public void onSuccess(Void result) {
@@ -311,7 +308,6 @@ public class MyPlantDetailViewModel extends ViewModel {
                 Log.d(TAG, "Schedule added successfully.");
                 // Sau khi thêm thành công, tải lại cả danh sách schedules và tasks để cập nhật UI
                 loadPlantSchedulesAndTasks(); // <-- Tải lại để refresh danh sách
-
             }
 
             @Override

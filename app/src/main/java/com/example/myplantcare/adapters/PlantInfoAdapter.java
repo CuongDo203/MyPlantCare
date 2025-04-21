@@ -18,6 +18,7 @@ import com.example.myplantcare.activities.PlantInfoDetail;
 import com.example.myplantcare.data.responses.PlantResponse;
 import com.example.myplantcare.models.PlantModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlantInfoAdapter extends RecyclerView.Adapter<PlantInfoAdapter.PlantInfoViewHolder>{
@@ -33,6 +34,11 @@ public class PlantInfoAdapter extends RecyclerView.Adapter<PlantInfoAdapter.Plan
     public PlantInfoAdapter.PlantInfoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_plant_info, parent, false);
         return new PlantInfoViewHolder(view);
+    }
+
+    public void setPlantInfos(List<PlantResponse> plantInfos) {
+        this.plantInfos = plantInfos != null ? plantInfos : new ArrayList<>();
+        notifyDataSetChanged();
     }
 
     @Override

@@ -46,9 +46,8 @@ import com.example.myplantcare.utils.DateUtils;
 import com.example.myplantcare.utils.FirestoreCallback;
 import com.example.myplantcare.viewmodels.ImageViewModel;
 import com.example.myplantcare.viewmodels.MyPlantDetailViewModel;
-
-import java.util.HashMap;
-import java.util.Map;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class MyPlantDetailActivity extends AppCompatActivity implements View.OnClickListener {
     private static final String TAG = "MyPlantDetailActivity";
@@ -64,7 +63,6 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
     private ActivityResultLauncher<String> permissionRequestLauncher;
     private ActivityResultLauncher<Intent> updateActivityLauncher;
     private ImageViewModel imageViewModel;
-    //    private MyPlantRepository myPlantRepository;
     private RecyclerView recyclerViewSchedules;
     private MyPlantScheduleAdapter myPlantScheduleAdapter;
     private MyPlantDetailViewModel myPlantDetailViewModel;
@@ -79,20 +77,15 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_plant_detail);
-
-//        myPlantRepository = new MyPlantRepositoryImpl();
-
         // Lấy User ID hiện tại
-//        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-//        if (currentUser != null) {
-//            currentUserId = currentUser.getUid();
-//        } else {
-//            // Xử lý trường hợp người dùng chưa đăng nhập (không thể xem chi tiết cây của họ)
-//            Toast.makeText(this, "Bạn cần đăng nhập", Toast.LENGTH_SHORT).show();
-//            finish(); // Đóng Activity
-//            return;
-//        }
-        currentUserId = "eoWltJXzlBtC8U8QZx9G"; // Xóa hardcode này khi có Auth thật
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            currentUserId = currentUser.getUid();
+        } else {
+            Toast.makeText(this, "Bạn cần đăng nhập", Toast.LENGTH_SHORT).show();
+            finish(); // Đóng Activity
+            return;
+        }
 
         Intent intent = getIntent();
         if (intent != null && intent.getExtras() != null) {
@@ -121,10 +114,21 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
         registerActivityResults();
         setupObservers();
         setupClickListeners();
-//        getAndDisplayPlantData();
         myPlantImg.setVisibility(View.GONE); // Hide ImageView initially
         lottieImageLoading.setVisibility(View.VISIBLE); // Show Lottie initially
         lottieImageLoading.playAnimation();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (currentUserId != null && myPlantId != null) {
+            myPlantDetailViewModel.loadPlantDetails();
+            myPlantDetailViewModel.loadPlantSchedulesAndTasks();
+            Log.d(TAG, "onResume: Calling loadPlantDetails() and loadPlantSchedulesAndTasks() to refresh data.");
+        } else {
+            Log.w(TAG, "onResume: userId or myPlantId is null, cannot load data.");
+        }
     }
 
     private void setupClickListeners() {
@@ -145,16 +149,8 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
                     if (myPlantStatus != null) myPlantStatus.setText(plant.getStatus());
                     // TODO: Update other details (Height, Type, etc.) based on plant object
 
-
-                    // --- Load image using Glide with RequestListener ---
                     if (plant.getImage() != null && !plant.getImage().isEmpty()) {
                         Log.d(TAG, "Loading image with Glide: " + plant.getImage());
-
-                        // Ensure Lottie is showing while Glide loads (redundant with isLoadingDetails but safe)
-                        // myPlantImg.setVisibility(View.GONE);
-                        // lottieImageLoading.setVisibility(View.VISIBLE);
-                        // lottieImageLoading.playAnimation();
-
                         Glide.with(MyPlantDetailActivity.this)
                                 .load(plant.getImage())
                                 .listener(new RequestListener<Drawable>() { // Attach RequestListener
@@ -192,14 +188,12 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
                         myPlantImg.setVisibility(View.VISIBLE); // Show placeholder ImageView
                     }
 
-
                     String formatCreatedDate = DateUtils.formatTimestamp(plant.getCreatedAt(), DateUtils.DATE_FORMAT_DISPLAY);
                     String formatUpdatedDate = DateUtils.formatTimestamp(plant.getUpdatedAt(), DateUtils.DATE_FORMAT_DISPLAY);
                     myPlantCreated.setText(formatCreatedDate);
                     myPlantUpdated.setText(formatUpdatedDate);
                 }else {
                     Log.w(TAG, "Plant details LiveData is null or plant not found.");
-                    // Handle case plant not found (e.g., show error message, finish activity)
                     Toast.makeText(this, "Không tìm thấy thông tin cây.", Toast.LENGTH_SHORT).show();
                     finish(); // Finish activity if plant details are null
                 }
@@ -218,12 +212,7 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
                     lottieImageLoading.playAnimation(); // Start animation
                     // TODO: Show a progress bar for the whole screen if needed
                 } else {
-                    // When loading details from DB finishes, the plantDetails observer
-                    // will be triggered. Image loading visibility will be handled there by Glide Listener.
-                    // Avoid hiding Lottie here immediately, let the Glide listener do it.
-                    // lottieImageLoading.setVisibility(View.GONE);
-                    // lottieImageLoading.cancelAnimation();
-                    // TODO: Hide the progress bar
+
                 }
             } else {
                 Log.d(TAG, "Ignoring isLoadingDetails update, Activity is finishing or destroyed.");
@@ -279,6 +268,7 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
                 }
             }
         });
+
     }
 
     private void registerActivityResults() {
@@ -319,7 +309,6 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
                             Log.d(TAG, "Result code is OK from update. Refreshing plant data from DB via ViewModel.");
                             myPlantDetailViewModel.loadPlantDetails();
                             myPlantDetailViewModel.loadPlantSchedulesAndTasks();
-//                      reloadDataFromDb(currentUserId, myPlantId);
                         } else {
                             Log.e(TAG, "Cannot refresh data: userId or plantId is null.");
                         }
@@ -328,45 +317,6 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
                     }
                 }
         );
-    }
-
-    private void getAndDisplayPlantData() {
-        Intent intent = getIntent();
-        if (intent != null && intent.getExtras() != null) {
-            Bundle extras = intent.getExtras();
-            myPlantId = extras.getString("id"); // Lấy ID cây với key "id"
-
-            if (myPlantId == null || currentUserId == null) {
-                Log.e(TAG, "myPlantId or currentUserId is null.");
-                Toast.makeText(this, "Lỗi dữ liệu cây", Toast.LENGTH_SHORT).show();
-                finish();
-                return;
-            }
-            Log.d(TAG, "Loading details for myPlantId: " + myPlantId + " userId: " + currentUserId);
-            // Hiển thị dữ liệu từ Intent (cần đảm bảo các key này đúng)
-            myPlantName.setText(extras.getString("plantName")); // Hoặc key khác cho nickname
-            myPlantLocation.setText(extras.getString("location"));
-            myPlantStatus.setText(extras.getString("status"));
-            Glide.with(this).load(extras.getString("image")).into(myPlantImg);
-
-            if (extras.getString("my_plant_created") == null) {
-                myPlantCreated.setText("--/--/----");
-            } else {
-                myPlantCreated.setText(extras.getString("my_plant_created"));
-            }
-            if (extras.getString("my_plant_updated") == null) {
-                myPlantUpdated.setText("--/--/----");
-            } else {
-                myPlantUpdated.setText(extras.getString("my_plant_updated"));
-            }
-            //cap nhat sau, hien tai dang fixed cung
-            myPlantHeight.setText("--cm");
-            myPlantType.setText("N/A");
-        } else {
-            Log.e(TAG, "Intent or extras is null. Cannot load plant data.");
-            Toast.makeText(this, "Không nhận được dữ liệu cây", Toast.LENGTH_SHORT).show();
-            finish();
-        }
     }
 
     private void initContents() {
@@ -413,8 +363,17 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
             Log.d(TAG, "Add Schedule button clicked.");
             if (currentUserId != null && myPlantId != null) {
                 // Tạo instance của DialogFragment bằng newInstance() factory method
-                AddScheduleDialogFragment addScheduleDialogFragment = new AddScheduleDialogFragment();
-                addScheduleDialogFragment.show(getSupportFragmentManager(), "ADD_SCHEDULE_DIALOG"); // Sử dụng getSupportFragmentManager()
+                AddScheduleDialogFragment addScheduleDialogFragment = AddScheduleDialogFragment.newInstance(myPlantId, currentUserId);
+                addScheduleDialogFragment.setOnScheduleSavedListener(() -> {
+                    Log.d(TAG, "AddScheduleDialogFragment reported schedule saved.");
+                    if (myPlantDetailViewModel != null) {
+                        myPlantDetailViewModel.loadPlantSchedulesAndTasks();
+                        Log.d(TAG, "Triggering loadPlantSchedulesAndTasks() after dialog saved.");
+                    } else {
+                        Log.w(TAG, "ViewModel is null, cannot load schedules after dialog saved.");
+                    }
+                });
+                addScheduleDialogFragment.show(getSupportFragmentManager(), "ADD_SCHEDULE_DIALOG");
             } else {
                 Log.e(TAG, "Cannot open AddScheduleDialog: userId or plantId is null.");
                 Toast.makeText(this, "Lỗi: Không có thông tin cây để thêm lịch trình.", Toast.LENGTH_SHORT).show();
@@ -477,9 +436,6 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
             lottieImageLoading.setVisibility(View.VISIBLE);
             lottieImageLoading.playAnimation();
         } else {
-//            myPlantImg.setVisibility(View.VISIBLE);
-//            lottieImageLoading.setVisibility(View.GONE);
-//            lottieImageLoading.cancelAnimation();
         }
     }
 
@@ -508,10 +464,7 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
                 .setMessage("Bạn có chắc chắn muốn xoá cây này không? Thao tác này không thể hoàn tác.")
                 .setPositiveButton("Xoá", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        // Gọi ViewModel để xóa cây
                         myPlantDetailViewModel.deletePlant(); // <-- Gọi ViewModel
-                        // Kết quả (thành công/thất bại và kết thúc Activity) được xử lý bởi observer plantDeletionResult
-                        // showLoading(true); // Hiển thị indicator loading cho quá trình xóa cây nếu có
                     }
                 })
                 .setNegativeButton("Huỷ", null)
@@ -547,8 +500,6 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Không cần remove observers nếu dùng getViewLifecycleOwner() hoặc 'this' (Activity)
-        // Cleanup khác nếu có (ví dụ: dừng animation Lottie khi Activity bị hủy)
         if (lottieImageLoading != null) {
             lottieImageLoading.cancelAnimation();
         }

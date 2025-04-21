@@ -28,6 +28,8 @@ import com.example.myplantcare.models.TaskModel;
 import com.example.myplantcare.viewmodels.ScheduleViewModel;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -45,7 +47,7 @@ public class ScheduleFragment extends Fragment {
     private ImageView btnOpenDatePicker;
     private FloatingActionButton fab;
 //    List<Pair<String, List<ScheduleWithMyPlantInfo>>> todaySchedulesList;
-
+    private String userId;
 
     // Tạo danh sách ngày
     private List<DayModel> generateDays() {
@@ -171,7 +173,12 @@ public class ScheduleFragment extends Fragment {
     }
 
     private void setupViewModel() {
-        String userId = "eoWltJXzlBtC8U8QZx9G";  //tam thoi de hard code
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            Toast.makeText(getContext(), "Người dùng chưa đăng nhập", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        userId = user.getUid();
         scheduleViewModel = new ViewModelProvider(this, new ViewModelProvider.Factory() {
             @NonNull
             @Override
@@ -182,7 +189,7 @@ public class ScheduleFragment extends Fragment {
     }
 
     private void showAddScheduleDialog() {
-        AddScheduleDialogFragment addScheduleDialogFragment = new AddScheduleDialogFragment();
+        AddScheduleDialogFragment addScheduleDialogFragment = AddScheduleDialogFragment.newInstance(null, userId);
         addScheduleDialogFragment.show(getParentFragmentManager(), "ADD_SCHEDULE_DIALOG");
     }
 

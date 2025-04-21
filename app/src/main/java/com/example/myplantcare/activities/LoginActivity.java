@@ -93,7 +93,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             startActivity(intent);
         }
         else if (v.getId() == R.id.ivTogglePasswordLogin) {
-
             togglePasswordVisibility();
         }
         else if(v.getId() == R.id.btnForgotPassword)

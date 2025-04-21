@@ -14,11 +14,13 @@ public class ViewPagerPlantInfoAdapter extends FragmentStateAdapter {
 
     private final String plantDescription;
     private final String plantInstruction;
+
     public ViewPagerPlantInfoAdapter(@NonNull FragmentActivity fragmentActivity, String description, String instruction) {
         super(fragmentActivity);
         this.plantDescription = description;
         this.plantInstruction = instruction;
     }
+
     public ViewPagerPlantInfoAdapter(@NonNull Fragment fragment, String description, String instruction) {
         super(fragment);
         this.plantDescription = description;
