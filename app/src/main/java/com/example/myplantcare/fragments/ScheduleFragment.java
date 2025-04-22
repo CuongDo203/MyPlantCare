@@ -1,6 +1,14 @@
 package com.example.myplantcare.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
+import android.util.Pair;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -9,20 +17,12 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
-import android.util.Pair;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.Toast;
-
 import com.example.myplantcare.R;
 import com.example.myplantcare.adapters.DayAdapter;
 import com.example.myplantcare.adapters.ScheduleAdapter;
-import com.example.myplantcare.adapters.ScheduleDetailAdapter;
 import com.example.myplantcare.data.responses.ScheduleWithMyPlantInfo;
 import com.example.myplantcare.models.DayModel;
+import com.example.myplantcare.utils.DateUtils;
 import com.example.myplantcare.viewmodels.ScheduleViewModel;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -36,13 +36,13 @@ import java.util.Map;
 
 public class ScheduleFragment extends Fragment implements
 //        ScheduleDetailAdapter.OnTaskCompletionChangeListener,
-        ScheduleAdapter.OnTaskGroupActionListener
-{
+        ScheduleAdapter.OnTaskGroupActionListener {
     private static final String TAG = "ScheduleFragment";
     private RecyclerView recyclerViewDays, recyclerViewScheduleUncompleted, recyclerViewScheduleCompleted;
     private DayAdapter dayAdapter;
     private ScheduleAdapter scheduleAdapterUncomplete, scheduleAdapterCompleted;
     private ScheduleViewModel scheduleViewModel;
+    private TextView dayTextView;
     private List<DayModel> dayList;
     private List<Pair<String, List<ScheduleWithMyPlantInfo>>> scheduleListUncompleted, scheduleListCompleted;
     private ImageView btnOpenDatePicker;
@@ -50,6 +50,7 @@ public class ScheduleFragment extends Fragment implements
     private String userId;
 
     private Calendar currentSelectedDate = Calendar.getInstance();
+
     // Tạo danh sách ngày
     private List<DayModel> generateDays() {
         List<DayModel> days = new ArrayList<>();
@@ -86,7 +87,7 @@ public class ScheduleFragment extends Fragment implements
 
 
             days.add(new DayModel(dayOfWeek, day, isToday, isSelected, (Calendar) calendar.clone())); // Pass isSelected and cloned Calendar
-            calendar.add(Calendar.DAY_OF_MONTH, 1); // Move to the next day
+            calendar.add(Calendar.DAY_OF_MONTH, 1); // Move to the next dayTextView
         }
         return days;
     }
@@ -109,9 +110,8 @@ public class ScheduleFragment extends Fragment implements
             // Cập nhật ngày được chọn
             currentSelectedDate = (Calendar) calendar.clone();
             Log.d(TAG, "Date selected from picker: " + currentSelectedDate.getTime().toString()); // Use TAG
+            updateDisplayedDate(currentSelectedDate);
 
-            // TODO: Load schedules for the newly selected date
-            // Bạn cần gọi phương thức trong ScheduleViewModel để tải lịch trình cho ngày này
             if (scheduleViewModel != null) {
                 scheduleViewModel.loadSchedulesForDate(currentSelectedDate);
                 Log.d(TAG, "Calling loadSchedulesForDate for selected date."); // Use TAG
@@ -134,7 +134,7 @@ public class ScheduleFragment extends Fragment implements
         observeViewModel();
         fab.setOnClickListener(v -> {
             showAddScheduleDialog();
-                });
+        });
 
         recyclerViewDays.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         dayList = generateDays();
@@ -147,13 +147,14 @@ public class ScheduleFragment extends Fragment implements
             recyclerViewDays.scrollToPosition(initialSelectedPosition);
         }
 
-        Log.d("ScheduleFragment", "Size cv can lam o onCreateView: " + scheduleListUncompleted.size());
+        updateDisplayedDate(currentSelectedDate);
+
         recyclerViewScheduleUncompleted.setLayoutManager(new LinearLayoutManager(getContext()));
-        scheduleAdapterUncomplete = new ScheduleAdapter(scheduleListUncompleted,false, this);
+        scheduleAdapterUncomplete = new ScheduleAdapter(scheduleListUncompleted, false, this);
         recyclerViewScheduleUncompleted.setAdapter(scheduleAdapterUncomplete);
 
         recyclerViewScheduleCompleted.setLayoutManager(new LinearLayoutManager(getContext()));
-        scheduleAdapterCompleted = new ScheduleAdapter(scheduleListCompleted,true, this);
+        scheduleAdapterCompleted = new ScheduleAdapter(scheduleListCompleted, true, this);
         recyclerViewScheduleCompleted.setAdapter(scheduleAdapterCompleted);
 
         btnOpenDatePicker.setOnClickListener(v -> openDatePicker());
@@ -174,10 +175,8 @@ public class ScheduleFragment extends Fragment implements
 
     private void onDaySelected(DayModel dayModel, int position) {
         Log.d(TAG, "Day selected: " + dayModel.getDayOfMonth() + "/" + (dayModel.getCalendar().get(Calendar.MONTH) + 1)); // Use TAG
-        // Update the Fragment's selected date
         currentSelectedDate = dayModel.getCalendar();
-
-        // Load schedules for the newly selected date
+        updateDisplayedDate(currentSelectedDate);
         if (scheduleViewModel != null) {
             scheduleViewModel.loadSchedulesForDate(currentSelectedDate);
             Log.d(TAG, "Calling loadSchedulesForDate for selected date from adapter click."); // Use TAG
@@ -186,12 +185,36 @@ public class ScheduleFragment extends Fragment implements
         }
     }
 
+    private void updateDisplayedDate(Calendar dateToDisplay) {
+        if (dayTextView != null && dateToDisplay != null) {
+            // Check if the date is today to display "Hôm nay"
+            Calendar today = Calendar.getInstance();
+            today.set(Calendar.HOUR_OF_DAY, 0);
+            today.set(Calendar.MINUTE, 0);
+            today.set(Calendar.SECOND, 0);
+            today.set(Calendar.MILLISECOND, 0);
+
+            Calendar dateZeroTime = (Calendar) dateToDisplay.clone();
+            dateZeroTime.set(Calendar.HOUR_OF_DAY, 0);
+            dateZeroTime.set(Calendar.MINUTE, 0);
+            dateZeroTime.set(Calendar.SECOND, 0);
+            dateZeroTime.set(Calendar.MILLISECOND, 0);
+
+            if (dateZeroTime.equals(today)) {
+                dayTextView.setText("Hôm nay");
+            } else {
+                dayTextView.setText(DateUtils.formatDate(dateToDisplay.getTime(), DateUtils.DATE_FORMAT_DISPLAY));
+            }
+        } else {
+            Log.w(TAG, "dayTextView or dateToDisplay is null, cannot update date display.");
+        }
+    }
+
     private void updateDayListSelection(Calendar selectedDate) {
         if (dayList == null || dayAdapter == null || selectedDate == null) {
-            Log.w(TAG, "Cannot update day list selection: list, adapter or date is null.");
+            Log.w(TAG, "Cannot update dayTextView list selection: list, adapter or date is null.");
             return;
         }
-
         int oldSelectedPosition = dayAdapter.getSelectedPosition();
         int newSelectedPosition = RecyclerView.NO_POSITION;
 
@@ -201,7 +224,6 @@ public class ScheduleFragment extends Fragment implements
         selectedDateZeroTime.set(Calendar.MINUTE, 0);
         selectedDateZeroTime.set(Calendar.SECOND, 0);
         selectedDateZeroTime.set(Calendar.MILLISECOND, 0);
-
 
         // Find the position of the newly selected date in the current dayList
         for (int i = 0; i < dayList.size(); i++) {
@@ -219,54 +241,29 @@ public class ScheduleFragment extends Fragment implements
 
         // Update selection in the list and notify adapter
         if (newSelectedPosition != RecyclerView.NO_POSITION) {
-            // Deselect old item if it exists and is different from the new one
             if (oldSelectedPosition != RecyclerView.NO_POSITION && oldSelectedPosition != newSelectedPosition) {
                 dayList.get(oldSelectedPosition).setSelected(false);
                 dayAdapter.notifyItemChanged(oldSelectedPosition);
             }
-            // Select the new item
             dayList.get(newSelectedPosition).setSelected(true);
             dayAdapter.setSelectedPosition(newSelectedPosition); // Assuming DayAdapter has this setter
             dayAdapter.notifyItemChanged(newSelectedPosition);
-
-            // Scroll to the newly selected position (optional but good UX)
             recyclerViewDays.scrollToPosition(newSelectedPosition);
-
         } else {
-            // If the selected date is outside the current 7-day window,
-            // deselect the old item and reset the selected position in the adapter.
             if (oldSelectedPosition != RecyclerView.NO_POSITION) {
                 dayList.get(oldSelectedPosition).setSelected(false);
                 dayAdapter.notifyItemChanged(oldSelectedPosition);
             }
             dayAdapter.setSelectedPosition(RecyclerView.NO_POSITION); // Reset selected position
-            Log.d(TAG, "Selected date from picker is outside the current day list window.");
-            // TODO: Optionally regenerate the day list centered around the new date here
-            // if the user selects a date far in the past or future using the DatePicker.
-            // This would involve calling generateDays() again with the new date and updating the adapter.
+            Log.d(TAG, "Selected date from picker is outside the current dayTextView list window.");
         }
     }
+
     private void observeViewModel() {
-//        scheduleViewModel.todaySchedules.observe(getViewLifecycleOwner(), groupedSchedules  -> {
-//            if (groupedSchedules == null || groupedSchedules.isEmpty()) {
-//                Toast.makeText(getContext(), "Không có công việc hôm nay", Toast.LENGTH_SHORT).show();
-//                scheduleListUncompleted.clear();
-//                scheduleAdapterUncomplete.notifyDataSetChanged();
-//                return;
-//            }
-//            scheduleListUncompleted.clear();
-//            for (Map.Entry<String, List<ScheduleWithMyPlantInfo>> entry : groupedSchedules.entrySet()) {
-//                scheduleListUncompleted.add(new Pair<>(entry.getKey(), entry.getValue()));
-//            }
-//            Log.d("ScheduleFragment", "Size cv can lam o observeViewModel: " + scheduleListUncompleted.size());
-//            scheduleAdapterUncomplete.notifyDataSetChanged();
-//        });
         scheduleViewModel.uncompletedSchedules.observe(getViewLifecycleOwner(), groupedUncompletedSchedules -> {
             Log.d(TAG, "Uncompleted Schedules LiveData updated. Groups size: " + (groupedUncompletedSchedules != null ? groupedUncompletedSchedules.size() : "null"));
-
             scheduleListUncompleted.clear(); // Xóa dữ liệu cũ
             if (groupedUncompletedSchedules != null && !groupedUncompletedSchedules.isEmpty()) {
-                // Chuyển đổi Map entries sang List of Pairs cho adapter
                 for (Map.Entry<String, List<ScheduleWithMyPlantInfo>> entry : groupedUncompletedSchedules.entrySet()) {
                     scheduleListUncompleted.add(new Pair<>(entry.getKey(), entry.getValue()));
                 }
@@ -289,8 +286,6 @@ public class ScheduleFragment extends Fragment implements
                 for (Map.Entry<String, List<ScheduleWithMyPlantInfo>> entry : groupedCompletedSchedules.entrySet()) {
                     scheduleListCompleted.add(new Pair<>(entry.getKey(), entry.getValue()));
                 }
-                // TODO: Cập nhật UI empty state/RecyclerView visibility
-                // showCompletedSchedulesList();
             } else {
                 Log.d(TAG, "No completed schedules found for the selected date.");
             }
@@ -309,7 +304,6 @@ public class ScheduleFragment extends Fragment implements
         });
 
         scheduleViewModel.isLoading.observe(getViewLifecycleOwner(), isLoading -> {
-            // Có thể thêm ProgressBar sau nếu bạn muốn
             Log.d("ScheduleFragment", "Đang tải: " + isLoading);
         });
 
@@ -321,7 +315,6 @@ public class ScheduleFragment extends Fragment implements
             if (resultMessage != null && !resultMessage.isEmpty()) {
                 Toast.makeText(getContext(), resultMessage, Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "Operation Result: " + resultMessage);
-//                scheduleViewModel.clearOperationResult(); // Xóa thông báo sau khi hiển thị
             }
         });
     }
@@ -355,6 +348,7 @@ public class ScheduleFragment extends Fragment implements
         fab = view.findViewById(R.id.fab_add_schedule);
         scheduleListUncompleted = new ArrayList<>();
         scheduleListCompleted = new ArrayList<>();
+        dayTextView = view.findViewById(R.id.day);
     }
 
     @Override
@@ -362,9 +356,7 @@ public class ScheduleFragment extends Fragment implements
         Log.d(TAG, "Mark Checked in Group Complete clicked for " + (checkedTasksInGroup != null ? checkedTasksInGroup.size() : 0) + " checked tasks (UNCOMPLETED list).");
 
         if (scheduleViewModel != null && currentSelectedDate != null && checkedTasksInGroup != null && !checkedTasksInGroup.isEmpty()) {
-            // Call ViewModel to mark each checked task as complete
             for (ScheduleWithMyPlantInfo task : checkedTasksInGroup) {
-                // ViewModel will handle checking if it's already completed to avoid redundant writes
                 scheduleViewModel.markScheduleCompleted(task);
             }
             Toast.makeText(getContext(), "Đang đánh dấu hoàn thành các công việc đã chọn...", Toast.LENGTH_SHORT).show();
@@ -376,8 +368,6 @@ public class ScheduleFragment extends Fragment implements
             Log.w(TAG, "ViewModel, currentSelectedDate, or checkedTasksInGroup list is null/empty, cannot mark checked tasks complete.");
             Toast.makeText(getContext(), "Lỗi: Không thể hoàn thành các công việc đã chọn.", Toast.LENGTH_SHORT).show();
         }
-
-        // ViewModel will handle reloading schedules.
     }
 
     @Override
@@ -395,29 +385,10 @@ public class ScheduleFragment extends Fragment implements
         } else if (checkedTasksInGroup == null || checkedTasksInGroup.isEmpty()) {
             Log.d(TAG, "Unmark Checked in Group clicked, but no tasks were checked.");
             Toast.makeText(getContext(), "Vui lòng chọn công việc cần hoàn tác.", Toast.LENGTH_SHORT).show();
-        }
-        else {
+        } else {
             Log.w(TAG, "ViewModel, currentSelectedDate, or checkedTasksInGroup list is null/empty, cannot unmark checked tasks.");
             Toast.makeText(getContext(), "Lỗi: Không thể hoàn tác các công việc đã chọn.", Toast.LENGTH_SHORT).show();
         }
-
-        // ViewModel will handle reloading schedules.
     }
 
-//    @Override
-//    public void onTaskCompletionChanged(ScheduleWithMyPlantInfo task, boolean isChecked) {
-//        Log.d(TAG, "Task completion checkbox changed for Schedule ID: " + task.getSchedule().getId() + ", isChecked: " + isChecked);
-//
-//        if (scheduleViewModel != null && currentSelectedDate != null) {
-//            // Call ViewModel method based on the checkbox state
-//            if (isChecked) {
-//                scheduleViewModel.markScheduleCompleted(task); // Call ViewModel to mark as complete
-//            } else {
-//                scheduleViewModel.unmarkScheduleCompleted(task); // Call ViewModel to unmark as complete
-//            }
-//        } else {
-//            Log.w(TAG, "ViewModel or currentSelectedDate is null, cannot update task completion.");
-//            Toast.makeText(getContext(), "Lỗi: Không thể cập nhật trạng thái công việc.", Toast.LENGTH_SHORT).show();
-//        }
-//    }
 }

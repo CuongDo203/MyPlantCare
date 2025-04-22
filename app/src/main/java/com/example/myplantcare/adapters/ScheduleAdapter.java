@@ -144,13 +144,6 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
             markAsComplete = itemView.findViewById(R.id.mark_as_complete);
         }
 
-//        public ScheduleViewHolder(View itemView, ViewGroup parent) {
-//            super(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_schedule, parent, false));
-//            taskName = itemView.findViewById(R.id.taskName);
-//            recyclerViewTasks = itemView.findViewById(R.id.recyclerViewTasks);
-//            taskIcon = itemView.findViewById(R.id.ic_task);
-//            markAsComplete = itemView.findViewById(R.id.mark_as_complete);
-//        }
     }
 
 }
