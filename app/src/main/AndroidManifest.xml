@@ -46,6 +46,7 @@
         <activity android:name=".activities.DetailNoteActivity" />
         <activity android:name=".activities.StatisticActivity" />
         <activity android:name=".activities.DetailStatisticActivity" />
+
         <activity
             android:name=".activities.LandingPageActivity"
             android:exported="true"
