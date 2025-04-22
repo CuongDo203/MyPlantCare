@@ -20,8 +20,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ScheduleViewHolder> {
-
+    private static final String TAG = "ScheduleAdapter";
     private List<Pair<String, List<ScheduleWithMyPlantInfo>>> scheduleList;
+    private boolean isCompletedList;
+
+    // --- Listener Interface for Group Action ---
+    public interface OnTaskGroupActionListener {
+        void onMarkCheckedInGroupCompleteClick(List<ScheduleWithMyPlantInfo> tasksInGroup);
+        void onUnmarkCheckedInGroupCompleteClick(List<ScheduleWithMyPlantInfo> tasksInGroup);
+        // Add other group actions if needed (e.g., onUnmarkGroupCompleteClick)
+    }
+
+    private OnTaskGroupActionListener groupActionListener;
+//    private ScheduleDetailAdapter.OnTaskCompletionChangeListener itemCompletionListener; // Listener for individual item changes
+
+
+    // --- Constructor with Listeners ---
+    public ScheduleAdapter(List<Pair<String, List<ScheduleWithMyPlantInfo>>> scheduleList,
+                           boolean isCompletedList,
+                           OnTaskGroupActionListener groupActionListener
+//                           ScheduleDetailAdapter.OnTaskCompletionChangeListener itemCompletionListener
+    ) {
+        this.scheduleList = scheduleList;
+        this.isCompletedList = isCompletedList;
+        this.groupActionListener = groupActionListener;
+//        this.itemCompletionListener = itemCompletionListener;
+    }
 
     public ScheduleAdapter(List<Pair<String, List<ScheduleWithMyPlantInfo>>> scheduleList) {
         this.scheduleList = scheduleList;
@@ -38,11 +62,6 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
     public void onBindViewHolder(@NonNull ScheduleViewHolder holder, int position) {
         Pair<String, List<ScheduleWithMyPlantInfo>> schedule = scheduleList.get(position);
         List<ScheduleWithMyPlantInfo> tasks = schedule.second;
-        for(ScheduleWithMyPlantInfo task : tasks){
-            Log.d("ScheduleAdapter", "Binding task: "+task.getMyPlantNickname());
-            Log.d("ScheduleAdapter", "Binding task: "+task.getScheduleTime());
-            Log.d("ScheduleAdapter", "Binding task: "+task.getMyPlantLocation());
-        }
         holder.taskName.setText(schedule.first);
         switch (schedule.first){
             case "Tưới nước":
@@ -62,6 +81,44 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
         ScheduleDetailAdapter scheduleDetailAdapter = new ScheduleDetailAdapter(tasks);
         holder.recyclerViewTasks.setLayoutManager(new LinearLayoutManager(holder.itemView.getContext()));
         holder.recyclerViewTasks.setAdapter(scheduleDetailAdapter);
+
+        if (isCompletedList) {
+            // If this is the completed list, show rollback icon
+            holder.markAsComplete.setImageResource(R.drawable.ic_rollback); // Assuming you have ic_rollback drawable
+            // Optionally hide the markAsComplete button if the group is empty
+            holder.markAsComplete.setVisibility(tasks != null && !tasks.isEmpty() ? View.VISIBLE : View.GONE);
+
+        } else {
+            // If this is the uncompleted list, show mark all complete icon (or similar)
+            holder.markAsComplete.setImageResource(R.drawable.ic_task_checked); // Assuming you have ic_done_all or similar
+            // Optionally hide the markAsComplete button if the group is empty
+            holder.markAsComplete.setVisibility(tasks != null && !tasks.isEmpty() ? View.VISIBLE : View.GONE);
+        }
+
+        holder.markAsComplete.setOnClickListener(v -> {
+            if (tasks == null || tasks.isEmpty()) {
+                Log.w(TAG, "Group action clicked on empty group: " + schedule.first);
+                return;
+            }
+            Log.d(TAG, "Group action ImageView clicked for task group: " + schedule.first + ". IsCompletedList: " + isCompletedList);
+            List<ScheduleWithMyPlantInfo> checkedTasks = new ArrayList<>();
+            for (ScheduleWithMyPlantInfo task : tasks) {
+                if (task.isCheckedForGroupAction()) { // Check the temporary state in the model
+                    checkedTasks.add(task);
+                }
+            }
+            if (!checkedTasks.isEmpty()) {
+                if (groupActionListener != null) {
+                    if (isCompletedList) {
+                        groupActionListener.onUnmarkCheckedInGroupCompleteClick(checkedTasks);
+                    } else {
+                        groupActionListener.onMarkCheckedInGroupCompleteClick(checkedTasks);
+                    }
+                }
+            } else {
+                Log.d(TAG, "Group action clicked but no tasks were checked.");
+            }
+        });
     }
 
     @Override
@@ -69,18 +126,31 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
         return scheduleList.size();
     }
 
+    public void setSchedules(List<Pair<String, List<ScheduleWithMyPlantInfo>>> scheduleList) {
+        this.scheduleList = scheduleList;
+        notifyDataSetChanged();
+    }
+
     public static class ScheduleViewHolder extends RecyclerView.ViewHolder {
         TextView taskName;
         RecyclerView recyclerViewTasks;
-        ImageView taskIcon;
+        ImageView taskIcon, markAsComplete;
 
         public ScheduleViewHolder(View itemView) {
             super(itemView);
             taskName = itemView.findViewById(R.id.taskName);
             recyclerViewTasks = itemView.findViewById(R.id.recyclerViewTasks);
             taskIcon = itemView.findViewById(R.id.ic_task);
-
+            markAsComplete = itemView.findViewById(R.id.mark_as_complete);
         }
+
+//        public ScheduleViewHolder(View itemView, ViewGroup parent) {
+//            super(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_schedule, parent, false));
+//            taskName = itemView.findViewById(R.id.taskName);
+//            recyclerViewTasks = itemView.findViewById(R.id.recyclerViewTasks);
+//            taskIcon = itemView.findViewById(R.id.ic_task);
+//            markAsComplete = itemView.findViewById(R.id.mark_as_complete);
+//        }
     }
 
 }

@@ -42,13 +42,13 @@
             android:id="@+id/recyclerViewTasks"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="40dp"
 
             />
 
     </LinearLayout>
 
     <ImageView
+        android:id="@+id/mark_as_complete"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_alignParentEnd="true"

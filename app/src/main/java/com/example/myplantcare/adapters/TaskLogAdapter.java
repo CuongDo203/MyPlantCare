@@ -39,9 +39,9 @@ public class TaskLogAdapter extends RecyclerView.Adapter<TaskLogAdapter.TaskLogV
     @Override
     public void onBindViewHolder(@NonNull TaskLogViewHolder holder, int position) {
         TaskLogModel taskLog = taskLogList.get(position);
-        holder.textViewDate.setText(DateUtils.formatDate(taskLog.getDate(), DateUtils.DATE_FORMAT_DISPLAY));
+        holder.textViewDate.setText(DateUtils.formatDate(taskLog.getDate().toDate(), DateUtils.DATE_FORMAT_DISPLAY));
         Calendar calendar = Calendar.getInstance();
-        long numDayBefore = getDaysBetweenDates( taskLog.getDate(), calendar.getTime());
+        long numDayBefore = getDaysBetweenDates( taskLog.getDate().toDate(), calendar.getTime());
         holder.textViewRelativeTime.setText(String.valueOf(numDayBefore)+" ngày trước");
         holder.textViewTaskName.setText(taskLog.getTaskName());
         switch (taskLog.getTaskName()){
