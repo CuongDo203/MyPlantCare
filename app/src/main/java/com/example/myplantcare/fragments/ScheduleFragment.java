@@ -351,8 +351,34 @@ public class ScheduleFragment extends Fragment implements
         dayTextView = view.findViewById(R.id.day);
     }
 
+    private boolean isToday(Calendar date) {
+        if (date == null) {
+            return false;
+        }
+        Calendar today = Calendar.getInstance();
+        // Normalize both dates to start of day for comparison
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
+
+        Calendar dateZeroTime = (Calendar) date.clone();
+        dateZeroTime.set(Calendar.HOUR_OF_DAY, 0);
+        dateZeroTime.set(Calendar.MINUTE, 0);
+        dateZeroTime.set(Calendar.SECOND, 0);
+        dateZeroTime.set(Calendar.MILLISECOND, 0);
+
+        return dateZeroTime.equals(today);
+    }
+
     @Override
     public void onMarkCheckedInGroupCompleteClick(List<ScheduleWithMyPlantInfo> checkedTasksInGroup) {
+        if (!isToday(currentSelectedDate)) {
+            Log.w(TAG, "Attempted to mark complete on a date that is not today.");
+            Toast.makeText(getContext(), "Chỉ có thể đánh dấu hoàn thành cho ngày hôm nay.", Toast.LENGTH_SHORT).show();
+            return; // Exit the method if not today
+        }
+
         Log.d(TAG, "Mark Checked in Group Complete clicked for " + (checkedTasksInGroup != null ? checkedTasksInGroup.size() : 0) + " checked tasks (UNCOMPLETED list).");
 
         if (scheduleViewModel != null && currentSelectedDate != null && checkedTasksInGroup != null && !checkedTasksInGroup.isEmpty()) {
@@ -369,9 +395,13 @@ public class ScheduleFragment extends Fragment implements
             Toast.makeText(getContext(), "Lỗi: Không thể hoàn thành các công việc đã chọn.", Toast.LENGTH_SHORT).show();
         }
     }
-
     @Override
     public void onUnmarkCheckedInGroupCompleteClick(List<ScheduleWithMyPlantInfo> checkedTasksInGroup) {
+        if (!isToday(currentSelectedDate)) {
+            Log.w(TAG, "Attempted to unmark complete on a date that is not today.");
+            Toast.makeText(getContext(), "Chỉ có thể hoàn tác công việc cho ngày hôm nay.", Toast.LENGTH_SHORT).show();
+            return;
+        }
         Log.d(TAG, "Unmark Checked in Group (Rollback) clicked for " + (checkedTasksInGroup != null ? checkedTasksInGroup.size() : 0) + " checked tasks (COMPLETED list).");
 
         if (scheduleViewModel != null && currentSelectedDate != null && checkedTasksInGroup != null && !checkedTasksInGroup.isEmpty()) {
