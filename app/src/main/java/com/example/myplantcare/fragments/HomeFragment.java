@@ -95,7 +95,6 @@ public class HomeFragment extends Fragment implements HomeTaskAdapter.OnTaskClic
 
     private void setupTaskListRecyclerView() {
         rvHomeTasks.setLayoutManager(new LinearLayoutManager(getContext()));
-        // Initialize adapter, passing 'this' as the click listener
         homeTaskAdapter = new HomeTaskAdapter(this); // Pass HomeFragment as listener
         rvHomeTasks.setAdapter(homeTaskAdapter);
         Log.d(TAG, "Task list RecyclerView setup complete.");
@@ -134,7 +133,7 @@ public class HomeFragment extends Fragment implements HomeTaskAdapter.OnTaskClic
             if (errorMessage != null && !errorMessage.isEmpty()) {
                 Toast.makeText(getContext(), errorMessage, Toast.LENGTH_LONG).show();
                 // Có thể reset lỗi sau khi hiển thị
-                // homeViewModel.clearError(); // Cần thêm hàm này trong ViewModel
+                // homeViewModel.clearError();
             }
         });
     }
