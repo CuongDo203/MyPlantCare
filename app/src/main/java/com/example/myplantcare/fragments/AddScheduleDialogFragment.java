@@ -67,12 +67,13 @@ public class AddScheduleDialogFragment extends DialogFragment {
     private EditText editTextCustomFrequencyDays;
 
     private Calendar selectedDateCalendar = Calendar.getInstance();
-    private MyPlantListViewModel myPlantListViewModel;
+//    private MyPlantListViewModel myPlantListViewModel;
     private AddScheduleViewModel addScheduleViewModel;
+
     private List<MyPlantModel> userPlants = new ArrayList<>();
     private List<TaskModel> allTasks = new ArrayList<>();
     private List<String> frequencyOptions = new ArrayList<>();
-    private String userId = "eoWltJXzlBtC8U8QZx9G";
+    private String userId;
     private String myPlantId;
     // Selected values (có thể lưu tạm)
     private MyPlantModel selectedPlant = null;
@@ -81,6 +82,16 @@ public class AddScheduleDialogFragment extends DialogFragment {
     private String selectedFrequencyText = null;
     private Calendar selectedStartTime;
     private int selectedCustomDays = -1;
+
+    public interface OnScheduleSavedListener {
+        void onScheduleSaved();
+    }
+
+    private OnScheduleSavedListener onScheduleSavedListener;
+
+    public void setOnScheduleSavedListener(OnScheduleSavedListener listener) {
+        this.onScheduleSavedListener = listener;
+    }
 
     public static AddScheduleDialogFragment newInstance(String plantId, String userId) {
         AddScheduleDialogFragment fragment = new AddScheduleDialogFragment();
@@ -114,13 +125,13 @@ public class AddScheduleDialogFragment extends DialogFragment {
         View view = inflater.inflate(R.layout.dialog_add_schedule, null);
         initContents(view);
 
-        myPlantListViewModel = new ViewModelProvider(requireActivity(), new ViewModelProvider.Factory() {
-            @NonNull
-            @Override
-            public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-                return (T)new MyPlantListViewModel(userId);
-            }
-        }).get(MyPlantListViewModel.class);
+//        myPlantListViewModel = new ViewModelProvider(requireActivity(), new ViewModelProvider.Factory() {
+//            @NonNull
+//            @Override
+//            public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+//                return (T)new MyPlantListViewModel(userId);
+//            }
+//        }).get(MyPlantListViewModel.class);
         addScheduleViewModel = new ViewModelProvider(this, new AddScheduleViewModel.Factory(userId, myPlantId)).get(AddScheduleViewModel.class);
         setupSpinners();
         setupObservers();
@@ -157,6 +168,9 @@ public class AddScheduleDialogFragment extends DialogFragment {
         });
         addScheduleViewModel.saveResult.observe(this, result -> {
             if(result != null && result) {
+                if (onScheduleSavedListener != null) {
+                    onScheduleSavedListener.onScheduleSaved();
+                }
                 Toast.makeText(getContext(), "Lưu lịch trình thành công.", Toast.LENGTH_SHORT).show();
                 dismiss();
             }
@@ -264,13 +278,6 @@ public class AddScheduleDialogFragment extends DialogFragment {
                           selectedPlant = null; // placeholder
                          Log.d("AddScheduleDialogFragment", "No plant selected.");
                      }
-//                    if (position < userPlants.size()) { // Đảm bảo vị trí hợp lệ
-//                        selectedPlant = userPlants.get(position-1); // Lưu cây được chọn
-//                        Log.d("AddScheduleDialogFragment", "Plant selected: " + selectedPlant.getNickname() + ", ID: " + selectedPlant.getId());
-//                    } else {
-//                        selectedPlant = null; // Xử lý trường hợp không có cây nào được chọn
-//                        Log.d("AddScheduleDialogFragment", "No plant selected.");
-//                    }
                 }
 
                 @Override
@@ -279,15 +286,12 @@ public class AddScheduleDialogFragment extends DialogFragment {
                 }
             });
         } else {
-            // Trường hợp không có cây nào hoặc lỗi tải dữ liệu
             Log.d("AddScheduleDialogFragment", "No plants found or error loading plants.");
             userPlants = new ArrayList<>(); // Đặt danh sách rỗng khi data null
-            // Cập nhật Adapter với danh sách rỗng nếu không có cây nào
             ArrayAdapter<String> emptyPlantAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, new ArrayList<>());
             emptyPlantAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinnerPlant.setAdapter(emptyPlantAdapter);
             Toast.makeText(getContext(), "Không tìm thấy cây nào.", Toast.LENGTH_SHORT).show();
-            // Có thể disable spinner hoặc hiển thị thông báo rỗng
         }
 
 

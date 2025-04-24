@@ -137,7 +137,30 @@ public class MyPlantListViewModel extends ViewModel {
                 ", Search: '" + searchText + "', Species ID: " + filterSpeciesId);
     }
 
+    public void deleteMyPlant(String plantId) {
+        if (currentUserId == null || plantId == null || plantId.isEmpty()) {
+            Log.e("MyPlantListViewModel", "Cannot delete plant: currentUserId is null or plantId is invalid");
+            _errorMessage.postValue("Lỗi: Không đủ thông tin để xóa cây.");
+            return;
+        }
 
+        myPlantRepository.deleteMyPlant(currentUserId, plantId, new FirestoreCallback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                Log.d("MyPlantListViewModel", "Plant deleted successfully: " + plantId);
+                _errorMessage.postValue("Đã xóa cây thành công!"); // Báo cáo thành công
+                loadMyPlants(); // <-- Tải lại để refresh danh sách
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e("MyPlantListViewModel", "Error deleting plant: " + plantId, e);
+                _errorMessage.postValue("Lỗi xóa cây: " + e.getMessage()); // Báo cáo lỗi
+
+                // _isLoading.setValue(false); // Kết thúc loading nếu có cờ riêng cho xóa
+            }
+        });
+    }
 
     // Phương thức để xóa lỗi sau khi đã hiển thị (tùy chọn)
     public void clearErrorMessage() {

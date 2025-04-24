@@ -17,10 +17,37 @@ import java.util.List;
 public class DayAdapter extends RecyclerView.Adapter<DayAdapter.DayViewHolder> {
 
     private List<DayModel> dayList;  // Danh sách các ngày
+    private int selectedPosition = RecyclerView.NO_POSITION; // Track selected position
 
-    // Constructor nhận danh sách các ngày (DayModel)
+    // --- Listener interface to communicate clicks back to Fragment ---
+    public interface OnDaySelectedListener {
+        void onDaySelected(DayModel dayModel, int position);
+    }
+
+    private OnDaySelectedListener listener;
+
+    public void setOnDaySelectedListener(OnDaySelectedListener listener) {
+        this.listener = listener;
+    }
+    // --- End Listener interface ---
+
+    public int getSelectedPosition() {
+        return selectedPosition;
+    }
+
+    public void setSelectedPosition(int selectedPosition) {
+        this.selectedPosition = selectedPosition;
+    }
+
     public DayAdapter(List<DayModel> dayList) {
         this.dayList = dayList;
+        // Find the initial selected position (today)
+        for (int i = 0; i < dayList.size(); i++) {
+            if (dayList.get(i).isSelected()) {
+                selectedPosition = i;
+                break;
+            }
+        }
     }
 
     @NonNull
@@ -38,26 +65,33 @@ public class DayAdapter extends RecyclerView.Adapter<DayAdapter.DayViewHolder> {
 
         // Gán tên ngày trong tuần và ngày của tháng vào các TextView tương ứng
         holder.dayOfWeek.setText(day.getDayOfWeek());
-        holder.day.setText(String.valueOf(day.getDay()));
-
-        // Kiểm tra nếu vị trí hiện tại là ngày đã chọn hoặc hôm nay
-        if (holder.getAdapterPosition() == position || day.isToday()) {
-            // Đặt background cho ngày hôm nay hoặc ngày được chọn
-            holder.dayOfWeek.setBackgroundResource(R.drawable.bg_today);
-        } else {
-            // Đặt lại background nếu không phải ngày được chọn hay hôm nay
-            holder.dayOfWeek.setBackgroundResource(0);
-        }
+        holder.day.setText(String.valueOf(day.getDayOfMonth()));
 
         // Thay đổi màu chữ thành màu đỏ nếu đó là hôm nay, nếu không thì giữ màu đen
         holder.day.setTextColor(day.isToday() ? Color.RED : Color.BLACK);
+        // Kiểm tra nếu vị trí hiện tại là ngày đã chọn hoặc hôm nay
 
-        // Lắng nghe sự kiện click vào item và thay đổi vị trí ngày đã chọn
+        if(day.isSelected()) {
+            holder.dayOfWeek.setBackgroundResource(R.color.bg_selected_day);
+        }
+        else {
+            holder.dayOfWeek.setBackgroundResource(android.R.color.transparent);
+        }
+
         holder.itemView.setOnClickListener(v -> {
-            int previousPosition = holder.getAdapterPosition();  // Lấy vị trí cũ
-            // Thực hiện cập nhật vị trí mới
-            notifyItemChanged(previousPosition);  // Cập nhật item cũ
-            notifyItemChanged(position);  // Cập nhật item mới
+            if(selectedPosition != position) {
+                if (selectedPosition != RecyclerView.NO_POSITION) {
+                    dayList.get(selectedPosition).setSelected(false);
+                    notifyItemChanged(selectedPosition); // Update old item UI
+                }
+                selectedPosition = position;
+                day.setSelected(true);
+                notifyItemChanged(selectedPosition); // Update new item UI
+                // Notify the listener (Fragment) about the selection change
+                if (listener != null) {
+                    listener.onDaySelected(day, position);
+                }
+            }
         });
     }
 
@@ -74,7 +108,7 @@ public class DayAdapter extends RecyclerView.Adapter<DayAdapter.DayViewHolder> {
         public DayViewHolder(View itemView) {
             super(itemView);
             dayOfWeek = itemView.findViewById(R.id.dayOfWeek);  // TextView cho tên ngày trong tuần
-            day = itemView.findViewById(R.id.day);  // TextView cho ngày trong tháng
+            day = itemView.findViewById(R.id.dayOfMonth);  // TextView cho ngày trong tháng
         }
     }
 }

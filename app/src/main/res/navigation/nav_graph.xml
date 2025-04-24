@@ -9,7 +9,7 @@
         android:id="@+id/noteFragment"
         android:name="com.example.myplantcare.fragments.NoteFragment"
         android:label="Ghi chú"
-        tools:layout="@layout/fragment_note" >
+        tools:layout="@layout/fragment_note">
         <action
             android:id="@+id/action_noteFragment_to_detailNoteFragment"
             app:destination="@id/recycler_detail_notes" />
@@ -20,4 +20,22 @@
         android:name="com.example.myplantcare.fragments.DetailNoteFragment"
         android:label="Ghi chú"
         tools:layout="@layout/fragment_detail_note" />
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.myplantcare.fragments.HomeFragment"
+        android:label="Trang chủ"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_scheduleFragment"
+            app:destination="@id/scheduleFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/scheduleFragment"
+        android:name="com.example.myplantcare.fragments.ScheduleFragment"
+        android:label="Lịch trình"
+        tools:layout="@layout/fragment_schedule">
+
+    </fragment>
 </navigation>

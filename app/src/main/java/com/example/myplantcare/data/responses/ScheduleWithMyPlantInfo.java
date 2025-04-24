@@ -10,7 +10,10 @@ public class ScheduleWithMyPlantInfo {
     private ScheduleModel schedule;
     private MyPlantModel myPlant;
 
-    private TaskModel task;
+    private boolean completedOnDate;
+    private String taskName;
+
+    private transient boolean isCheckedForGroupAction = false; // transient means it's not saved to Firestore
 
     public ScheduleWithMyPlantInfo(ScheduleModel schedule, MyPlantModel myPlant) {
         this.schedule = schedule;
@@ -40,5 +43,28 @@ public class ScheduleWithMyPlantInfo {
 
     public Timestamp getScheduleTime() {
         return (schedule != null) ? schedule.getTime() : null;
+    }
+
+    public boolean isCompletedOnDate() {
+        return completedOnDate;
+    }
+
+    public boolean isCheckedForGroupAction() {
+        return isCheckedForGroupAction;
+    }
+
+    public void setCheckedForGroupAction(boolean checkedForGroupAction) {
+        isCheckedForGroupAction = checkedForGroupAction;
+    }
+    public void setCompletedOnDate(boolean completedOnDate) {
+        this.completedOnDate = completedOnDate;
+    }
+
+    public String getTaskName() {
+        return taskName;
+    }
+
+    public void setTaskName(String taskName) {
+        this.taskName = taskName;
     }
 }

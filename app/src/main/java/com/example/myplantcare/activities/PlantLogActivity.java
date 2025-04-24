@@ -14,6 +14,7 @@ import com.bumptech.glide.Glide;
 import com.example.myplantcare.R;
 import com.example.myplantcare.adapters.TaskLogAdapter;
 import com.example.myplantcare.models.TaskLogModel;
+import com.google.firebase.Timestamp;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,8 +44,8 @@ public class PlantLogActivity extends AppCompatActivity implements View.OnClickL
 
     private void loadTaskLog() {
         taskLogList = new ArrayList<>();
-        taskLogList.add(new TaskLogModel(new Date(), "Tưới nước", true, null));
-        taskLogList.add(new TaskLogModel(new Date(), "Bón phân", true, null));
+        taskLogList.add(new TaskLogModel("Test1",new Timestamp(new Date()),  true));
+        taskLogList.add(new TaskLogModel("Test2",new Timestamp(new Date()),  true));
 
     }
 

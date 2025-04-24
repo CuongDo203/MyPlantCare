@@ -47,7 +47,6 @@ import java.util.Calendar;
 import java.util.Locale;
 
 public class AddPlantDialogFragment extends DialogFragment {
-
     private static final String TAG = "AddPlantDialogFragment"; // Sử dụng TAG nhất quán
 
     private ImageView imageViewPlantPreview;
@@ -66,6 +65,17 @@ public class AddPlantDialogFragment extends DialogFragment {
     private MyPlantRepository myPlantRepository;
     private ActivityResultLauncher<Intent> imagePickerLauncher;
 
+    private String userId;
+
+    public static AddPlantDialogFragment newInstance(String myPlantId, String userId) { // Thêm userId
+        AddPlantDialogFragment fragment = new AddPlantDialogFragment();
+        Bundle args = new Bundle();
+        args.putString("my_plant_id", myPlantId);
+        args.putString("user_id", userId);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     public interface OnSavePlantListener {
         void onSavePlant();
     }
@@ -77,12 +87,15 @@ public class AddPlantDialogFragment extends DialogFragment {
     }
 
     public AddPlantDialogFragment() {
-        // Required empty public constructor
+
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            userId = getArguments().getString("user_id");
+        }
         // Đăng ký launcher để xử lý kết quả chọn ảnh
         imagePickerLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -167,6 +180,14 @@ public class AddPlantDialogFragment extends DialogFragment {
 
     // --- Logic Lưu cây ---
     private void savePlant() {
+        if (this.userId == null || this.userId.isEmpty()) {
+            Log.e(TAG, "User ID is null or empty. Cannot save plant.");
+            Toast.makeText(requireContext(), "Lỗi: Không có thông tin người dùng.", Toast.LENGTH_SHORT).show();
+            // Tùy chọn: Đóng dialog hoặc chuyển hướng đến login
+             dismiss();
+            return;
+        }
+
         String plantName = editTextPlantName.getText().toString().trim();
         String location = editTextLocation.getText().toString().trim();
 
@@ -194,31 +215,16 @@ public class AddPlantDialogFragment extends DialogFragment {
             Toast.makeText(requireContext(), "Vui lòng chọn loại cây", Toast.LENGTH_SHORT).show();
             return;
         }
-        // TODO: Validate plantingDateCalendar nếu cần
-        // TODO: Validate location nếu cần
 
-        // --- Lấy User ID ---
-//        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-//        if (currentUser == null) {
-//            Toast.makeText(requireContext(), "Bạn cần đăng nhập để thêm cây", Toast.LENGTH_SHORT).show();
-//            // TODO: Chuyển hướng đến màn hình đăng nhập nếu cần
-//            dismiss();
-//            return;
-//        }
-        String userId = "eoWltJXzlBtC8U8QZx9G";
         Log.d(TAG, "Current User ID: " + userId);
 
-
-        // --- Tạo đối tượng MyPlantModel ban đầu ---
         MyPlantModel myPlantToSave = new MyPlantModel(); // Sử dụng constructor rỗng nếu có setters
         myPlantToSave.setNickname(plantName); // Giả sử nickname là tên cây nhập vào
         myPlantToSave.setLocation(location);
         myPlantToSave.setSpeciesId(speciesId); // Lưu speciesId vào trường plantId trong MyPlantModel
         myPlantToSave.setUserId(userId);
         // myPlantToSave.setProgress(0); // Set progress nếu cần
-        // TODO: Set plantingDateCalendar vào MyPlantModel
         // myPlantToSave.setCreatedAt(new Timestamp(plantingDateCalendar.getTime())); // Lưu ngày trồng vào created_at hoặc trường riêng
-
 
         // --- Logic lưu ---
         showLoading(true); // Bắt đầu hiển thị trạng thái tải
@@ -276,7 +282,6 @@ public class AddPlantDialogFragment extends DialogFragment {
         }
     }
 
-
     // Hàm riêng để lưu đối tượng MyPlantModel vào Firestore (nhận thêm callback)
     private void savePlantToFirestore(String userId, MyPlantModel myPlant, FirestoreCallback<Void> callback) {
         Log.d(TAG, "Saving plant to Firestore...");
@@ -286,11 +291,6 @@ public class AddPlantDialogFragment extends DialogFragment {
     // Hàm hiển thị/ẩn trạng thái tải
     private void showLoading(boolean isLoading) {
         buttonSavePlant.setEnabled(!isLoading); // Disable nút Save khi đang tải
-        // TODO: Bạn có thể thêm ProgressBar vào layout và điều khiển visibility ở đây
-        // Ví dụ: ProgressBar progressBar = requireDialog().findViewById(R.id.progress_bar);
-        // if (progressBar != null) {
-        //     progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
-        // }
     }
 
 
@@ -369,5 +369,4 @@ public class AddPlantDialogFragment extends DialogFragment {
         if (speciesViewModel.species.hasObservers()) speciesViewModel.species.removeObservers(this);
         if (speciesViewModel.errorMessage.hasObservers()) speciesViewModel.errorMessage.removeObservers(this);
     }
-
 }

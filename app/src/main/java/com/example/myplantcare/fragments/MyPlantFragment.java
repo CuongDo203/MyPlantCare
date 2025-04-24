@@ -2,9 +2,11 @@ package com.example.myplantcare.fragments;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,11 +21,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -38,6 +42,8 @@ import com.example.myplantcare.models.SpeciesModel;
 import com.example.myplantcare.utils.DateUtils;
 import com.example.myplantcare.viewmodels.MyPlantListViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,11 +58,8 @@ public class MyPlantFragment extends Fragment {
     private EditText editTextSearchPlantName;
     private Spinner spinnerFilterPlantType;
     private Button buttonHideFilter;
-    private ImageView clearSearchIcon;
-
     private RecyclerView recyclerView;
     private MyPlantAdapter adapter;
-    private List<MyPlantModel> myPlantList;
     private FloatingActionButton fabAddMyPlant;
     private MyPlantListViewModel myPlantListViewModel;
     LottieAnimationView lottieLoadingAnimation;
@@ -69,16 +72,17 @@ public class MyPlantFragment extends Fragment {
     // Khai báo Activity Result Launcher
     private ActivityResultLauncher<Intent> detailActivityLauncher;
     private List<SpeciesModel> speciesList = new ArrayList<>();
+    private String currentUserId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_my_plant, container, false);
 
-        initContents(view); // Tìm Views và setup RecyclerView/Adapter ban đầu
-        setupViewModel(); // Setup ViewModel
-        observeViewModel(); // Quan sát LiveData từ ViewModel
-        registerActivityResults(); // Đăng ký Launchers
+        initContents(view);
+        setupViewModel();
+        observeViewModel();
+        registerActivityResults();
 
         fabAddMyPlant.setOnClickListener(v -> showAddPlantDialog());
         btnFilter.setOnClickListener(v -> toggleFilterOptionsVisibility());
@@ -94,8 +98,15 @@ public class MyPlantFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        myPlantListViewModel.loadMyPlants();
-        Log.d(TAG, "onResume: Calling loadMyPlants() to refresh data.");
+        if (currentUserId != null) { // Chỉ tải dữ liệu nếu có userId
+            myPlantListViewModel.loadMyPlants();
+            myPlantListViewModel.loadSpecies(); // Tải danh sách loại cây cho Spinner
+            Log.d(TAG, "onResume: Calling loadMyPlants() and loadSpecies() to refresh data for userId: " + currentUserId);
+        } else {
+            Log.w(TAG, "onResume: No user logged in, cannot load plants.");
+            // TODO: Xử lý trường hợp không có người dùng đăng nhập (ví dụ: hiển thị thông báo)
+            // Adapter đã được khởi tạo với danh sách rỗng, empty state sẽ hiển thị.
+        }
     }
 
     private void registerActivityResults() {
@@ -115,8 +126,6 @@ public class MyPlantFragment extends Fragment {
                     }
                 });
     }
-
-
     private void observeViewModel() {
         myPlantListViewModel.myPlants.observe(getViewLifecycleOwner(), myPlants -> {
             Log.d(TAG, "myPlants LiveData updated. Size: " + (myPlants != null ? myPlants.size() : "null"));
@@ -188,11 +197,7 @@ public class MyPlantFragment extends Fragment {
                         myPlantListViewModel.applyFilter(editTextSearchPlantName.getText().toString(), null);
                     }
                 });
-
-                // Mặc định chọn "Tất cả loại" (index 0)
                 spinnerFilterPlantType.setSelection(0);
-
-
             } else {
                 Log.w(TAG, "Species list data is null.");
                 List<String> typesList = new ArrayList<>();
@@ -206,25 +211,23 @@ public class MyPlantFragment extends Fragment {
     }
 
     private void setupViewModel() {
-        String userId = "eoWltJXzlBtC8U8QZx9G";  //tam thoi de hard code
-        // TODO: Lấy userId thật từ Firebase Auth ở đây
-        // FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        // String userId = currentUser != null ? currentUser.getUid() : null;
-        // if (userId == null) { /* Xử lý trường hợp user chưa đăng nhập */ }
-
-        // ViewModelProvider nên dùng scope của Activity nếu ViewModel quản lý dữ liệu cho toàn bộ screen
-        // hoặc nếu ViewModel cần sống sót qua Fragment recreation.
-        // MyPlantListViewModel cần userId, nên cần truyền nó qua Factory.
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        currentUserId = currentUser != null ? currentUser.getUid() : null;
+        if(currentUserId == null) {
+            Log.w(TAG, "No user logged in. Cannot initialize ViewModel.");
+            Toast.makeText(requireContext(), "Bạn cần đăng nhập để xem cây của mình.", Toast.LENGTH_LONG).show();
+            return;
+        }
         myPlantListViewModel = new ViewModelProvider(requireActivity(), new ViewModelProvider.Factory() {
             @NonNull
             @Override
             public <T extends androidx.lifecycle.ViewModel> T create(@NonNull Class<T> modelClass) {
                 // Đảm bảo userId đã có giá trị hợp lệ trước khi tạo ViewModel
-                if (userId == null) {
+                if (currentUserId == null) {
                     throw new IllegalStateException("User ID is not available to create ViewModel");
                 }
                 if (modelClass.isAssignableFrom(MyPlantListViewModel.class)) {
-                    return (T) new MyPlantListViewModel(userId); // Truyền userId vào constructor ViewModel
+                    return (T) new MyPlantListViewModel(currentUserId); // Truyền userId vào constructor ViewModel
                 }
                 throw new IllegalArgumentException("Unknown ViewModel class");
             }
@@ -238,9 +241,6 @@ public class MyPlantFragment extends Fragment {
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
         lottieLoadingAnimation = view.findViewById(R.id.lottie_loading_animation);
         btnFilter = view.findViewById(R.id.ic_filter_myplant);
-        // TODO: Cần lấy userId thật ở đây hoặc truyền từ ViewModel/Activity
-        String userIdForAdapter = "eoWltJXzlBtC8U8QZx9G"; // Tạm thời hardcode
-
         layoutFilterOptions = view.findViewById(R.id.layout_filter_options);
         editTextSearchPlantName = view.findViewById(R.id.edit_text_search_plant_name);
         spinnerFilterPlantType = view.findViewById(R.id.spinner_filter_plant_type);
@@ -261,8 +261,7 @@ public class MyPlantFragment extends Fragment {
 
                     @Override
                     public void onDeleteClick(MyPlantModel plant) {
-                        // Xử lý delete click (có thể gọi ViewModel ở đây)
-                        // myPlantListViewModel.deleteMyPlant(plant.getId());
+                        showDeleteConfirmationDialog(plant);
                     }
                 });
         recyclerView.setAdapter(adapter);
@@ -273,15 +272,41 @@ public class MyPlantFragment extends Fragment {
                 if(editTextSearchPlantName.getCompoundDrawables()[DRAWABLE_RIGHT] != null) {
                     // Check if click is within the bounds of the drawable
                     if(event.getRawX() >= (editTextSearchPlantName.getRight() - editTextSearchPlantName.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
-                        // Clear text and apply filter
                         editTextSearchPlantName.setText("");
-                        // applyFilter is called by TextWatcher when text changes
                         return true; // Consume the event
                     }
                 }
             }
             return false;
         });
+    }
+
+    private void showDeleteConfirmationDialog(MyPlantModel plant) {
+        if (plant == null || TextUtils.isEmpty(plant.getId())) {
+            Log.w(TAG, "Cannot show delete confirmation dialog: plant or plant ID is null.");
+            Toast.makeText(requireContext(), "Lỗi: Không có thông tin cây để xoá.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        new AlertDialog.Builder(requireContext()) // Sử dụng requireContext()
+                .setTitle("Xác nhận xoá cây")
+                .setMessage("Bạn có chắc chắn muốn xoá cây \"" + plant.getNickname() + "\" không? Thao tác này không thể hoàn tác.") // Hiển thị tên cây
+                .setPositiveButton("Xoá", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Gọi ViewModel để xóa cây
+                        if (myPlantListViewModel != null) { // Kiểm tra ViewModel có null không
+                            myPlantListViewModel.deleteMyPlant(plant.getId()); // <-- Gọi ViewModel
+                            Log.d(TAG, "Called ViewModel to delete plant: " + plant.getId());
+                            // Kết quả (thành công/thất bại và tải lại danh sách) được xử lý bởi observer errorMessage và myPlants
+                        } else {
+                            Log.w(TAG, "ViewModel is null, cannot delete plant.");
+                            Toast.makeText(requireContext(), "Lỗi hệ thống: Không thể xoá cây.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .setNegativeButton("Huỷ", null) // Null listener chỉ đơn giản đóng dialog
+                .setIcon(android.R.drawable.ic_dialog_alert) // Icon cảnh báo
+                .show(); // Hiển thị dialog
     }
 
     private void toggleFilterOptionsVisibility() {
@@ -303,8 +328,6 @@ public class MyPlantFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
                 Log.d(TAG, "Search text changed: " + s.toString());
-                // Apply filter when text changes
-                // Pass current search text and selected spinner item
                 String selectedType = spinnerFilterPlantType.getSelectedItemPosition() > 0 ?
                         (String) spinnerFilterPlantType.getSelectedItem() : null;
                 myPlantListViewModel.applyFilter(s.toString(), selectedType);
@@ -318,7 +341,6 @@ public class MyPlantFragment extends Fragment {
 
     private void openPlantDetailActivity(MyPlantModel plant) {
         Intent intent = new Intent(requireContext(), MyPlantDetailActivity.class);
-        // Đóng gói dữ liệu cây vào Intent
         // Cần đảm bảo các key ở đây khớp với các key trong MyPlantDetailActivity.getAndDisplayPlantData()
         intent.putExtra("id", plant.getId()); // Truyền ID cây
         intent.putExtra("plantName", plant.getNickname()); // Hoặc nickname
@@ -338,11 +360,22 @@ public class MyPlantFragment extends Fragment {
     }
 
     private void showAddPlantDialog() {
-        AddPlantDialogFragment dialogFragment = new AddPlantDialogFragment();
+        String userIdForDialog = this.currentUserId; // Sử dụng biến thành viên currentUserId
+
+        if (userIdForDialog == null || userIdForDialog.isEmpty()) {
+            Log.w(TAG, "No user logged in or userId is missing. Cannot show AddPlantDialog.");
+            Toast.makeText(requireContext(), "Bạn cần đăng nhập để thêm cây.", Toast.LENGTH_SHORT).show();
+            return; // Thoát khỏi hàm nếu không có user ID
+        }
+
+        AddPlantDialogFragment dialogFragment = AddPlantDialogFragment.newInstance(null, userIdForDialog); // null vì thêm cây mới
         dialogFragment.setOnSavePlantListener(() -> {
-            Log.d(TAG, "AddPlantDialog closed. Refreshing plants.");
-            // Khi cây được lưu thành công, yêu cầu ViewModel tải lại danh sách
-            myPlantListViewModel.loadMyPlants();
+            if (myPlantListViewModel != null) { // Kiểm tra ViewModel null
+                myPlantListViewModel.loadMyPlants(); // <-- Gọi phương thức tải lại dữ liệu
+                Log.d(TAG, "Called loadMyPlants() after successful plant save.");
+            } else {
+                Log.w(TAG, "ViewModel is null, cannot load plants after successful save.");
+            }
         });
         dialogFragment.show(getChildFragmentManager(), "AddPlantDialogTag");
     }
@@ -356,5 +389,4 @@ public class MyPlantFragment extends Fragment {
             myPlantListViewModel.myPlants.removeObservers(getViewLifecycleOwner());
         }
     }
-
 }

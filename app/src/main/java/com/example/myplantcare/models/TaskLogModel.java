@@ -1,18 +1,21 @@
 package com.example.myplantcare.models;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentId;
 import com.google.firebase.firestore.Exclude;
+import com.google.firebase.firestore.ServerTimestamp;
 
 import java.util.Date;
 
 public class TaskLogModel {
-
     @DocumentId
     private String id;
     private String scheduleId;
-    private Date date;
+    private Timestamp date;
     private String taskName;
     private boolean status;
+    @ServerTimestamp
+    private Timestamp createdAt;
     @Exclude
     private String userPhotoUrl;
 
@@ -32,20 +35,19 @@ public class TaskLogModel {
         this.scheduleId = scheduleId;
     }
 
-    public TaskLogModel(Date date, String taskName, boolean status, String userPhotoUrl) {
+    public TaskLogModel(String scheduleId, Timestamp date, boolean status) {
         this.date = date;
-        this.taskName = taskName;
+        this.scheduleId = scheduleId;
         this.status = status;
-        this.userPhotoUrl = userPhotoUrl;
     }
 
     public TaskLogModel(){}
 
-    public Date getDate() {
+    public Timestamp getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Timestamp date) {
         this.date = date;
     }
 

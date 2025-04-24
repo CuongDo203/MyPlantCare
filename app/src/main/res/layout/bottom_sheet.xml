@@ -36,6 +36,7 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/my_plant_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="6dp"
@@ -66,6 +67,7 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/my_plant_location"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="6dp"
@@ -97,6 +99,7 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/task_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="6dp"
@@ -127,6 +130,7 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/task_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="6dp"
@@ -160,6 +164,7 @@
             android:textSize="16sp" />
 
         <TextView
+            android:id="@+id/task_progress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="6dp"
@@ -175,6 +180,7 @@
         android:orientation="horizontal">
 
         <Button
+            android:id="@+id/btn_complete"
             android:layout_width="160dp"
             android:layout_height="60dp"
             android:backgroundTint="#46B48C"
@@ -186,6 +192,7 @@
             android:layout_height="match_parent" />
 
         <Button
+            android:id="@+id/btn_note"
             android:layout_width="160dp"
             android:layout_height="60dp"
             android:backgroundTint="#D3C786"
