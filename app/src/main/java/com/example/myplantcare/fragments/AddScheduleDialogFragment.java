@@ -411,7 +411,6 @@ public class AddScheduleDialogFragment extends DialogFragment {
 
         // Giới hạn ngày có thể chọn (tùy chọn)
         // datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
-
         datePickerDialog.show();
     }
 
@@ -550,6 +549,5 @@ public class AddScheduleDialogFragment extends DialogFragment {
                 Log.e("Firestore", "Error getting document", task.getException());
             }
         });
-
     }
 }

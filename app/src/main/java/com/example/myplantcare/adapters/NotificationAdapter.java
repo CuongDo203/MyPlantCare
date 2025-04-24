@@ -9,15 +9,12 @@ import com.example.myplantcare.R;
 import com.example.myplantcare.models.Notification;
 import java.util.List;
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder> {
-
     private List<Notification> notificationList;
     private OnItemClickListener onItemClickListener;
-
     public NotificationAdapter(List<Notification> notificationList, OnItemClickListener onItemClickListener) {
         this.notificationList = notificationList;
         this.onItemClickListener = onItemClickListener;
     }
-
     @NonNull
     @Override
     public NotificationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

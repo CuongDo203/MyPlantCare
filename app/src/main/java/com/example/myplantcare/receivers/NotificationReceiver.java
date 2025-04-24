@@ -11,32 +11,8 @@ import com.example.myplantcare.R;
 import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.HashMap;
 import java.util.Map;
+import com.google.firebase.auth.FirebaseAuth;
 
-//public class NotificationReceiver extends BroadcastReceiver {
-//    @Override
-//    public void onReceive(Context context, Intent intent) {
-//        Log.d("RECEIVER", "onReceive() được gọi!");
-//        // Tạo thông báo với cùng ID kênh đã tạo trong MainActivity
-//        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "PLANTAPP_CHANNEL")  // Đảm bảo ID kênh giống nhau
-//                .setSmallIcon(R.drawable.ic_launcher_foreground)
-//                .setContentTitle("Thông báo My Application")
-//                .setContentText("Đừng quên tưới cây hôm nay nhé!")
-//                .setPriority(NotificationCompat.PRIORITY_HIGH);
-//
-//        // Kiểm tra quyền POST_NOTIFICATIONS (Android 13 trở lên)
-//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
-//                context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED)
-//                {
-//
-//            // Gửi thông báo nếu quyền đã được cấp
-//            NotificationManagerCompat manager = NotificationManagerCompat.from(context);
-//            manager.notify(1, builder.build());
-//            Log.d("RECEIVER", "Thông báo đã được gửi!");
-//        } else {
-//            Log.d("RECEIVER", "Chưa cấp quyền POST_NOTIFICATIONS.");
-//        }
-//    }
-//}
 public class NotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -79,15 +55,20 @@ public class NotificationReceiver extends BroadcastReceiver {
             notificationData.put("content",plantName + "cân làm công việc " + taskName);
             notificationData.put("number", 1);  // Tạo timestamp tự động
 
-            // Lưu dữ liệu vào Firestore trong collection "notifications"
-            db.collection("Notification")
-                    .add(notificationData)
+            // Lưu thông báo vào subcollection "notifications" của người dùng
+            db.collection("users")  // Collection cha "users"
+                    .document(FirebaseAuth.getInstance().getCurrentUser().getUid())  // Document của người dùng, dùng UID làm ID
+                    .collection("notifications")  // Subcollection "notifications"
+                    .add(notificationData)  // Thêm thông báo mới
                     .addOnSuccessListener(documentReference -> {
-                        Log.d("Firestore", "Lưu thông báo thành công");
+                        // Nếu lưu thành công
+                        Log.d("Firestore", "Thông báo đã được lưu thành công vào subcollection 'notifications'");
                     })
                     .addOnFailureListener(e -> {
-                        Log.e("Firestore", "Lỗi lưu thông báo", e);
+                        // Nếu có lỗi
+                        Log.e("Firestore", "Lỗi lưu thông báo: " + e.getMessage());
                     });
+
         } else {
             Log.e("NotificationReceiver", "Thông tin cây hoặc công việc không hợp lệ.");
         }

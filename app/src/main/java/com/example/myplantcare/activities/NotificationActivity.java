@@ -48,7 +48,7 @@ public class NotificationActivity extends AppCompatActivity {
             startActivity(i);
             finish();
         });
-        fetchNotificationById(FirebaseAuth.getInstance().getCurrentUser().getUid().toString());
+        fetchNotificationsByUserId(FirebaseAuth.getInstance().getCurrentUser().getUid().toString());
     }
 
     private void showDeleteConfirmationDialog() {
@@ -62,38 +62,8 @@ public class NotificationActivity extends AppCompatActivity {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
-//    private void deleteAllNotifications() {
-//        db.collection("Notification")
-//                .get()
-//                .addOnCompleteListener(task -> {
-//                    if (task.isSuccessful()) {
-//                        QuerySnapshot querySnapshot = task.getResult();
-//                        if (querySnapshot != null && !querySnapshot.isEmpty()) {
-//
-//                            for (int i = 0; i < querySnapshot.size(); i++) {
-//                                String documentId = querySnapshot.getDocuments().get(i).getId();
-//
-//                                db.collection("Notification").document(documentId)
-//                                        .delete()
-//                                        .addOnCompleteListener(deleteTask -> {
-//                                            if (deleteTask.isSuccessful()) {
-//                                                Log.d("NotificationActivity", "DocumentSnapshot successfully deleted!");
-//                                            } else {
-//                                                Log.e("NotificationActivity", "Error deleting document", deleteTask.getException());
-//                                            }
-//                                        });
-//                            }
-//
-//                            adapter.clearNotifications();
-//                            Toast.makeText(NotificationActivity.this, "Đã xóa tất cả thông báo.", Toast.LENGTH_SHORT).show();
-//                        } else {
-//                            Toast.makeText(NotificationActivity.this, "Không có thông báo để xóa.", Toast.LENGTH_SHORT).show();
-//                        }
-//                    } else {
-//                        Toast.makeText(NotificationActivity.this, "Lỗi khi xóa thông báo.", Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-//    }
+
+
     private void deleteAllNotifications() {
         db.collection("Notification")
                 .get()
@@ -134,61 +104,39 @@ public class NotificationActivity extends AppCompatActivity {
                 });
     }
 
-    //    private void fetchNotifications() {
-//        db.collection("Notification")
-//                .get()
-//                .addOnCompleteListener(task -> {
-//                    if (task.isSuccessful()) {
-//                        QuerySnapshot querySnapshot = task.getResult();
-//                        if (querySnapshot != null && !querySnapshot.isEmpty()) {
-//                            for (DocumentSnapshot document : querySnapshot) {
-//                                String title = document.getString("title");
-//                                String content = document.getString("content");
-//                                String timestamp = document.getString("number");
-//
-//                                Log.d("NotificationData", "Title: " + title);
-//                                Log.d("NotificationData", "Content: " + content);
-//                                Log.d("NotificationData", "Number: " + timestamp);
-//                                displayNotification(title, content, timestamp);  // Add notification to adapter
-//                            }
-//                        } else {
-//                            Log.d("TAG", "No notifications found.");
-//                            Toast.makeText(NotificationActivity.this, "Không có thông báo.", Toast.LENGTH_SHORT).show();
-//                        }
-//                    } else {
-//                        Log.d("TAG", "Error getting documents.");
-//                        Toast.makeText(NotificationActivity.this, "Error getting documents.", Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-//    }
-private void fetchNotificationById(String notificationId) {
-    db.collection("Notification")
-            .document(notificationId)  // Lấy document dựa trên ID
-            .get()
+private void fetchNotificationsByUserId(String userId) {
+    // Truy vấn đến subcollection "notifications" của user với userId
+    db.collection("users") // Collection cha "users"
+            .document(userId) // Lấy document của người dùng, dùng userId làm ID
+            .collection("notifications") // Subcollection "notifications"
+            .get() // Lấy tất cả các document trong subcollection "notifications"
             .addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        // Lấy thông tin từ document
-                        String title = document.getString("title");
-                        String content = document.getString("content");
-                        String timestamp = document.getString("number");
+                    QuerySnapshot querySnapshot = task.getResult();
+                    if (querySnapshot != null && !querySnapshot.isEmpty()) {
+                        // Duyệt qua tất cả các document trong subcollection "notifications"
+                        for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                            String title = document.getString("title");
+                            String content = document.getString("content");
+                            String timestamp = document.getString("timestamp");
 
-                        // In thông tin ra Log và hiển thị thông báo
-                        Log.d("NotificationData", "Title: " + title);
-                        Log.d("NotificationData", "Content: " + content);
-                        Log.d("NotificationData", "Number: " + timestamp);
-                        displayNotification(title, content, timestamp);  // Add notification to UI
+                            // In thông tin ra Log và hiển thị thông báo
+                            Log.d("NotificationData", "Title: " + title);
+                            Log.d("NotificationData", "Content: " + content);
+                            Log.d("NotificationData", "Timestamp: " + timestamp);
+                            displayNotification(title, content, timestamp);  // Hiển thị thông báo lên UI
+                        }
                     } else {
-                        Log.d("TAG", "No such document found.");
-                        Toast.makeText(NotificationActivity.this, "Không tìm thấy thông báo.", Toast.LENGTH_SHORT).show();
+                        Log.d("TAG", "No notifications found.");
+                        Toast.makeText(NotificationActivity.this, "Không có thông báo.", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Log.d("TAG", "Error getting document.");
-                    Toast.makeText(NotificationActivity.this, "Lỗi khi lấy tài liệu.", Toast.LENGTH_SHORT).show();
+                    Log.d("TAG", "Error getting notifications.");
+                    Toast.makeText(NotificationActivity.this, "Lỗi khi lấy thông báo.", Toast.LENGTH_SHORT).show();
                 }
             });
 }
+
     private void displayNotification(String message, String time, String count) {
         Notification notification = new Notification(message, time, count);
         adapter.addNotification(notification);
