@@ -1,18 +1,13 @@
 package com.example.myplantcare.adapters;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.myplantcare.R;
 import com.example.myplantcare.models.Notification;
-
 import java.util.List;
-
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.NotificationViewHolder> {
 
     private List<Notification> notificationList;
@@ -26,7 +21,6 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
     @NonNull
     @Override
     public NotificationViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Inflate the layout for the individual notification item
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_notification, parent, false);
         return new NotificationViewHolder(view);
     }
@@ -79,5 +73,4 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         notificationList.clear();  // Clear the list of notifications
         notifyDataSetChanged();  // Notify the adapter that the data set has changed
     }
-
 }

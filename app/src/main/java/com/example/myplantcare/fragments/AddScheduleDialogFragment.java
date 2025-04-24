@@ -1,9 +1,19 @@
 package com.example.myplantcare.fragments;
 
+import static android.content.Context.ALARM_SERVICE;
+import static androidx.core.content.ContextCompat.getSystemService;
+
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -24,14 +34,18 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
-
 import com.example.myplantcare.R;
 import com.example.myplantcare.models.MyPlantModel;
 import com.example.myplantcare.models.ScheduleModel;
 import com.example.myplantcare.models.TaskModel;
+
+import com.example.myplantcare.receivers.NotificationReceiver;
 import com.example.myplantcare.viewmodels.AddScheduleViewModel;
 import com.example.myplantcare.viewmodels.MyPlantListViewModel;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,8 +53,10 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-public class AddScheduleDialogFragment extends DialogFragment {
 
+
+public class AddScheduleDialogFragment extends DialogFragment {
+    FirebaseFirestore db;
     private Spinner spinnerPlant, spinnerTask, spinnerFrequency;
     private TextView textViewStartDate, textViewStartTime;
     private EditText editTextNote;
@@ -88,6 +104,7 @@ public class AddScheduleDialogFragment extends DialogFragment {
             Toast.makeText(getContext(), "Lỗi: Không có thông tin người dùng.", Toast.LENGTH_SHORT).show();
             dismiss(); // Đóng dialog nếu không có user ID
         }
+        db = FirebaseFirestore.getInstance();
     }
     @NonNull
     @Override
@@ -335,11 +352,13 @@ public class AddScheduleDialogFragment extends DialogFragment {
         if (userId != null && selectedPlant != null && selectedPlant.getId() != null) {
             Log.d("AddScheduleDialogFragment", "Saving schedule for plant ID: " + selectedPlant.getId() + " and user ID: " + userId);
             addScheduleViewModel.addSchedule(selectedPlant.getId(), newSchedule);
+
+
+            // Đặt thông báo định kỳ
+            setPeriodicNotification(selectedPlant, newSchedule);
         } else {
             Toast.makeText(getContext(), "Lỗi: Thiếu thông tin cây hoặc người dùng để lưu.", Toast.LENGTH_SHORT).show();
         }
-
-
     }
     private int convertFrequencyToDays(String frequency) {
         switch (frequency){
@@ -457,5 +476,80 @@ public class AddScheduleDialogFragment extends DialogFragment {
                 selectedCustomDays = -1;
             }
         });
+    }
+
+    private void setPeriodicNotification(MyPlantModel myPlant, ScheduleModel schedule) {
+        // Kiểm tra tần suất lặp lại từ ScheduleModel (số ngày lặp lại)
+        int frequencyInDays = schedule.getFrequency();  // Giả sử frequency được lưu dưới dạng số ngày
+
+        if (frequencyInDays <= 0) {
+            // Nếu tần suất không hợp lệ, không tạo thông báo
+            Log.d("Notification", "Tần suất không hợp lệ");
+            return;
+        }
+
+        // Lấy thời gian thông báo từ ScheduleModel (biến time là Timestamp)
+        Timestamp timestamp = schedule.getTime();  // Giả sử time là Timestamp
+        if (timestamp == null) {
+            Log.d("Notification", "Không có thời gian thông báo");
+            return;
+        }
+        schedule.getTime();
+        // Chuyển Timestamp thành Calendar
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timestamp.toDate().getTime());  // Chuyển đổi Timestamp thành Date rồi lấy mili giây
+
+        // Lấy giờ, phút từ Timestamp
+        int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);  // Lấy giờ trong ngày
+        int minute = calendar.get(Calendar.MINUTE);  // Lấy phút
+
+        // Thiết lập thời gian gửi thông báo: giờ và phút từ Timestamp, giữ nguyên ngày hiện tại
+        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+        calendar.set(Calendar.MINUTE, minute);
+        calendar.set(Calendar.SECOND, 0);  // Đặt giây = 0 để tránh việc trễ thông báo
+        calendar.set(Calendar.MILLISECOND, 0);  // Đặt mili giây = 0
+
+        // Nếu thời gian đã qua trong ngày, đặt thời gian cho ngày tiếp theo
+        if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
+            calendar.add(Calendar.DATE, 1);  // Thêm một ngày nếu thời gian đã qua
+        }
+
+        // Kiểm tra getActivity() có null không trước khi sử dụng
+        if (getActivity() == null) {
+            Log.e("Notification", "Activity không được đính kèm!");
+            return;
+        }
+
+        Intent intent = new Intent(getActivity(), NotificationReceiver.class);  // NotificationReceiver là BroadcastReceiver
+        DocumentReference docRef = db.collection("tasks").document(schedule.getTaskId());
+
+        // Lấy document từ Firestore
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    // Tiến hành cài đặt PendingIntent và AlarmManager sau khi có kết quả từ Firestore
+                    String taskName = document.getString("name");
+                    intent.putExtra("plantName", myPlant.getNickname());
+                    intent.putExtra("task", taskName);
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+
+                    long intervalMillis = frequencyInDays * 24 * 60 * 60 * 1000;
+                    long triggerAtMillis = calendar.getTimeInMillis();
+                    AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+
+                    alarmManager.setInexactRepeating(
+                            AlarmManager.RTC_WAKEUP,
+                            triggerAtMillis,
+                            intervalMillis,
+                            pendingIntent);
+                } else {
+                    Log.d("Firestore", "Document does not exist!");
+                }
+            } else {
+                Log.e("Firestore", "Error getting document", task.getException());
+            }
+        });
+
     }
 }

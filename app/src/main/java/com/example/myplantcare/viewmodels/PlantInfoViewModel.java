@@ -1,5 +1,4 @@
 package com.example.myplantcare.viewmodels;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -11,7 +10,6 @@ import com.example.myplantcare.models.PlantModel;
 import com.example.myplantcare.utils.FirestoreCallback;
 
 import java.util.List;
-
 public class PlantInfoViewModel extends ViewModel {
 
     private final PlantRepository plantRepository = new PlantRepositoryImpl(); // Khởi tạo trực tiếp
