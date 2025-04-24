@@ -1,11 +1,12 @@
 package com.example.myplantcare.activities;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
@@ -15,8 +16,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.myplantcare.R;
 import com.example.myplantcare.adapters.DetailNoteAdapter;
 import com.example.myplantcare.models.DetailNote;
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
+
 
 public class DetailNoteActivity extends AppCompatActivity {
 
@@ -26,6 +33,7 @@ public class DetailNoteActivity extends AppCompatActivity {
     private int selectedPosition = -1;
     private TextView toolbarTitle;
     private ImageButton toolbarBackButton;
+    private FirebaseFirestore db;
 
     private final ActivityResultLauncher<String> imagePickerLauncher =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
@@ -38,9 +46,10 @@ public class DetailNoteActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_detail_note); // hoặc chuyển layout thành activity_detail_note.xml nếu cần
+        setContentView(R.layout.fragment_detail_note);
 
-        // Thiết lập Toolbar
+        db = FirebaseFirestore.getInstance();
+
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.insider_toolbar);
         toolbarTitle = toolbar.findViewById(R.id.toolbar_title);
         toolbarBackButton = toolbar.findViewById(R.id.toolbar_back_button);
@@ -48,26 +57,17 @@ public class DetailNoteActivity extends AppCompatActivity {
         toolbarBackButton.setVisibility(ImageButton.VISIBLE);
         toolbarBackButton.setOnClickListener(v -> finish());
 
-        // Nhận dữ liệu từ Intent
-        Intent intent = getIntent();
-        String noteTitle = intent.getStringExtra("noteTitle");
-        String noteContent = intent.getStringExtra("noteContent");
-        String noteDate = intent.getStringExtra("noteDate");
 
-        // Ánh xạ các view hiển thị tiêu đề và ngày
-        TextView tvNoteTitle = findViewById(R.id.tv_note_title);
-        TextView tvNoteDate = findViewById(R.id.tv_note_date);
-        EditText etNoteContent = findViewById(R.id.tv_note_content);
+        String noteId = getIntent().getStringExtra("noteId");
 
-        // Cập nhật nội dung hiển thị
-        tvNoteTitle.setText(noteTitle);
-        tvNoteDate.setText(noteDate);
-        etNoteContent.setText(noteContent);
 
-        // Thiết lập RecyclerView
+        if (noteId != null) {
+            fetchNoteDetails(noteId);
+        }
+
         recyclerView = findViewById(R.id.recycler_detail_notes);
         noteList = new ArrayList<>();
-        noteList.add(new DetailNote()); // Ghi chú trống khởi tạo ban đầu
+        noteList.add(new DetailNote());
 
         adapter = new DetailNoteAdapter(this, noteList, position -> {
             selectedPosition = position;
@@ -76,5 +76,37 @@ public class DetailNoteActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
+    }
+
+    private void fetchNoteDetails(String noteId) {
+        db.collection("notes").document(noteId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String title = documentSnapshot.getString("title");
+                        String content = documentSnapshot.getString("content");
+                        Timestamp timestamp = documentSnapshot.getTimestamp("lastUpdated");
+                        String dateStr = null;
+
+                        if (timestamp != null) {
+                            Date date = timestamp.toDate();
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                            dateStr = sdf.format(date);
+                        }
+
+
+                        TextView tvNoteTitle = findViewById(R.id.tv_note_title);
+                        TextView tvNoteDate = findViewById(R.id.tv_note_date);
+                        EditText etNoteContent = findViewById(R.id.tv_note_content);
+
+                        tvNoteTitle.setText(title);
+                        tvNoteDate.setText(dateStr);
+                        etNoteContent.setText(content);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("DetailNoteActivity", "Lỗi khi tải ghi chú: " + e.getMessage());
+                    Toast.makeText(DetailNoteActivity.this, "Lỗi tải dữ liệu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 }

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/white">
+
+    <TextView
+        android:id="@+id/textViewDetailTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Thống kê chi tiết"
+        android:textStyle="bold"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:paddingBottom="12dp" />
+
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/lineChartDetail"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"/>
+
+</LinearLayout>
+

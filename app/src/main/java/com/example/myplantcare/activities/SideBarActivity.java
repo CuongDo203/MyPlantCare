@@ -25,13 +25,11 @@ public class SideBarActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         mAuth = FirebaseAuth.getInstance();
         setContentView(R.layout.side_bar);
-        // Nút return dùng lại id ivMenu
-
         ivReturn = findViewById(R.id.ivReturn);
         ivReturn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish(); // Đóng SideBarActivity và quay về MainActivity
+                finish();
                 overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right); // Optional: hiệu ứng chuyển cảnh
             }
         });

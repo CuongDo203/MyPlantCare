@@ -1,47 +1,41 @@
 package com.example.myplantcare.models;
 
-import android.os.Build;
-
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.Locale;
-// Trong class Note.java
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class Note {
+
+    private String id;        // ✅ Thêm id để lưu Firestore documentId
     private String title;
     private String content;
     private LocalDate date;
-    private String date2;
 
-    // Constructor hiện tại của bạn (có thể có hoặc không)
-    public Note(String title, String content, String dateString) {
+    // Constructor nhận vào String ngày và chuyển thành LocalDate
+    public Note(String id, String title, String content, String dateString) {
+        this.id = id;
         this.title = title;
         this.content = content;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            this.date = LocalDate.parse(dateString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-        }
+        this.date = LocalDate.parse(dateString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
     }
 
-    // Constructor mới nhận LocalDate
-    public Note(String title, String content, LocalDate date) {
+    // Constructor nhận vào LocalDate
+    public Note(String id, String title, String content, LocalDate date) {
+        this.id = id;
         this.title = title;
         this.content = content;
         this.date = date;
     }
 
-    // Getter cho date
-    public LocalDate getDate() {
-        return date;
+    // Getter và setter cho id
+    public String getId() {
+        return id;
     }
 
-    // Setter cho date (nếu cần)
-    public void setDate(LocalDate date) {
-        this.date = date;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    // Getter và setter cho title và content (đã có hoặc thêm vào)
+    // Getter và setter cho title
     public String getTitle() {
         return title;
     }
@@ -50,11 +44,27 @@ public class Note {
         this.title = title;
     }
 
+    // Getter và setter cho content
     public String getContent() {
         return content;
     }
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    // Getter và setter cho date
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDate date) {
+        this.date = date;
+    }
+
+    // Phương thức trả về ngày dạng chuỗi
+    public String getFormattedDate() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        return this.date.format(formatter);
     }
 }

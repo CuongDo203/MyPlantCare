@@ -64,11 +64,11 @@ public class NoteFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerViewNotes);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        loadSampleNotes();
+//        loadSampleNotes();
         originalNoteList.addAll(noteList); // sao lưu danh sách gốc
         filteredNoteList.addAll(noteList); // hiển thị mặc định
 
-        adapter = new NoteAdapter(getContext(), filteredNoteList);
+//        adapter = new NoteAdapter(getContext(), filteredNoteList);
         recyclerView.setAdapter(adapter);
 
         // Xử lý khi bấm vào ghi chú trong danh sách
@@ -106,15 +106,15 @@ public class NoteFragment extends Fragment {
         });
     }
 
-    private void loadSampleNotes() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            noteList.add(new Note("Cây EFG đang phát triển tốt", "Những thứ cần mua tiếp theo cho ...", LocalDate.of(2025, 2, 28)));
-            noteList.add(new Note("BCD", "Các lá có dấu hiệu bị nhạt màu ...", LocalDate.of(2025, 2, 16)));
-            noteList.add(new Note("Cây lam", "Sẽ tiến hành kế hoạch chăm sóc, setup chỗ ...", LocalDate.of(2025, 2, 5)));
-            noteList.add(new Note("EFG ngày đầu về nhà setup", "Kế hoạch setup ánh sáng và nơi đặt cho cây ...", LocalDate.of(2025, 1, 29)));
-            noteList.add(new Note("Mua cây ACB", "Hôm nay là ngày đầu tiên mua cây ACB ...", LocalDate.of(2024, 11, 25)));
-        }
-    }
+//    private void loadSampleNotes() {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            noteList.add(new Note("Cây EFG đang phát triển tốt", "Những thứ cần mua tiếp theo cho ...", LocalDate.of(2025, 2, 28)));
+//            noteList.add(new Note("BCD", "Các lá có dấu hiệu bị nhạt màu ...", LocalDate.of(2025, 2, 16)));
+//            noteList.add(new Note("Cây lam", "Sẽ tiến hành kế hoạch chăm sóc, setup chỗ ...", LocalDate.of(2025, 2, 5)));
+//            noteList.add(new Note("EFG ngày đầu về nhà setup", "Kế hoạch setup ánh sáng và nơi đặt cho cây ...", LocalDate.of(2025, 1, 29)));
+//            noteList.add(new Note("Mua cây ACB", "Hôm nay là ngày đầu tiên mua cây ACB ...", LocalDate.of(2024, 11, 25)));
+//        }
+//    }
 
     private void filterNotes(String query) {
         filteredNoteList.clear();
