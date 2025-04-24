@@ -71,31 +71,25 @@ public class StatisticAdapter extends RecyclerView.Adapter<StatisticAdapter.Stat
         }
 
         public void bind(final StatisticItem item, final OnItemClickListener listener) {
-            // Set the tree name
             textViewTreeName.setText(item.getTreeName());
 
-            // Prepare chart data
             ArrayList<Entry> entries = new ArrayList<>();
             for (int i = 0; i < item.getChartData().size(); i++) {
                 ChartData data = item.getChartData().get(i);
-                // Use getXValue and getYValue for chart data
                 entries.add(new Entry(data.getXValue(), data.getYValue()));
             }
 
-            // Create LineDataSet
             LineDataSet dataSet = new LineDataSet(entries, "Chiều cao theo ngày");
             dataSet.setColor(Color.GREEN);
             dataSet.setLineWidth(2f);
             dataSet.setCircleRadius(4f);
             dataSet.setCircleColor(Color.GREEN);
             dataSet.setValueTextColor(Color.BLACK);
-            dataSet.setDrawValues(false); // Hide values for the chart
+            dataSet.setDrawValues(false);
 
-            // Set LineData for the chart
             LineData lineData = new LineData(dataSet);
             lineChart.setData(lineData);
 
-            // X-Axis: Day count
             XAxis xAxis = lineChart.getXAxis();
             xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
             xAxis.setDrawGridLines(false);
@@ -109,7 +103,6 @@ public class StatisticAdapter extends RecyclerView.Adapter<StatisticAdapter.Stat
                 }
             });
 
-            // Y-Axis: Height (cm)
             YAxis yAxisLeft = lineChart.getAxisLeft();
             yAxisLeft.setTextColor(Color.DKGRAY);
             yAxisLeft.setTextSize(12f);
@@ -120,16 +113,14 @@ public class StatisticAdapter extends RecyclerView.Adapter<StatisticAdapter.Stat
                 }
             });
 
-            lineChart.getAxisRight().setEnabled(false); // Hide the right Y-Axis
+            lineChart.getAxisRight().setEnabled(false);
 
-            // Disable description text for the chart
             Description description = new Description();
             description.setText("");
             lineChart.setDescription(description);
 
-            lineChart.invalidate(); // Update the chart with new data
+            lineChart.invalidate();
 
-            // Set item click listener
             itemView.setOnClickListener(v -> listener.onItemClick(item));
         }
     }

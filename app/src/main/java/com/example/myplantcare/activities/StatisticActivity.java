@@ -31,38 +31,31 @@ public class StatisticActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistic);
 
-        // Toolbar setup
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.insider_toolbar);
         toolbarTitle = toolbar.findViewById(R.id.toolbar_title);
         toolbarBackButton = toolbar.findViewById(R.id.toolbar_back_button);
         toolbarTitle.setText("Thống kê phát triển");
         toolbarBackButton.setOnClickListener(v -> finish());
 
-        // RecyclerView setup
         recyclerViewStatistics = findViewById(R.id.recyclerViewStatistics);
         recyclerViewStatistics.setLayoutManager(new LinearLayoutManager(this));
 
         statisticList = new ArrayList<>();
 
-        // Tạo dữ liệu mẫu cho StatisticItem với biểu đồ
         statisticList.add(createStatisticItem("Cây EFG"));
         statisticList.add(createStatisticItem("Cây ABC"));
-        // Thêm các cây khác...
 
-        // Thiết lập Adapter cho RecyclerView
         adapter = new StatisticAdapter(this, statisticList, item -> {
             // Chuyển Intent và truyền đối tượng StatisticItem qua putExtra
             Intent intent = new Intent(StatisticActivity.this, DetailStatisticActivity.class);
-            intent.putExtra("statisticItem", item);  // truyền nguyên object StatisticItem
+            intent.putExtra("statisticItem", item);
             startActivity(intent);
         });
 
         recyclerViewStatistics.setAdapter(adapter);
     }
 
-    // Tạo StatisticItem với dữ liệu biểu đồ mẫu
     private StatisticItem createStatisticItem(String treeName) {
-        // Tạo danh sách Entry (dữ liệu cho LineChart)
         List<ChartData> chartData = new ArrayList<>();
         chartData.add(new ChartData(0, 12));  // Ngày 1: cao 12 cm
         chartData.add(new ChartData(1, 14));  // Ngày 2: cao 14 cm
