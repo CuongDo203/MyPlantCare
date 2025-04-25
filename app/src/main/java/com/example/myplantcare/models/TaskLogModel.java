@@ -41,6 +41,14 @@ public class TaskLogModel {
         this.status = status;
     }
 
+    public TaskLogModel(String scheduleId, String taskName, Timestamp date, boolean status, String userPhotoUrl) {
+        this.scheduleId = scheduleId;
+        this.taskName = taskName;
+        this.date = date;
+        this.status = status;
+        this.userPhotoUrl = userPhotoUrl;
+    }
+
     public TaskLogModel(){}
 
     public Timestamp getDate() {

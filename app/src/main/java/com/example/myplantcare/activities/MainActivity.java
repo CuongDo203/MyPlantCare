@@ -35,7 +35,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements HomeFragment.HomeFragmentListener{
 
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
@@ -135,6 +135,15 @@ public class MainActivity extends AppCompatActivity {
                 .beginTransaction()
                 .replace(R.id.frame_container, fragment)
                 .commit();
+    }
+
+    @Override
+    public void onNavigateToScheduleFromHome() {
+        loadFragment(new ScheduleFragment());
+        MenuItem scheduleMenuItem = bottomNavigationView.getMenu().findItem(R.id.nav_schedule); // Tìm item menu Schedule bằng ID
+        if (scheduleMenuItem != null) {
+            scheduleMenuItem.setChecked(true);
+        }
     }
 
     private void createNotificationChannel() {

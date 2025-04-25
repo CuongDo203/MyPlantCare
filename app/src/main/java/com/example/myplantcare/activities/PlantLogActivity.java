@@ -2,9 +2,11 @@ package com.example.myplantcare.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -14,20 +16,24 @@ import com.bumptech.glide.Glide;
 import com.example.myplantcare.R;
 import com.example.myplantcare.adapters.TaskLogAdapter;
 import com.example.myplantcare.models.TaskLogModel;
+import com.example.myplantcare.viewmodels.PlantLogViewModel;
 import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class PlantLogActivity extends AppCompatActivity implements View.OnClickListener{
-
+    private static final String TAG = "PlantLogActivity";
     private RecyclerView recyclerView;
     private TaskLogAdapter taskLogAdapter;
     private List<TaskLogModel> taskLogList;
     private ImageView plantImage, btnBack;
     private TextView plantName;
-    private String plantId;
+    private String plantId, userId;
+    private PlantLogViewModel plantLogViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,18 +41,44 @@ public class PlantLogActivity extends AppCompatActivity implements View.OnClickL
         setContentView(R.layout.activity_plant_log);
         initContents();
         loadPlantInfo();
-        loadTaskLog();
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            userId = currentUser.getUid();
+            Log.d(TAG, "Current user ID: " + userId);
+        } else {
+            Log.w(TAG, "User is not logged in. Cannot trigger ViewModel load.");
+            Toast.makeText(this, "Vui lòng đăng nhập để xem lịch sử công việc.", Toast.LENGTH_SHORT).show();
+        }
+        plantLogViewModel = new PlantLogViewModel();
+        plantLogViewModel.loadPlantTaskLogs(userId, plantId);
+        observeViewModel();
         btnBack.setOnClickListener(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         taskLogAdapter = new TaskLogAdapter(this, taskLogList);
         recyclerView.setAdapter(taskLogAdapter);
     }
 
-    private void loadTaskLog() {
-        taskLogList = new ArrayList<>();
-        taskLogList.add(new TaskLogModel("Test1",new Timestamp(new Date()),  true));
-        taskLogList.add(new TaskLogModel("Test2",new Timestamp(new Date()),  true));
+    private void observeViewModel() {
+        plantLogViewModel.taskLogs.observe(this, taskLogs -> {
+            Log.d(TAG, "Task logs observed in Activity. Count: " + (taskLogs != null ? taskLogs.size() : 0));
+            if (taskLogs != null) {
+                taskLogAdapter = new TaskLogAdapter(this, taskLogs);
+                recyclerView.setAdapter(taskLogAdapter);
 
+            } else {
+                Log.d(TAG, "Observed null task logs.");
+                taskLogAdapter = new TaskLogAdapter(this, new ArrayList<>());
+                recyclerView.setAdapter(taskLogAdapter);
+            }
+        });
+
+        plantLogViewModel.isLoading.observe(this, isLoading -> {
+            //Hieu ung loading....
+        });
+
+        plantLogViewModel.errorMessage.observe(this, errorMessage -> {
+            //neu co loi
+        });
     }
 
     private void loadPlantInfo() {

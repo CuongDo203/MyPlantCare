@@ -519,7 +519,7 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     }
 
     @Override
-    public void markScheduleCompleted(String userId, String myPlantId, String scheduleId, Calendar date, FirestoreCallback<Void> callback) {
+    public void markScheduleCompleted(String userId, String myPlantId, String scheduleId,String taskName, Calendar date, FirestoreCallback<Void> callback) {
         // Kiểm tra tham số đầu vào
         if (userId == null || userId.isEmpty() || myPlantId == null || myPlantId.isEmpty() || scheduleId == null || scheduleId.isEmpty() || date == null) {
             Log.w(TAG, "markScheduleCompleted: invalid input.");
@@ -537,7 +537,9 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
         dateZeroTime.set(Calendar.MILLISECOND, 0);
 
         // Tạo đối tượng TaskLogModel
-        TaskLogModel taskLog = new TaskLogModel(scheduleId, new Timestamp(dateZeroTime.getTime()), true); // Sử dụng trạng thái "done"
+        TaskLogModel taskLog = new TaskLogModel(scheduleId, new Timestamp(dateZeroTime.getTime()), true);
+        taskLog.setTaskName(taskName);
+        taskLog.setUserPhotoUrl("");
 
         // Lấy tham chiếu đến subcollection 'task_logs' dưới cây cụ thể của người dùng
         CollectionReference taskLogsCollectionRef = userRef
