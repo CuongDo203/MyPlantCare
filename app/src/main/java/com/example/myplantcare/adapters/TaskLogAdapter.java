@@ -1,6 +1,7 @@
 package com.example.myplantcare.adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import java.util.List;
 
 public class TaskLogAdapter extends RecyclerView.Adapter<TaskLogAdapter.TaskLogViewHolder> {
 
+    private static String TAG = "TaskLogAdapter";
     private List<TaskLogModel> taskLogList;
     private Context context;
     public TaskLogAdapter(Context context, List<TaskLogModel> taskLogList) {
@@ -43,20 +45,23 @@ public class TaskLogAdapter extends RecyclerView.Adapter<TaskLogAdapter.TaskLogV
         Calendar calendar = Calendar.getInstance();
         long numDayBefore = getDaysBetweenDates( taskLog.getDate().toDate(), calendar.getTime());
         holder.textViewRelativeTime.setText(String.valueOf(numDayBefore)+" ngày trước");
-        holder.textViewTaskName.setText(taskLog.getTaskName());
-        switch (taskLog.getTaskName()){
-            case "Tưới nước":
-                holder.imageViewTaskIcon.setImageResource(R.drawable.ic_tuoi_nuoc);
-                break;
-            case "Bón phân":
-                holder.imageViewTaskIcon.setImageResource(R.drawable.ic_bon_phan);
-                break;
-            case "Kiểm tra sâu bệnh":
-                holder.imageViewTaskIcon.setImageResource(R.drawable.ic_kt_sau_benh);
-                break;
-            default:
-                holder.imageViewTaskIcon.setImageResource(R.drawable.ic_tuoi_nuoc);
-                break;
+        Log.d(TAG, "onBindViewHolder: " + taskLog);
+        if(taskLog.getTaskName() != null) {
+            holder.textViewTaskName.setText(taskLog.getTaskName());
+            switch (taskLog.getTaskName()){
+                case "Tưới nước":
+                    holder.imageViewTaskIcon.setImageResource(R.drawable.ic_tuoi_nuoc);
+                    break;
+                case "Bón phân":
+                    holder.imageViewTaskIcon.setImageResource(R.drawable.ic_bon_phan);
+                    break;
+                case "Kiểm tra sâu bệnh":
+                    holder.imageViewTaskIcon.setImageResource(R.drawable.ic_kt_sau_benh);
+                    break;
+                default:
+                    holder.imageViewTaskIcon.setImageResource(R.drawable.ic_tuoi_nuoc);
+                    break;
+            }
         }
         if(taskLog.getUserPhotoUrl() != null && !taskLog.getUserPhotoUrl().isEmpty()){
 //            holder.imageViewUserPhoto.setVisibility(View.VISIBLE);

@@ -1,6 +1,7 @@
 package com.example.myplantcare.fragments;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -54,6 +55,30 @@ public class HomeFragment extends Fragment implements HomeTaskAdapter.OnTaskClic
     private RecyclerView rvHomeTasks;
     private HomeTaskAdapter homeTaskAdapter;
     private String userId;
+    public interface HomeFragmentListener {
+        void onNavigateToScheduleFromHome(); // Phương thức để Activity implement và HomeFragment gọi
+        // Thêm các phương thức khác nếu HomeFragment cần yêu cầu Activity làm gì đó
+    }
+
+    private HomeFragmentListener listener;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        Log.d(TAG, "HomeFragment onAttach");
+        if (context instanceof HomeFragmentListener) {
+            listener = (HomeFragmentListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement HomeFragmentListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        listener = null; // Tránh rò rỉ bộ nhớ
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -88,8 +113,9 @@ public class HomeFragment extends Fragment implements HomeTaskAdapter.OnTaskClic
             Log.w(TAG, "User is not logged in, cannot fetch tasks.");
         }
         tvSeeMore.setOnClickListener(v -> {
-            NavController navController = Navigation.findNavController(requireView());
-            navController.navigate(R.id.action_homeFragment_to_scheduleFragment);
+            if (listener != null) {
+                listener.onNavigateToScheduleFromHome(); // <--- GỌI PHƯƠNG THỨC CỦA LISTENER
+            }
         });
     }
 

@@ -473,7 +473,6 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
     }
 
     private void showDeleteScheduleConfirmationDialog(ScheduleDisplayItem scheduleToDelete) {
-        // TODO: Triển khai AlertDialog xác nhận xóa lịch trình
         if (scheduleToDelete == null || TextUtils.isEmpty(scheduleToDelete.getScheduleId())) {
             Log.w(TAG, "Cannot show delete schedule dialog, invalid schedule.");
             return;
@@ -481,7 +480,6 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
         new AlertDialog.Builder(this)
                 .setTitle("Xác nhận xoá lịch trình")
                 .setMessage("Bạn có chắc chắn muốn xoá lịch trình \"" + scheduleToDelete.getTaskName() + "\" không?") // Hiển thị tên task
-                // TODO: Lấy tên task thân thiện thay vì Task ID
                 .setPositiveButton("Xoá", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // Gọi ViewModel để xóa lịch trình
