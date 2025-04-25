@@ -34,6 +34,7 @@ public class NotificationActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         db = FirebaseFirestore.getInstance();
         adapter = new NotificationAdapter(new ArrayList<>(), notification -> {
+
             Toast.makeText(NotificationActivity.this, "Clicked: " + notification.getContent(), Toast.LENGTH_SHORT).show();
         });
         recyclerView.setAdapter(adapter);

@@ -304,65 +304,114 @@ public class AddScheduleDialogFragment extends DialogFragment {
         Toast.makeText(requireContext(), "Chức năng thêm cây update sau", Toast.LENGTH_SHORT).show();
     }
 
-    private void saveSchedule() {
-        if (selectedPlant == null || TextUtils.isEmpty(selectedPlant.getId())) {
-            Toast.makeText(getContext(), "Vui lòng chọn cây.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (selectedTask == null || TextUtils.isEmpty(selectedTask.getId())) {
-            Toast.makeText(getContext(), "Vui lòng chọn công việc.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (textViewStartDate.getText().toString().equals("Chọn ngày")) {
-            Toast.makeText(getContext(), "Vui lòng chọn ngày bắt đầu.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (textViewStartTime.getText().toString().equals("Chọn giờ")) {
-            Toast.makeText(getContext(), "Vui lòng chọn giờ.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (TextUtils.isEmpty(selectedFrequencyText)) {
-            Toast.makeText(getContext(), "Vui lòng chọn tần suất.", Toast.LENGTH_SHORT).show();
-            return;
-        }
+//    private void saveSchedule() {
+//        if (selectedPlant == null || TextUtils.isEmpty(selectedPlant.getId())) {
+//            Toast.makeText(getContext(), "Vui lòng chọn cây.", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//        if (selectedTask == null || TextUtils.isEmpty(selectedTask.getId())) {
+//            Toast.makeText(getContext(), "Vui lòng chọn công việc.", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//        if (textViewStartDate.getText().toString().equals("Chọn ngày")) {
+//            Toast.makeText(getContext(), "Vui lòng chọn ngày bắt đầu.", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//        if (textViewStartTime.getText().toString().equals("Chọn giờ")) {
+//            Toast.makeText(getContext(), "Vui lòng chọn giờ.", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//        if (TextUtils.isEmpty(selectedFrequencyText)) {
+//            Toast.makeText(getContext(), "Vui lòng chọn tần suất.", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
+//
+//        int customDays = -1;
+//        if (selectedFrequencyText.equals("x ngày 1 lần")) {
+//            String daysText = editTextCustomFrequencyDays.getText().toString().trim();
+//            if (TextUtils.isEmpty(daysText)) {
+//                Toast.makeText(getContext(), "Vui lòng nhập số ngày cho tần suất tùy chỉnh.", Toast.LENGTH_SHORT).show();
+//                editTextCustomFrequencyDays.requestFocus();
+//                return;
+//            }
+//            try {
+//                customDays = Integer.parseInt(daysText);
+//                if (customDays <= 0) {
+//                    Toast.makeText(getContext(), "Số ngày phải lớn hơn 0.", Toast.LENGTH_SHORT).show();
+//                    editTextCustomFrequencyDays.requestFocus();
+//                    return;
+//                }
+//            } catch (NumberFormatException e) {
+//                Toast.makeText(getContext(), "Số ngày không hợp lệ.", Toast.LENGTH_SHORT).show();
+//                editTextCustomFrequencyDays.requestFocus();
+//                return;
+//            }
+//        }
 
-        int customDays = -1;
-        if (selectedFrequencyText.equals("x ngày 1 lần")) {
-            String daysText = editTextCustomFrequencyDays.getText().toString().trim();
-            if (TextUtils.isEmpty(daysText)) {
-                Toast.makeText(getContext(), "Vui lòng nhập số ngày cho tần suất tùy chỉnh.", Toast.LENGTH_SHORT).show();
-                editTextCustomFrequencyDays.requestFocus();
+    private void saveSchedule() {
+        try {
+            if (selectedPlant == null || TextUtils.isEmpty(selectedPlant.getId())) {
+                Toast.makeText(getContext(), "Vui lòng chọn cây.", Toast.LENGTH_SHORT).show();
                 return;
             }
-            try {
-                customDays = Integer.parseInt(daysText);
-                if (customDays <= 0) {
-                    Toast.makeText(getContext(), "Số ngày phải lớn hơn 0.", Toast.LENGTH_SHORT).show();
+            if (selectedTask == null || TextUtils.isEmpty(selectedTask.getId())) {
+                Toast.makeText(getContext(), "Vui lòng chọn công việc.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (textViewStartDate.getText().toString().equals("Chọn ngày")) {
+                Toast.makeText(getContext(), "Vui lòng chọn ngày bắt đầu.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (textViewStartTime.getText().toString().equals("Chọn giờ")) {
+                Toast.makeText(getContext(), "Vui lòng chọn giờ.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (TextUtils.isEmpty(selectedFrequencyText)) {
+                Toast.makeText(getContext(), "Vui lòng chọn tần suất.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            int customDays = -1;
+            if (selectedFrequencyText.equals("x ngày 1 lần")) {
+                String daysText = editTextCustomFrequencyDays.getText().toString().trim();
+                if (TextUtils.isEmpty(daysText)) {
+                    Toast.makeText(getContext(), "Vui lòng nhập số ngày cho tần suất tùy chỉnh.", Toast.LENGTH_SHORT).show();
                     editTextCustomFrequencyDays.requestFocus();
                     return;
                 }
-            } catch (NumberFormatException e) {
-                Toast.makeText(getContext(), "Số ngày không hợp lệ.", Toast.LENGTH_SHORT).show();
-                editTextCustomFrequencyDays.requestFocus();
-                return;
+                try {
+                    customDays = Integer.parseInt(daysText);
+                    if (customDays <= 0) {
+                        Toast.makeText(getContext(), "Số ngày phải lớn hơn 0.", Toast.LENGTH_SHORT).show();
+                        editTextCustomFrequencyDays.requestFocus();
+                        return;
+                    }
+                } catch (NumberFormatException e) {
+                    Toast.makeText(getContext(), "Số ngày không hợp lệ.", Toast.LENGTH_SHORT).show();
+                    editTextCustomFrequencyDays.requestFocus();
+                    return;
+                }
             }
+
+            ScheduleModel newSchedule = new ScheduleModel();
+            newSchedule.setTaskId(selectedTask.getId());
+            newSchedule.setFrequency(convertFrequencyToDays(selectedFrequencyText));
+            newSchedule.setStartDate(new Timestamp(selectedDateCalendar.getTime()));
+            newSchedule.setTime(new Timestamp(selectedStartTime.getTime()));
+            if (userId != null && selectedPlant != null && selectedPlant.getId() != null) {
+                Log.d("AddScheduleDialogFragment", "Saving schedule for plant ID: " + selectedPlant.getId() + " and user ID: " + userId);
+                addScheduleViewModel.addSchedule(selectedPlant.getId(), newSchedule);
+
+
+                // Đặt thông báo định kỳ
+                setPeriodicNotification(selectedPlant, newSchedule);
+            } else {
+                Toast.makeText(getContext(), "Lỗi: Thiếu thông tin cây hoặc người dùng để lưu.", Toast.LENGTH_SHORT).show();
+            }
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
         }
 
-        ScheduleModel newSchedule = new ScheduleModel();
-        newSchedule.setTaskId(selectedTask.getId());
-        newSchedule.setFrequency(convertFrequencyToDays(selectedFrequencyText));
-        newSchedule.setStartDate(new Timestamp(selectedDateCalendar.getTime()));
-        newSchedule.setTime(new Timestamp(selectedStartTime.getTime()));
-        if (userId != null && selectedPlant != null && selectedPlant.getId() != null) {
-            Log.d("AddScheduleDialogFragment", "Saving schedule for plant ID: " + selectedPlant.getId() + " and user ID: " + userId);
-            addScheduleViewModel.addSchedule(selectedPlant.getId(), newSchedule);
-
-
-            // Đặt thông báo định kỳ
-            setPeriodicNotification(selectedPlant, newSchedule);
-        } else {
-            Toast.makeText(getContext(), "Lỗi: Thiếu thông tin cây hoặc người dùng để lưu.", Toast.LENGTH_SHORT).show();
-        }
     }
     private int convertFrequencyToDays(String frequency) {
         switch (frequency){
@@ -535,7 +584,11 @@ public class AddScheduleDialogFragment extends DialogFragment {
                     String taskName = document.getString("name");
                     intent.putExtra("plantName", myPlant.getNickname());
                     intent.putExtra("task", taskName);
-                    int requestCode = schedule.getId().hashCode();
+
+                    String key = schedule.getId() + schedule.getTime().toDate().getTime();
+                    int requestCode = key.hashCode();
+                    if (requestCode == Integer.MIN_VALUE) requestCode = 0;
+                    else requestCode = Math.abs(requestCode);
                     PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
                     long intervalMillis = frequencyInDays * 24 * 60 * 60 * 1000;
@@ -547,6 +600,7 @@ public class AddScheduleDialogFragment extends DialogFragment {
                             triggerAtMillis,
                             intervalMillis,
                             pendingIntent);
+                    Log.d("AlarmSetup", "" +requestCode);
                 } else {
                     Log.d("Firestore", "Document không tồn tại!");
                 }
