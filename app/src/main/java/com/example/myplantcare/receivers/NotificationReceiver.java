@@ -25,7 +25,6 @@ public class NotificationReceiver extends BroadcastReceiver {
         if (plantName != null && taskName != null) {
             // Tạo nội dung thông báo
             String notificationText = "Cây " + plantName + " cần làm công việc: " + taskName;
-
             // Tạo thông báo với kênh đã tạo trong MainActivity
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "PLANTAPP_CHANNEL")
                     .setSmallIcon(R.drawable.ic_launcher_foreground)

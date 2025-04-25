@@ -541,7 +541,6 @@ public class AddScheduleDialogFragment extends DialogFragment {
                     long intervalMillis = frequencyInDays * 24 * 60 * 60 * 1000;
                     long triggerAtMillis = calendar.getTimeInMillis();
                     AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
-
                     alarmManager.setInexactRepeating(
                             AlarmManager.RTC_WAKEUP,
                             triggerAtMillis,
