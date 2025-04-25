@@ -42,7 +42,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                 }
             }
 
-            // Gửi thông báo nếu quyền đã được cấp (hoặc nếu Android < 13)
+            // Gửi thông báo
             NotificationManagerCompat manager = NotificationManagerCompat.from(context);
             manager.notify(1, builder.build());
             Log.d("RECEIVER", "Thông báo đã được gửi!");
@@ -52,7 +52,7 @@ public class NotificationReceiver extends BroadcastReceiver {
             // Tạo dữ liệu thông báo để lưu vào Firestore
             Map<String, Object> notificationData = new HashMap<>();
             notificationData.put("title", "Thông báo PlantCare");
-            notificationData.put("content",plantName + "cân làm công việc " + taskName);
+            notificationData.put("content",plantName + " cần làm công việc " + taskName);
             notificationData.put("number", 1);  // Tạo timestamp tự động
 
             // Lưu thông báo vào subcollection "notifications" của người dùng

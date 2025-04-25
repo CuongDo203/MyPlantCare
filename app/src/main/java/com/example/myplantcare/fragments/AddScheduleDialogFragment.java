@@ -531,11 +531,12 @@ public class AddScheduleDialogFragment extends DialogFragment {
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if (document.exists()) {
-                    // Tiến hành cài đặt PendingIntent và AlarmManager sau khi có kết quả từ Firestore
+                    // Tạo nhắc nhở sau khi có kết quả từ Firestore
                     String taskName = document.getString("name");
                     intent.putExtra("plantName", myPlant.getNickname());
                     intent.putExtra("task", taskName);
-                    PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+                    int requestCode = schedule.getId().hashCode();
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
                     long intervalMillis = frequencyInDays * 24 * 60 * 60 * 1000;
                     long triggerAtMillis = calendar.getTimeInMillis();
@@ -547,10 +548,10 @@ public class AddScheduleDialogFragment extends DialogFragment {
                             intervalMillis,
                             pendingIntent);
                 } else {
-                    Log.d("Firestore", "Document does not exist!");
+                    Log.d("Firestore", "Document không tồn tại!");
                 }
             } else {
-                Log.e("Firestore", "Error getting document", task.getException());
+                Log.e("Firestore", "Lỗi get document", task.getException());
             }
         });
     }

@@ -151,16 +151,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
-                        if (user != null) {
-                            if (newUser) {
-                                String uid = user.getUid();
-                                Map<String, Object> userInfo = new HashMap<>();
-                                userInfo.put("name", "Nguyễn Văn A");
-                                userInfo.put("email", trimmedEmail);
-                                userInfo.put("phone", "");
-                                userInfo.put("dob", "");
-                                userInfo.put("role", "");
-                                userInfo.put("cityId", "");
+                        if (user != null) {                            if (newUser) {
+                            String uid = user.getUid();
+                            Map<String, Object> userInfo = new HashMap<>();
+                            userInfo.put("name", "Nguyễn Văn A");
+                            userInfo.put("email", trimmedEmail);
+                            userInfo.put("phone", "");
+                            userInfo.put("dob", "");
+                            userInfo.put("role", "");
+                            userInfo.put("cityId", "");
+
 
                                 db.collection("users").document(uid)
                                         .set(userInfo)

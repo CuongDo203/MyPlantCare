@@ -57,16 +57,18 @@ public class NotificationActivity extends AppCompatActivity {
         builder.setMessage("Bạn có chắc chắn muốn xóa tất cả thông báo?");
         builder.setNegativeButton("Quay lại", (dialog, which) -> dialog.dismiss());
         builder.setPositiveButton("Đồng ý", (dialog, which) -> {
-            deleteAllNotifications();
+            deleteAllNotifications(FirebaseAuth.getInstance().getCurrentUser().getUid());
         });
         AlertDialog dialog = builder.create();
         dialog.show();
     }
 
 
-    private void deleteAllNotifications() {
-        db.collection("Notification")
-                .get()
+    private void deleteAllNotifications(String userId) {
+        db.collection("users") // Collection cha "users"
+                .document(userId) // Lấy document của người dùng, dùng userId làm ID
+                .collection("notifications") // Subcollection "notifications"
+                .get() // Lấy tất cả các document trong subcollection "notifications"
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         QuerySnapshot querySnapshot = task.getResult();
@@ -75,30 +77,30 @@ public class NotificationActivity extends AppCompatActivity {
                             // Duyệt qua tất cả các document và xóa từng document theo ID
                             for (int i = 0; i < querySnapshot.size(); i++) {
                                 String documentId = querySnapshot.getDocuments().get(i).getId();
-                                Log.d("NotificationActivity", "Attempting to delete document with ID: " + documentId);
+
 
                                 db.collection("Notification").document(documentId)
                                         .delete()
                                         .addOnCompleteListener(deleteTask -> {
                                             if (deleteTask.isSuccessful()) {
-                                                Log.d("NotificationActivity", "Document with ID " + documentId + " successfully deleted.");
+                                                Log.d("NotificationActivity", "Document ID " + documentId + " xóa thành công");
                                             } else {
-                                                Log.e("NotificationActivity", "Error deleting document with ID " + documentId, deleteTask.getException());
+                                                Log.e("NotificationActivity", "lỗi xóa thông báo" + documentId, deleteTask.getException());
                                             }
                                         });
                             }
 
-                            // Clear the notifications list and show success toast
+                            // xóa toàn bộ thông báo
                             adapter.clearNotifications();
                             Toast.makeText(NotificationActivity.this, "Đã xóa tất cả thông báo.", Toast.LENGTH_SHORT).show();
-                            Log.d("NotificationActivity", "All notifications have been deleted.");
+
 
                         } else {
-                            Log.d("NotificationActivity", "No notifications to delete.");
+
                             Toast.makeText(NotificationActivity.this, "Không có thông báo để xóa.", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Log.e("NotificationActivity", "Error fetching notifications.", task.getException());
+                        Log.e("NotificationActivity", "Lỗi get thông báo", task.getException());
                         Toast.makeText(NotificationActivity.this, "Lỗi khi xóa thông báo.", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -136,7 +138,6 @@ private void fetchNotificationsByUserId(String userId) {
                 }
             });
 }
-
     private void displayNotification(String message, String time, String count) {
         Notification notification = new Notification(message, time, count);
         adapter.addNotification(notification);
