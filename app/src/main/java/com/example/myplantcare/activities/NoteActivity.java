@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -60,13 +61,33 @@ public class NoteActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         loadNotesFromFirestore();
 
+//        etSearchNote = findViewById(R.id.etSearchNote);
+//        etSearchNote.addTextChangedListener(new TextWatcher() {
+//            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+//            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                filterNotes(s.toString());
+//            }
+//            @Override public void afterTextChanged(Editable s) {}
+//        });
+
         etSearchNote = findViewById(R.id.etSearchNote);
+
+        // Cho phép nhập cả chữ có dấu và số
+        etSearchNote.setRawInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+
         etSearchNote.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filterNotes(s.toString());
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Sử dụng trim() để loại bỏ khoảng trắng dư
+                String query = s.toString().trim();
+                filterNotes(query);
             }
-            @Override public void afterTextChanged(Editable s) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {}
         });
 
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.insider_toolbar);

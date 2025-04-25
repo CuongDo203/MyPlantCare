@@ -84,8 +84,29 @@ public class DetailNoteAdapter extends RecyclerView.Adapter<DetailNoteAdapter.No
         });
     }
 
+
     @Override
     public int getItemCount() {
         return notes.size();
     }
+
+    // Thêm item mới
+    public void addNote(DetailNote note) {
+        notes.add(note);
+        notifyItemInserted(notes.size() - 1);
+    }
+
+    // Cập nhật ảnh cho item ở vị trí cụ thể
+    public void setImageUriAt(int position, Uri imageUri) {
+        if (position >= 0 && position < notes.size()) {
+            notes.get(position).setImageUri(imageUri);
+            notifyItemChanged(position);
+        }
+    }
+
+    // Lấy danh sách ghi chú
+    public List<DetailNote> getNotes() {
+        return notes;
+    }
+
 }
