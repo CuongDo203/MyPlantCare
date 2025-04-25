@@ -136,7 +136,6 @@ public class HomeFragment extends Fragment implements HomeTaskAdapter.OnTaskClic
     }
     private void observeViewModel() {
         homeViewModel.weatherData.observe(getViewLifecycleOwner(), weatherResponse -> {
-            // Được gọi khi dữ liệu thời tiết thay đổi
             if (weatherResponse != null) {
                 updateWeatherUI(weatherResponse); // Gọi hàm cập nhật UI đã có
             }
@@ -151,15 +150,11 @@ public class HomeFragment extends Fragment implements HomeTaskAdapter.OnTaskClic
 
         homeViewModel.isLoadingTasks.observe(getViewLifecycleOwner(), isLoading -> {
             Log.d(TAG, "isLoadingTasks observed: " + isLoading);
-            // TODO: Show/hide loading indicator for tasks
         });
 
         homeViewModel.errorMessage.observe(getViewLifecycleOwner(), errorMessage -> {
-            // Được gọi khi có lỗi
             if (errorMessage != null && !errorMessage.isEmpty()) {
                 Toast.makeText(getContext(), errorMessage, Toast.LENGTH_LONG).show();
-                // Có thể reset lỗi sau khi hiển thị
-                // homeViewModel.clearError();
             }
         });
     }
