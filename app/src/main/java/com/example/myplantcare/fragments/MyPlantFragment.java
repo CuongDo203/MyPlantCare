@@ -84,7 +84,7 @@ public class MyPlantFragment extends Fragment {
         observeViewModel();
         registerActivityResults();
 
-        fabAddMyPlant.setOnClickListener(v -> showAddPlantDialog());
+        fabAddMyPlant.setOnClickListener(v -> showAddPlantDialog(currentUserId));
         btnFilter.setOnClickListener(v -> toggleFilterOptionsVisibility());
         return view;
     }
@@ -359,16 +359,15 @@ public class MyPlantFragment extends Fragment {
         Log.d(TAG, "Launched MyPlantDetailActivity with launcher for plant ID: " + plant.getId());
     }
 
-    private void showAddPlantDialog() {
-        String userIdForDialog = this.currentUserId; // Sử dụng biến thành viên currentUserId
+    public void showAddPlantDialog(String userId) {
 
-        if (userIdForDialog == null || userIdForDialog.isEmpty()) {
+        if (userId == null || userId.isEmpty()) {
             Log.w(TAG, "No user logged in or userId is missing. Cannot show AddPlantDialog.");
             Toast.makeText(requireContext(), "Bạn cần đăng nhập để thêm cây.", Toast.LENGTH_SHORT).show();
             return; // Thoát khỏi hàm nếu không có user ID
         }
 
-        AddPlantDialogFragment dialogFragment = AddPlantDialogFragment.newInstance(null, userIdForDialog); // null vì thêm cây mới
+        AddPlantDialogFragment dialogFragment = AddPlantDialogFragment.newInstance(null, userId); // null vì thêm cây mới
         dialogFragment.setOnSavePlantListener(() -> {
             if (myPlantListViewModel != null) { // Kiểm tra ViewModel null
                 myPlantListViewModel.loadMyPlants(); // <-- Gọi phương thức tải lại dữ liệu

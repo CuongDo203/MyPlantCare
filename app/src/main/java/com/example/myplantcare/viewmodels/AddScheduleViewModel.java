@@ -95,7 +95,7 @@ public class AddScheduleViewModel extends ViewModel {
         });
     }
 
-    private void loadUserPlants() {
+    public void loadUserPlants() {
         if (userId == null) {
             _errorMessage.postValue("Không có User ID để tải danh sách cây.");
             return;

@@ -23,7 +23,7 @@ public class WeatherRepositoryImpl implements WeatherRepository{
     @Override
     public LiveData<WeatherResponse> getCurrentWeatherLiveData(String cityName, String apiKey, String units, String lang) {
         MutableLiveData<WeatherResponse> data = new MutableLiveData<>();
-        apiService.getCurrentWeather(cityName, apiKey, units, lang)
+        apiService.getCurrentWeatherByCity(cityName, apiKey, units, lang)
                 .enqueue(new Callback<WeatherResponse>() {
                     @Override
                     public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
@@ -40,6 +40,29 @@ public class WeatherRepositoryImpl implements WeatherRepository{
                     public void onFailure(Call<WeatherResponse> call, Throwable throwable) {
                         data.setValue(null); // Hoặc tạo một lớp Result/Resource để chứa cả lỗi
                         Log.e("Repo", "API Failure: " + throwable.getMessage());
+                    }
+                });
+        return data;
+    }
+
+    @Override
+    public LiveData<WeatherResponse> getCurrentWeatherLiveDataByCoordinates(double lat, double lon, String apiKey, String units, String lang) {
+        MutableLiveData<WeatherResponse> data = new MutableLiveData<>();
+        apiService.getCurrentWeatherByCoordinates(lat, lon, apiKey, units, lang)
+                .enqueue(new Callback<WeatherResponse>() {
+                    @Override
+                    public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
+                        if (response.isSuccessful()) {
+                            data.setValue(response.body());
+                        } else {
+                            data.setValue(null);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<WeatherResponse> call, Throwable throwable) {
+                        data.setValue(null);
+                        Log.e("Repo", "API Failure fetching weather data for coordinates " + lat + ", " + lon + ": " + throwable.getMessage(), throwable); // Log lỗi chi tiết
                     }
                 });
         return data;

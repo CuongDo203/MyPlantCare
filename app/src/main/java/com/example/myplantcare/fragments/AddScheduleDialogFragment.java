@@ -22,7 +22,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.myplantcare.R;
@@ -30,7 +29,6 @@ import com.example.myplantcare.models.MyPlantModel;
 import com.example.myplantcare.models.ScheduleModel;
 import com.example.myplantcare.models.TaskModel;
 import com.example.myplantcare.viewmodels.AddScheduleViewModel;
-import com.example.myplantcare.viewmodels.MyPlantListViewModel;
 import com.google.firebase.Timestamp;
 
 import java.text.SimpleDateFormat;
@@ -39,7 +37,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-public class AddScheduleDialogFragment extends DialogFragment {
+public class AddScheduleDialogFragment extends DialogFragment implements AddPlantDialogFragment.OnSavePlantListener{
 
     private Spinner spinnerPlant, spinnerTask, spinnerFrequency;
     private TextView textViewStartDate, textViewStartTime;
@@ -94,7 +92,6 @@ public class AddScheduleDialogFragment extends DialogFragment {
             myPlantId = getArguments().getString("myPlantId");
             userId = getArguments().getString("userId");
         }
-        // TODO: Xử lý trường hợp userId hoặc myPlantId bị null nếu cần (Toast, đóng dialog)
         if (TextUtils.isEmpty(userId)) {
             Toast.makeText(getContext(), "Lỗi: Không có thông tin người dùng.", Toast.LENGTH_SHORT).show();
             dismiss(); // Đóng dialog nếu không có user ID
@@ -107,19 +104,10 @@ public class AddScheduleDialogFragment extends DialogFragment {
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.dialog_add_schedule, null);
         initContents(view);
-
-//        myPlantListViewModel = new ViewModelProvider(requireActivity(), new ViewModelProvider.Factory() {
-//            @NonNull
-//            @Override
-//            public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-//                return (T)new MyPlantListViewModel(userId);
-//            }
-//        }).get(MyPlantListViewModel.class);
         addScheduleViewModel = new ViewModelProvider(this, new AddScheduleViewModel.Factory(userId, myPlantId)).get(AddScheduleViewModel.class);
         setupSpinners();
         setupObservers();
         setupClickListeners();
-
 
         builder.setView(view);
         AlertDialog dialog = builder.create();
@@ -135,16 +123,20 @@ public class AddScheduleDialogFragment extends DialogFragment {
         textViewStartDate.setOnClickListener(v -> showDatePickerDialog());
         textViewStartTime.setOnClickListener(v -> showTimePickerDialog());
         buttonSaveSchedule.setOnClickListener(v -> saveSchedule());
-        buttonAddPlant.setOnClickListener(v -> addPlant());
+        buttonAddPlant.setOnClickListener(v -> showAddPlantDialog());
 
     }
 
     private void setupObservers() {
         addScheduleViewModel.userPlants.observe(this, plants -> {
             if(plants != null) {
+                userPlants = plants;
                 updatePlantSpinner(plants);
             }
-
+            else {
+                userPlants = new ArrayList<>();
+                updatePlantSpinner(new ArrayList<>());
+            }
         });
         addScheduleViewModel.allTasks.observe(this, tasks -> {
             updateTaskSpinner(tasks);
@@ -283,8 +275,24 @@ public class AddScheduleDialogFragment extends DialogFragment {
         spinnerPlant.setAdapter(plantAdapter);
     }
 
-    private void addPlant() {
-        Toast.makeText(requireContext(), "Chức năng thêm cây update sau", Toast.LENGTH_SHORT).show();
+    private void showAddPlantDialog() {
+        //Mở dialog thêm cây
+        if (userId == null || userId.isEmpty()) {
+            Toast.makeText(requireContext(), "Lỗi: Không có thông tin người dùng.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        AddPlantDialogFragment addPlantDialog = AddPlantDialogFragment.newInstance(null, userId);
+        // --- Thiết lập Listener để nhận thông báo khi cây được lưu thành công ---
+        addPlantDialog.setOnSavePlantListener(this); // 'this' là AddScheduleDialogFragment
+        addPlantDialog.show(getParentFragmentManager(), "AddPlantDialog");
+    }
+
+    @Override
+    public void onSavePlant() {
+        // Phương thức này được gọi khi cây được lưu thành công trong AddPlantDialogFragment
+        Log.d("AddScheduleDialogFragment", "onSavePlant() called in AddScheduleDialogFragment. Refreshing plant list.");
+        addScheduleViewModel.loadUserPlants();
+        Toast.makeText(requireContext(), "Danh sách cây đã được làm mới.", Toast.LENGTH_SHORT).show(); // Thông báo tạm
     }
 
     private void saveSchedule() {

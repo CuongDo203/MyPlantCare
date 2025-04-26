@@ -383,6 +383,7 @@ public class ScheduleFragment extends Fragment implements
 
         if (scheduleViewModel != null && currentSelectedDate != null && checkedTasksInGroup != null && !checkedTasksInGroup.isEmpty()) {
             for (ScheduleWithMyPlantInfo task : checkedTasksInGroup) {
+                Log.d(TAG, "Marking task complete: " + task.getTaskName());
                 scheduleViewModel.markScheduleCompleted(task);
             }
             Toast.makeText(getContext(), "Đang đánh dấu hoàn thành các công việc đã chọn...", Toast.LENGTH_SHORT).show();

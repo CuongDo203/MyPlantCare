@@ -1,11 +1,15 @@
 package com.example.myplantcare.viewmodels;
 
+import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.example.myplantcare.data.repositories.ImageRepository;
+import com.example.myplantcare.data.repositories.ImageRepositoryImpl;
 import com.example.myplantcare.data.repositories.TaskLogRepository;
 import com.example.myplantcare.data.repositories.TaskLogRepositoryImpl;
 import com.example.myplantcare.models.TaskLogModel;
@@ -15,6 +19,7 @@ import java.util.List;
 
 public class PlantLogViewModel extends ViewModel {
     private final TaskLogRepository taskLogRepository;
+    private final ImageRepository imageRepository;
     private static final String TAG = "PlantLogViewModel";
     private final MutableLiveData<List<TaskLogModel>> _taskLogs = new MutableLiveData<>();
     public final LiveData<List<TaskLogModel>> taskLogs = _taskLogs;
@@ -27,8 +32,16 @@ public class PlantLogViewModel extends ViewModel {
     private final MutableLiveData<String> _errorMessage = new MutableLiveData<>();
     public final LiveData<String> errorMessage = _errorMessage;
 
-    public PlantLogViewModel() {
+    private final MutableLiveData<Boolean> _isUploadingImage = new MutableLiveData<>(false);
+    public final LiveData<Boolean> isUploadingImage = _isUploadingImage;
+
+    // LiveData cho lỗi upload ảnh (tùy chọn)
+    private final MutableLiveData<String> _imageUploadError = new MutableLiveData<>();
+    public final LiveData<String> imageUploadError = _imageUploadError;
+
+    public PlantLogViewModel(Context context) {
         this.taskLogRepository = new TaskLogRepositoryImpl();
+        this.imageRepository = new ImageRepositoryImpl(context);
     }
 
     public void loadPlantTaskLogs(String userId, String plantId) {
@@ -68,7 +81,59 @@ public class PlantLogViewModel extends ViewModel {
         });
     }
 
+    public void uploadTaskLogImage(String userId, String plantId, String taskLogId, Uri imageUri) {
+        Log.d(TAG, "Attempting to upload image for task log ID: " + taskLogId);
+
+        // Kiểm tra tham số
+        if (taskLogId == null || taskLogId.isEmpty() || imageUri == null) {
+            Log.w(TAG, "uploadTaskLogImage: invalid input. taskLogId or imageUri is null/empty.");
+            _errorMessage.setValue("Lỗi: Thiếu thông tin ảnh hoặc mục lịch sử.");
+            return;
+        }
+
+        _isUploadingImage.setValue(true);
+        _imageUploadError.setValue(null);
+        _errorMessage.setValue(null);
+
+        imageRepository.uploadImage(imageUri, new FirestoreCallback<String>() {
+            @Override
+            public void onSuccess(String imageUrl) {
+                Log.d(TAG, "Image uploaded to Cloudinary successfully. URL: " + imageUrl);
+                taskLogRepository.uploadTaskLogImage(userId, plantId, taskLogId, imageUrl,
+                        new FirestoreCallback<Void>() { // Truyền URL dưới dạng Uri
+                            @Override
+                            public void onSuccess(Void data) {
+                                Log.d(TAG, "Task log document updated with image URL successfully.");
+                                _isUploadingImage.setValue(false); // Kết thúc upload loading
+
+                                loadPlantTaskLogs(userId, plantId);
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                Log.e(TAG, "Error updating task log document with image URL.", e);
+                                _imageUploadError.setValue("Lỗi cập nhật Firestore: " + e.getMessage());
+                                _errorMessage.setValue("Lỗi cập nhật Firestore: " + e.getMessage());
+                                _isUploadingImage.setValue(false);
+                            }
+                        });
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e(TAG, "Error uploading image to Cloudinary.", e);
+                _imageUploadError.setValue("Lỗi tải ảnh lên Cloudinary: " + e.getMessage()); // Lỗi upload Cloudinary
+                _errorMessage.setValue("Lỗi tải ảnh lên Cloudinary: " + e.getMessage()); // Lỗi chung
+                _isUploadingImage.setValue(false); // Kết thúc upload loading
+            }
+        });
+    }
+
     public void clearErrorMessage() {
         _errorMessage.postValue(null);
+    }
+
+    public void clearImageUploadError() {
+        _imageUploadError.setValue(null);
     }
 }

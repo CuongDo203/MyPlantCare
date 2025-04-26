@@ -26,9 +26,15 @@ public class TaskLogAdapter extends RecyclerView.Adapter<TaskLogAdapter.TaskLogV
     private static String TAG = "TaskLogAdapter";
     private List<TaskLogModel> taskLogList;
     private Context context;
-    public TaskLogAdapter(Context context, List<TaskLogModel> taskLogList) {
+    public TaskLogAdapter(Context context, List<TaskLogModel> taskLogList, OnTaskLogImageClickListener listener) {
         this.taskLogList = taskLogList;
         this.context = context;
+        this.listener = listener;
+    }
+
+    private OnTaskLogImageClickListener listener;
+    public interface OnTaskLogImageClickListener {
+        void onTaskLogImageClick(String taskLogId);
     }
 
     @NonNull
@@ -63,18 +69,34 @@ public class TaskLogAdapter extends RecyclerView.Adapter<TaskLogAdapter.TaskLogV
                     break;
             }
         }
-        if(taskLog.getUserPhotoUrl() != null && !taskLog.getUserPhotoUrl().isEmpty()){
-//            holder.imageViewUserPhoto.setVisibility(View.VISIBLE);
+
+        String imageUrl = taskLog.getUserPhotoUrl();
+        if(imageUrl != null && !imageUrl.isEmpty()) {
+            holder.imageViewUserPhoto.setVisibility(View.VISIBLE);
             Glide.with(context)
-                    .load(taskLog.getUserPhotoUrl()) // Tải ảnh từ URL/URI
-                    .placeholder(R.drawable.plant_sample) // Ảnh chờ
-                    .error(R.drawable.ic_photo_error) // Ảnh lỗi
+                    .load(imageUrl)
+                    .placeholder(R.drawable.ic_photo_error)
+                    .error(R.drawable.ic_photo_error)
                     .centerCrop()
                     .into(holder.imageViewUserPhoto);
         }
         else {
-//            holder.imageViewUserPhoto.setVisibility(View.GONE);
-            Glide.with(context).clear(holder.imageViewUserPhoto); // Quan trọng để tránh hiển thị ảnh sai khi cuộn nhanh
+            Glide.with(context)
+                    .load(R.drawable.plant_sample2)
+                    .placeholder(R.drawable.ic_photo_error)
+                    .error(R.drawable.ic_photo_error)
+                    .centerCrop()
+                    .into(holder.imageViewUserPhoto);
+        }
+
+        if (taskLog.getId() != null && listener != null) {
+            holder.imageViewUserPhoto.setOnClickListener(v -> {
+                Log.d(TAG, "Image clicked for task log ID: " + taskLog.getId());
+                listener.onTaskLogImageClick(taskLog.getId()); // Gọi phương thức listener
+            });
+        } else {
+            holder.imageViewUserPhoto.setOnClickListener(null);
+            Log.w(TAG, "Cannot set image click listener for task log: ID is null or listener is null.");
         }
     }
 
@@ -88,6 +110,8 @@ public class TaskLogAdapter extends RecyclerView.Adapter<TaskLogAdapter.TaskLogV
         long days = diff / (24 * 60 * 60 * 1000);
         return days;
     }
+
+
 
     static class TaskLogViewHolder extends RecyclerView.ViewHolder {
         TextView textViewDate, textViewRelativeTime, textViewTaskName;

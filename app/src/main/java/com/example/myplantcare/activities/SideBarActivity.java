@@ -15,10 +15,11 @@ import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-// SideBarActivity.java
 public class SideBarActivity extends AppCompatActivity {
     ImageView ivReturn;
+    LinearLayout itemPlants;
     private FirebaseAuth mAuth;
+    public static final int RESULT_CODE_NAV_TO_PLANTS = 201;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -28,6 +29,8 @@ public class SideBarActivity extends AppCompatActivity {
         // Nút return dùng lại id ivMenu
 
         ivReturn = findViewById(R.id.ivReturn);
+        itemPlants = findViewById(R.id.itemPlants);
+
         ivReturn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -66,6 +69,13 @@ public class SideBarActivity extends AppCompatActivity {
             Toast.makeText(SideBarActivity.this, "Null", Toast.LENGTH_SHORT).show();
         }
 
+        itemPlants.setOnClickListener(v -> {
+            Intent intent = new Intent();
+            setResult(RESULT_CODE_NAV_TO_PLANTS, intent);
+
+            finish();
+            overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right);
+        });
     }
     public void logoutUser() {
 

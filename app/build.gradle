@@ -59,4 +59,5 @@ dependencies {
     implementation ("com.cloudinary:cloudinary-android-download:3.0.2")
     implementation ("com.cloudinary:cloudinary-android-preprocess:3.0.2")
     implementation ("com.airbnb.android:lottie:6.6.6")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
 }

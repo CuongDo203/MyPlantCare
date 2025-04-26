@@ -37,22 +37,23 @@
             tools:text="0 ngày trước" />
 
         <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_marginTop="20dp"
+            android:id="@+id/separator_line"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_marginTop="8dp"
             android:background="@color/gray_text"
-            app:layout_constraintBottom_toBottomOf="@+id/text_view_log_relative_time"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@id/text_view_log_date" />
 
         <ImageView
             android:id="@+id/image_view_log_task_icon"
             android:layout_width="26dp"
             android:layout_height="26dp"
             android:layout_marginTop="8dp"
+            android:contentDescription="Task Icon"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/text_view_log_date"
+            app:layout_constraintTop_toBottomOf="@id/separator_line"
             tools:src="@drawable/ic_tuoi_nuoc" />
 
         <TextView
@@ -73,13 +74,14 @@
             android:layout_width="match_parent"
             android:layout_height="150dp"
             android:layout_marginTop="12dp"
+            android:contentDescription="Task Completion Photo"
             android:scaleType="centerCrop"
-            android:visibility="gone"
+            android:visibility="visible"
+            android:clickable="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/image_view_log_task_icon"
             tools:src="@tools:sample/backgrounds/scenic"
-            tools:visibility="visible" />
+            />
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </com.google.android.material.card.MaterialCardView>

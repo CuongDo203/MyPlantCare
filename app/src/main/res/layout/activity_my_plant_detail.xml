@@ -78,7 +78,7 @@
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:backgroundTint="#EBF8E9"
             app:cardCornerRadius="12dp"
             app:cardElevation="4dp">
@@ -387,7 +387,7 @@
                         android:id="@+id/recycler_view_schedules"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:nestedScrollingEnabled="false"
+                        android:nestedScrollingEnabled="true"
                         tools:listitem="@layout/item_schedule" />
 
                     <View
@@ -434,7 +434,6 @@
                     android:layout_height="20dp" />
 
             </LinearLayout>
-
 
         </com.google.android.material.card.MaterialCardView>
 
