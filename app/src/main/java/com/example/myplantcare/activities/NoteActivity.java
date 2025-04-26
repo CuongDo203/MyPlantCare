@@ -61,14 +61,6 @@ public class NoteActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         loadNotesFromFirestore();
 
-//        etSearchNote = findViewById(R.id.etSearchNote);
-//        etSearchNote.addTextChangedListener(new TextWatcher() {
-//            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-//            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                filterNotes(s.toString());
-//            }
-//            @Override public void afterTextChanged(Editable s) {}
-//        });
 
         etSearchNote = findViewById(R.id.etSearchNote);
 
