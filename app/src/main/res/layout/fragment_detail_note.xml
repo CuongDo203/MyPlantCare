@@ -1,67 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@android:color/white"
-    android:padding="16dp"
     tools:context=".fragments.DetailNoteFragment">
 
-    <!-- Toolbar -->
-    <include layout="@layout/insider_toolbar" />
-
-    <!-- Thông tin ghi chú -->
-    <TextView
-        android:id="@+id/tv_note_title"
+    <!-- Layout chính: thông tin và danh sách -->
+    <LinearLayout
+        android:id="@+id/layout_detail_note"
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        android:padding="16dp">
+
+        <!-- Toolbar -->
+        <include layout="@layout/insider_toolbar" />
+
+        <!-- Thông tin ghi chú -->
+        <TextView
+            android:id="@+id/tv_note_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tiêu đề ghi chú"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#000000"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/tv_note_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ngày tạo"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Nội dung mô tả ghi chú -->
+        <EditText
+            android:id="@+id/tv_note_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nội dung ghi chú"
+            android:textSize="16sp"
+            android:background="@null"
+            android:inputType="textMultiLine"
+            android:minLines="4"
+            android:gravity="top|start"
+            android:visibility="gone" />
+
+        <!-- Danh sách item -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_detail_notes"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:padding="8dp"
+            android:clipToPadding="false"
+            android:scrollbars="vertical"
+            tools:listitem="@layout/item_detail_note"
+            android:contentDescription="@string/note_list_desc" />
+    </LinearLayout>
+
+    <!-- Nút thêm item -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_note_item"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tiêu đề ghi chú"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="#000000"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="4dp" />
-
-    <TextView
-        android:id="@+id/tv_note_date"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Ngày tạo"
-        android:textSize="14sp"
-        android:textColor="#666666"
-        android:layout_marginBottom="8dp" />
-
-<!--    <TextView-->
-<!--        android:id="@+id/tv_note_content"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="Nội dung ghi chú"-->
-<!--        android:textSize="16sp"-->
-<!--        android:textColor="#333333"-->
-<!--        android:layout_marginBottom="12dp" />-->
-
-    <EditText
-        android:id="@+id/tv_note_content"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Nội dung ghi chú"
-        android:textSize="16sp"
-        android:background="@null"
-        android:inputType="textMultiLine"
-        android:minLines="4"
-        android:gravity="top|start"
-        />
-
-    <!-- Danh sách item ghi chú chi tiết -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_detail_notes"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="@drawable/inner_shadow_background"
-        android:padding="8dp"
-        android:clipToPadding="false"
-        android:contentDescription="@string/recycler_note_desc"
-        tools:listitem="@layout/item_detail_note" />
-</LinearLayout>
+        android:layout_gravity="bottom|end"
+        android:layout_margin="20dp"
+        android:contentDescription="Thêm ghi chú"
+        android:src="@drawable/ic_plus"
+        android:tint="@android:color/white"
+        android:backgroundTint="#4CAF50" />
+</FrameLayout>

@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.myplantcare.R;
 import com.example.myplantcare.adapters.DetailNoteAdapter;
 import com.example.myplantcare.models.DetailNote;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -76,37 +77,52 @@ public class DetailNoteActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
+
+        FloatingActionButton fabAddItem = findViewById(R.id.fab_add_note_item);
+        fabAddItem.setOnClickListener(v -> {
+            adapter.addNote(new DetailNote()); // tạo phương thức addNewNoteItem() trong adapter
+            recyclerView.smoothScrollToPosition(adapter.getItemCount() - 1);
+        });
+
+        if (noteId != null) {
+            fetchNoteDetails(noteId);
+        }
+
     }
 
-    private void fetchNoteDetails(String noteId) {
-        db.collection("notes").document(noteId)
-                .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        String title = documentSnapshot.getString("title");
-                        String content = documentSnapshot.getString("content");
-                        Timestamp timestamp = documentSnapshot.getTimestamp("lastUpdated");
-                        String dateStr = null;
+private void fetchNoteDetails(String noteId) {
+    db.collection("notes").document(noteId)
+            .get()
+            .addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists()) {
+                    String title = documentSnapshot.getString("title");
+                    String content = documentSnapshot.getString("content");
+                    Timestamp timestamp = documentSnapshot.getTimestamp("lastUpdated");
+                    String dateStr = null;
 
-                        if (timestamp != null) {
-                            Date date = timestamp.toDate();
-                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                            dateStr = sdf.format(date);
-                        }
-
-
-                        TextView tvNoteTitle = findViewById(R.id.tv_note_title);
-                        TextView tvNoteDate = findViewById(R.id.tv_note_date);
-                        EditText etNoteContent = findViewById(R.id.tv_note_content);
-
-                        tvNoteTitle.setText(title);
-                        tvNoteDate.setText(dateStr);
-                        etNoteContent.setText(content);
+                    if (timestamp != null) {
+                        Date date = timestamp.toDate();
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                        dateStr = sdf.format(date);
                     }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("DetailNoteActivity", "Lỗi khi tải ghi chú: " + e.getMessage());
-                    Toast.makeText(DetailNoteActivity.this, "Lỗi tải dữ liệu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
+
+                    // Set title and date
+                    TextView tvNoteTitle = findViewById(R.id.tv_note_title);
+                    TextView tvNoteDate = findViewById(R.id.tv_note_date);
+                    tvNoteTitle.setText(title);
+                    tvNoteDate.setText(dateStr);
+
+                    // Set content inside recycler item
+                    noteList.clear(); // Xóa phần tử mặc định
+                    DetailNote detailNote = new DetailNote();
+                    detailNote.setNoteText(content); // Gán content từ Firestore
+                    noteList.add(detailNote);
+                    adapter.notifyDataSetChanged(); // Cập nhật lại adapter
+                }
+            })
+            .addOnFailureListener(e -> {
+                Log.e("DetailNoteActivity", "Lỗi khi tải ghi chú: " + e.getMessage());
+                Toast.makeText(DetailNoteActivity.this, "Lỗi tải dữ liệu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
     }
 }

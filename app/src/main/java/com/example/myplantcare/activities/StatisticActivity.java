@@ -1,11 +1,13 @@
 package com.example.myplantcare.activities;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -64,5 +66,6 @@ public class StatisticActivity extends AppCompatActivity {
 
         return new StatisticItem(treeName, chartData);
     }
+
 }
 
