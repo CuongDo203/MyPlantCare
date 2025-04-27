@@ -28,6 +28,7 @@ import com.example.myplantcare.fragments.NoteFragment;
 import com.example.myplantcare.fragments.PlantFragment;
 import com.example.myplantcare.fragments.ScheduleFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 import android.view.View;
 
@@ -39,6 +40,9 @@ public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
+
+    private String userId;
+    private String myPlantId;
     ImageView ivMenu;
 
     private BottomNavigationView bottomNavigationView;
@@ -47,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+//        userId = getIntent().getStringExtra("userId");
+        myPlantId = getIntent().getStringExtra("id");
 
         Toolbar toolbar = findViewById(R.id.topAppBar);
         setSupportActionBar(toolbar);
@@ -81,6 +88,10 @@ public class MainActivity extends AppCompatActivity {
                 fragment = new PlantFragment();
             } else if (itemId == R.id.nav_note) {
                 Intent intent = new Intent(MainActivity.this, NoteActivity.class);
+//                intent.putExtra("userId", userId);
+//                intent.putExtra("id", myPlantsId);  // Nếu là tất cả notes thì myPlantsId = null
+                intent.putExtra("userId", FirebaseAuth.getInstance().getCurrentUser().getUid());
+                intent.putExtra("Id", myPlantId);
                 startActivity(intent);
                 return true;
             }
@@ -122,7 +133,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
 
         // Yêu cầu quyền thông báo Android 13 trở lên
         requestNotificationPermission();
