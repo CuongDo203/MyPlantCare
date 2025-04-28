@@ -1,6 +1,11 @@
 package com.example.myplantcare.activities;
 
+import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -158,6 +163,11 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.Home
             }
         }
 
+
+        // Yêu cầu quyền thông báo Android 13 trở lên
+        requestNotificationPermission();
+        // Tạo kênh thông báo cho app
+        createNotificationChannel();
     }
 
     private void loadFragment(Fragment fragment) {
@@ -176,4 +186,37 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.Home
         }
     }
 
+    private void createNotificationChannel() {
+        // Kiểm tra nếu phiên bản hệ điều hành >= Android 8.0 (API 26)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Kiểm tra kênh thông báo đã tồn tại chưa
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            if (notificationManager != null) {
+                NotificationChannel existingChannel = notificationManager.getNotificationChannel("PLANTAPP_CHANNEL");
+                if (existingChannel == null) {
+                    // Nếu kênh chưa tồn tại, tạo kênh mới
+                    NotificationChannel channel = new NotificationChannel(
+                            "PLANTAPP_CHANNEL",
+                            "Reminder Channel",
+                            NotificationManager.IMPORTANCE_HIGH
+                    );
+                    // Mô tả kênh thông báo (tùy chọn)
+                    channel.setDescription("This channel is used for daily reminders.");
+
+                    // Tạo kênh thông báo
+                    notificationManager.createNotificationChannel(channel);
+                }
+            }
+        }
+    }
+
+
+    private void requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 101);
+            }
+        }
+    }
 }
