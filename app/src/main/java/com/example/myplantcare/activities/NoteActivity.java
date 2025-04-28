@@ -93,7 +93,7 @@ public class NoteActivity extends AppCompatActivity {
         // 👉 Lấy userId và myPlantsId từ Intent
         userId = getIntent().getStringExtra("userId");
         Log.d("NoteActivity", "userId nhận được: " + userId);
-        myPlantId = getIntent().getStringExtra("Id");
+        myPlantId = getIntent().getStringExtra("id");
         Log.d("NoteActivity", "myPlantsId nhận được: " + myPlantId);
 
         if (myPlantId == null) {
@@ -129,7 +129,7 @@ public class NoteActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recyclerViewNotes);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new NoteAdapter(this, new ArrayList<>());
+        adapter = new NoteAdapter(this, new ArrayList<>(), userId, myPlantId);
         recyclerView.setAdapter(adapter);
 
         adapter.setOnItemClickListener(note -> {
@@ -245,6 +245,7 @@ public class NoteActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private void handleRealtimeNoteData(QuerySnapshot snapshots, boolean fromInitialLoad) {
         if (snapshots == null) return;
 
@@ -299,9 +300,6 @@ public class NoteActivity extends AppCompatActivity {
             adapter.notifyDataSetChanged();
         }
     }
-
-
-
 
     private void onAllNotesLoaded() {
         hideLoading();
@@ -393,5 +391,4 @@ public class NoteActivity extends AppCompatActivity {
         }
         super.onDestroy();
     }
-
 }

@@ -52,7 +52,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        userId = getIntent().getStringExtra("userId");
         myPlantId = getIntent().getStringExtra("id");
 
         Toolbar toolbar = findViewById(R.id.topAppBar);

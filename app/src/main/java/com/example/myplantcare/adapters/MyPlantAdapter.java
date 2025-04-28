@@ -21,6 +21,7 @@ import com.example.myplantcare.activities.PlantLogActivity;
 // Import các lớp khác nếu cần cho model hoặc utils
 import com.example.myplantcare.models.MyPlantModel;
 import com.example.myplantcare.utils.DateUtils; // Import DateUtils nếu dùng
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList; // Import ArrayList
 import java.util.List;
@@ -143,8 +144,8 @@ public class MyPlantAdapter extends RecyclerView.Adapter<MyPlantAdapter.MyPlantV
             // Nếu Adapter tự mở Activity, giữ nguyên code dưới đây:
             Log.d(TAG, "Notes clicked for plant ID: " + myPlant.getId());
             Intent intent = new Intent(holder.itemView.getContext(), NoteActivity.class);
-            intent.putExtra("plantName", myPlant.getNickname());
-            intent.putExtra("image", myPlant.getImage());
+//            intent.putExtra("plantName", myPlant.getNickname());
+            intent.putExtra("userId", FirebaseAuth.getInstance().getCurrentUser().getUid());
             intent.putExtra("id", myPlant.getId()); // Dùng ID của MyPlantModel, không phải Plant template ID
             holder.itemView.getContext().startActivity(intent);
         });
