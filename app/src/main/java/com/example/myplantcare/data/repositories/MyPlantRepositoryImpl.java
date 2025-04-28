@@ -17,6 +17,10 @@ import java.util.Map;
 public class MyPlantRepositoryImpl implements MyPlantRepository{
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    public MyPlantRepositoryImpl() {
+    }
+
     @Override
     public void getAllMyPlants(String userId, FirestoreCallback<List<MyPlantModel>> callback) {
         CollectionReference myPLantsRef = db.collection(Constants.USERS_COLLECTION)

@@ -41,7 +41,7 @@ public class PlantLogViewModel extends ViewModel {
 
     public PlantLogViewModel(Context context) {
         this.taskLogRepository = new TaskLogRepositoryImpl();
-        this.imageRepository = new ImageRepositoryImpl(context);
+        this.imageRepository = new ImageRepositoryImpl();
     }
 
     public void loadPlantTaskLogs(String userId, String plantId) {
