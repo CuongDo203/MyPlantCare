@@ -68,12 +68,12 @@ public class DetailNoteFragment extends Fragment {
             String noteDate = bundle.getString("noteDate", "Ngày tạo");
 
             // Ánh xạ các view hiển thị tiêu đề và ngày
-            TextView tvNoteTitle = view.findViewById(R.id.tv_note_title);
+            EditText etNoteTitle = view.findViewById(R.id.et_note_title);
             TextView tvNoteDate = view.findViewById(R.id.tv_note_date);
             EditText etNoteContent = view.findViewById(R.id.tv_note_content);
 
             // Cập nhật nội dung hiển thị
-            tvNoteTitle.setText(noteTitle);
+            etNoteTitle.setText(noteTitle);
             tvNoteDate.setText(noteDate);
             etNoteContent.setText(noteContent);
         }

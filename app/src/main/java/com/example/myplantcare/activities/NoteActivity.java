@@ -8,6 +8,7 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,19 +18,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myplantcare.R;
+import com.example.myplantcare.adapters.MyPlantAdapterForSelectDialog;
 import com.example.myplantcare.adapters.NoteAdapter;
 import com.example.myplantcare.fragments.SelectPlantDialog;
+import com.example.myplantcare.models.MyPlantModel;
 import com.example.myplantcare.models.Note;
 import com.example.myplantcare.models.NoteSectionItem;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -51,6 +56,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 
 public class NoteActivity extends AppCompatActivity {
 
@@ -78,6 +84,8 @@ public class NoteActivity extends AppCompatActivity {
     private String userId;
     private String myPlantId;
 
+    private MyPlantModel selectedPlant;
+
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,15 +102,7 @@ public class NoteActivity extends AppCompatActivity {
         userId = getIntent().getStringExtra("userId");
         Log.d("NoteActivity", "userId nhận được: " + userId);
         myPlantId = getIntent().getStringExtra("id");
-        Log.d("NoteActivity", "myPlantsId nhận được: " + myPlantId);
-
-        if (myPlantId == null) {
-            startListeningToNotes();
-        } else {
-            startListeningToNotes(); // Cả hai đều dùng startListeningToNotes
-        }
-
-
+        Log.d("NoteActivity", "myPlantId nhận được: " + myPlantId);
 
         etSearchNote = findViewById(R.id.etSearchNote);
         etSearchNote.setRawInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
@@ -133,18 +133,17 @@ public class NoteActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         adapter.setOnItemClickListener(note -> {
+            Log.d("NoteActivity", "Clicked noteId=" + note.getId()
+                    + " note.getMyPlantId()=" + note.getMyPlantId());
             Intent intent = new Intent(NoteActivity.this, DetailNoteActivity.class);
+            intent.putExtra("userId", userId);
+            intent.putExtra("id", note.getMyPlantId());
             intent.putExtra("noteId", note.getId());
             startActivity(intent);
         });
 
         Button btnCreateNote = findViewById(R.id.btnCreateNote);
         btnCreateNote.setOnClickListener(v -> showSelectPlantDialog());
-    }
-
-    private void showSelectPlantDialog() {
-        SelectPlantDialog selectPlantDialog = new SelectPlantDialog();
-        selectPlantDialog.show(getSupportFragmentManager(), "SelectPlantDialog");
     }
 
     private void filterNotes(String query) {
@@ -177,110 +176,109 @@ public class NoteActivity extends AppCompatActivity {
             return;
         }
 
-        noteList.clear(); // Xoá cũ để load mới
+        showLoading();
+        noteList.clear();
         totalPlantCount = 0;
         loadedPlantCount = 0;
 
         if (myPlantId != null) {
-            // 👉 Nếu có myPlantId cụ thể
-            notesListener = db.collection("users")
-                    .document(userId)
-                    .collection("my_plants")
-                    .document(myPlantId)
-                    .collection("notes")
-                    .addSnapshotListener((snapshot, e) -> {
-                        if (e != null) {
-                            Log.e("NoteActivity", "Lỗi realtime load notes: " + e.getMessage(), e);
-                            return;
-                        }
-                        handleRealtimeNoteData(snapshot, false);
-                    });
+            // Chỉ cho 1 cây
+            listenNotesForPlant(myPlantId);
         } else {
+            // Lấy tất cả cây
             db.collection("users")
                     .document(userId)
                     .collection("my_plants")
                     .get()
-                    .addOnSuccessListener(queryDocumentSnapshots -> {
-                        totalPlantCount = queryDocumentSnapshots.size();
-                        Log.d("NoteActivity", "Loaded " + totalPlantCount + " plants from Firestore");
+                    .addOnSuccessListener(plantsSnap -> {
+                        totalPlantCount = plantsSnap.size();
                         if (totalPlantCount == 0) {
                             onAllNotesLoaded();
                             return;
                         }
-                        for (QueryDocumentSnapshot plantDoc : queryDocumentSnapshots) {
-                            Log.d("NoteActivity", "Plant ID: " + plantDoc.getId());
-                            final boolean[] firstSnapshotReceived = {false}; // Khởi tạo lại mỗi lần xử lý cây
 
+                        for (DocumentSnapshot plantDoc : plantsSnap) {
+                            String plantId = plantDoc.getId();
+                            final boolean[] first = { false };
                             db.collection("users")
                                     .document(userId)
                                     .collection("my_plants")
-                                    .document(plantDoc.getId())
+                                    .document(plantId)
                                     .collection("notes")
-                                    .addSnapshotListener((snapshot, e) -> {
-                                        if (e != null) {
-                                            Log.e("NoteActivity", "Lỗi realtime load notes for plant " + plantDoc.getId() + ": " + e.getMessage(), e);
-                                            return;
-                                        }
-                                        if (snapshot != null) {
-                                            Log.d("NoteActivity", "Loaded notes for plant " + plantDoc.getId() + ": " + snapshot.size());
-                                            handleRealtimeNoteData(snapshot, false);
-
-                                            // Chỉ lần đầu tiên nhận snapshot mới tăng loadedPlantCount
-                                            if (!firstSnapshotReceived[0]) {
-                                                firstSnapshotReceived[0] = true;
-                                                loadedPlantCount++;
-                                                if (loadedPlantCount == totalPlantCount) {
-                                                    onAllNotesLoaded();
-                                                }
+                                    .addSnapshotListener((snaps, e) -> {
+                                        if (e != null || snaps == null) return;
+                                        // Truyền đúng plantId
+                                        handleRealtimeNoteData(snaps, plantId);
+                                        Log.e("NoteActivity", "plantId in startListeningToNotes: " + plantId);
+                                        // Sau lần snapshot đầu, tăng counter để biết khi nào hết cây
+                                        if (!first[0]) {
+                                            first[0] = true;
+                                            loadedPlantCount++;
+                                            if (loadedPlantCount == totalPlantCount) {
+                                                onAllNotesLoaded();
                                             }
                                         }
                                     });
                         }
                     })
                     .addOnFailureListener(e -> {
-                        Log.e("NoteActivity", "Lỗi khi tải danh sách my_plants: " + e.getMessage(), e);
+                        hideLoading();
                         Toast.makeText(this, "Lỗi tải cây: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
-
         }
     }
 
+    private void listenNotesForPlant(String plantId) {
+        notesListener = db.collection("users")
+                .document(userId)
+                .collection("my_plants")
+                .document(plantId)
+                .collection("notes")
+                .addSnapshotListener((snapshots, e) -> {
+                    if (e != null || snapshots == null) return;
+                    handleRealtimeNoteData(snapshots, plantId);
+                    // Với trường hợp 1 cây, ngay sau snapshot đầu ta coi là load xong
+                    onAllNotesLoaded();
+                });
+    }
+
     @SuppressLint("NotifyDataSetChanged")
-    private void handleRealtimeNoteData(QuerySnapshot snapshots, boolean fromInitialLoad) {
+    private void handleRealtimeNoteData(QuerySnapshot snapshots, String plantId) {
         if (snapshots == null) return;
-
-        boolean dataChanged = false; // 👈 Cờ kiểm tra có thay đổi không
-
-        Log.d("NoteActivity", "Received snapshot with " + snapshots.size() + " documents");
+        boolean dataChanged = false;
 
         for (DocumentChange dc : snapshots.getDocumentChanges()) {
             DocumentSnapshot doc = dc.getDocument();
-            String id = doc.getId();
-            String title = doc.getString("title");
+            String id      = doc.getId();
+            String title   = doc.getString("title");
             String summary = doc.getString("summary");
-            Timestamp timestamp = doc.getTimestamp("lastUpdated");
+            Timestamp ts   = doc.getTimestamp("lastUpdated");
 
-            if (title == null || summary == null || timestamp == null) {
+            if (title == null || summary == null || ts == null) {
                 Log.w("NoteActivity", "Ghi chú thiếu dữ liệu, bỏ qua: " + id);
                 continue;
             }
 
-            LocalDate date = timestamp.toDate().toInstant()
-                    .atZone(ZoneId.systemDefault()).toLocalDate();
-            Note note = new Note(id, title, summary, date);
+            LocalDate date = ts.toDate()
+                    .toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate();
+            // Dùng constructor 4-arg rồi setter, hoặc constructor 5-arg nếu bạn đã thêm
+            Note note = new Note(id, title, summary, date,plantId);
+
+            Log.d("NoteActivity", "handleRealtimeNoteData: noteId=" + id
+                    + " assigned plantId=" + note.getMyPlantId());
 
             switch (dc.getType()) {
                 case ADDED:
                     noteList.add(note);
                     dataChanged = true;
-                    Log.d("NoteActivity", "Added note: " + title);
                     break;
                 case MODIFIED:
                     for (int i = 0; i < noteList.size(); i++) {
                         if (noteList.get(i).getId().equals(id)) {
                             noteList.set(i, note);
                             dataChanged = true;
-                            Log.d("NoteActivity", "Modified note: " + title);
                             break;
                         }
                     }
@@ -288,15 +286,12 @@ public class NoteActivity extends AppCompatActivity {
                 case REMOVED:
                     if (noteList.removeIf(n -> n.getId().equals(id))) {
                         dataChanged = true;
-                        Log.d("NoteActivity", "Removed note: " + title);
                     }
                     break;
             }
         }
 
         if (dataChanged) {
-            Log.d("NoteActivity", "Data changed, updating RecyclerView.");
-            // Notify RecyclerView to refresh
             adapter.notifyDataSetChanged();
         }
     }
@@ -390,5 +385,90 @@ public class NoteActivity extends AppCompatActivity {
             notesListener = null;
         }
         super.onDestroy();
+    }
+
+
+    private void showSelectPlantDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_select_plant, null);
+        builder.setView(dialogView);
+
+        RecyclerView recyclerView = dialogView.findViewById(R.id.recycler_plant_list);
+        Button btnCancel = dialogView.findViewById(R.id.btn_cancel_dialog);
+        Button btnCreate = dialogView.findViewById(R.id.btn_create_note);
+
+        List<MyPlantModel> plantList = new ArrayList<>();
+        MyPlantAdapterForSelectDialog adapter = new MyPlantAdapterForSelectDialog(plantList, plant -> {
+            selectedPlant = plant;
+        });
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
+
+        fetchMyPlants(plantList, adapter);
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        btnCreate.setOnClickListener(v -> {
+            if (selectedPlant != null) {
+                dialog.dismiss();
+                createNoteForPlant(selectedPlant);
+            } else {
+                Toast.makeText(this, "Vui lòng chọn một cây!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // 2. Lấy danh sách cây của tôi
+    private void fetchMyPlants(List<MyPlantModel> plantList, MyPlantAdapterForSelectDialog adapter) {
+        db.collection("users").document(userId)
+                .collection("my_plants")
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    plantList.clear();
+                    for (QueryDocumentSnapshot doc : querySnapshot) {
+                        MyPlantModel plant = doc.toObject(MyPlantModel.class);
+                        plant.setId(doc.getId());
+                        plantList.add(plant);
+                    }
+                    adapter.notifyDataSetChanged();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("NoteActivity", "Lỗi khi lấy danh sách cây: " + e.getMessage());
+                    Toast.makeText(this, "Lỗi tải cây của bạn!", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void createNoteForPlant(MyPlantModel plant) {
+        String noteId = UUID.randomUUID().toString();
+
+        Map<String, Object> noteData = new HashMap<>();
+        noteData.put("title", "Ghi chú mới");
+        noteData.put("content", "");
+        noteData.put("summary", "");                     // Tóm tắt ban đầu rỗng
+        noteData.put("imageUrls", new ArrayList<String>());
+        noteData.put("lastUpdated", FieldValue.serverTimestamp());
+
+        db.collection("users").document(userId)
+                .collection("my_plants").document(plant.getId())
+                .collection("notes").document(noteId)
+                .set(noteData)
+                .addOnSuccessListener(unused -> {
+                    Toast.makeText(this, "Tạo ghi chú thành công!", Toast.LENGTH_SHORT).show();
+
+                    // Optional: mở DetailNoteActivity nếu muốn
+                    Intent intent = new Intent(this, DetailNoteActivity.class);
+                    intent.putExtra("noteId", noteId);
+                    intent.putExtra("id", plant.getId());
+                    intent.putExtra("userId", userId);
+                    startActivity(intent);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("NoteActivity", "Lỗi khi tạo ghi chú: " + e.getMessage());
+                    Toast.makeText(this, "Tạo ghi chú thất bại!", Toast.LENGTH_SHORT).show();
+                });
     }
 }

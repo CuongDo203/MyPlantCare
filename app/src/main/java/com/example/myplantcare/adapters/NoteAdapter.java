@@ -160,6 +160,8 @@ public class NoteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 .document(noteId)
                 .delete()
                 .addOnSuccessListener(aVoid -> {
+
+                    Log.d("deleteNote", "Note deleted successfully: " + noteId);
                     // Xóa ghi chú ở vị trí hiện tại trong danh sách
                     noteSectionItemList.remove(position);
 
@@ -179,6 +181,4 @@ public class NoteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     Toast.makeText(context, "Lỗi xóa ghi chú: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
-
-
 }

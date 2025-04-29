@@ -18,16 +18,19 @@
         <include layout="@layout/insider_toolbar" />
 
         <!-- Thông tin ghi chú -->
-        <TextView
-            android:id="@+id/tv_note_title"
+        <EditText
+            android:id="@+id/et_note_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Tiêu đề ghi chú"
+            android:hint="Tiêu đề ghi chú"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="#000000"
             android:layout_marginTop="8dp"
-            android:layout_marginBottom="4dp" />
+            android:layout_marginBottom="4dp"
+            android:background="@null"
+            android:inputType="textCapSentences" />
+
 
         <TextView
             android:id="@+id/tv_note_date"
@@ -75,4 +78,15 @@
         android:src="@drawable/ic_plus"
         android:tint="@android:color/white"
         android:backgroundTint="#4CAF50" />
+
+    <!-- ProgressBar giữa màn hình -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
 </FrameLayout>
+
