@@ -90,12 +90,14 @@ public class MainActivity extends AppCompatActivity {
 //                intent.putExtra("userId", userId);
 //                intent.putExtra("id", myPlantsId);  // Nếu là tất cả notes thì myPlantsId = null
                 intent.putExtra("userId", FirebaseAuth.getInstance().getCurrentUser().getUid());
-                intent.putExtra("Id", myPlantId);
+                intent.putExtra("id", myPlantId);
                 startActivity(intent);
                 return true;
             }
             else if (itemId == R.id.nav_statics){
                 Intent intent = new Intent(MainActivity.this, StatisticActivity.class);
+                intent.putExtra("userId", FirebaseAuth.getInstance().getCurrentUser().getUid());
+                intent.putExtra("id", myPlantId);
                 startActivity(intent);
                 return true;
             }

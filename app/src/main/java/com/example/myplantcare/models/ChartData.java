@@ -4,28 +4,19 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class ChartData implements Parcelable {
-    private float xValue;
+    private int xValue;
     private float yValue;
+    private String label;
 
-    public ChartData(float xValue, float yValue) {
+    public ChartData(int xValue, float yValue,String label) {
         this.xValue = xValue;
         this.yValue = yValue;
+        this.label = label;
     }
 
     protected ChartData(Parcel in) {
-        xValue = in.readFloat();
+        xValue = in.readInt();
         yValue = in.readFloat();
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeFloat(xValue);
-        dest.writeFloat(yValue);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
     }
 
     public static final Creator<ChartData> CREATOR = new Creator<ChartData>() {
@@ -33,18 +24,25 @@ public class ChartData implements Parcelable {
         public ChartData createFromParcel(Parcel in) {
             return new ChartData(in);
         }
-
         @Override
         public ChartData[] newArray(int size) {
             return new ChartData[size];
         }
     };
 
-    public float getXValue() {
-        return xValue;
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
-    public float getYValue() {
-        return yValue;
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(xValue);
+        dest.writeFloat(yValue);
     }
+
+    // getters
+    public int getXValue() { return xValue; }
+    public float getYValue() { return yValue; }
+    public String getLabel() { return label != null ? label : ""; }
 }
