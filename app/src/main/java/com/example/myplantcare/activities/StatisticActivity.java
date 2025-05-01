@@ -114,13 +114,6 @@ public class StatisticActivity extends AppCompatActivity {
                         List<Map<String, Object>> rawHeights =
                                 (List<Map<String, Object>>) growthDoc.get("heights");
                         List<ChartData> heightsData = new ArrayList<>();
-//                        if (rawHeights != null) {
-//                            for (int i = 0; i < rawHeights.size(); i++) {
-//                                Map<String, Object> e = rawHeights.get(i);
-//                                Number h = (Number) e.get("height");
-//                                if (h != null) heightsData.add(new ChartData(i, h.floatValue()));
-//                            }
-//                        }
                         if (rawHeights != null) {
                             for (int i = 0; i < rawHeights.size(); i++) {
                                 Map<String, Object> e = rawHeights.get(i);
@@ -130,7 +123,10 @@ public class StatisticActivity extends AppCompatActivity {
                                         ? new SimpleDateFormat("dd/MM").format(ts.toDate())
                                         : "N/A";
 
-                                if (h != null) heightsData.add(new ChartData(i, h.floatValue(), label));
+                                //if (h != null) heightsData.add(new ChartData(i, h.floatValue(), label));
+                                if (h != null && ts != null) {
+                                    heightsData.add(new ChartData(ts.toDate(), h.floatValue(), label));
+                                }
                             }
                         }
 
@@ -138,13 +134,6 @@ public class StatisticActivity extends AppCompatActivity {
                         List<Map<String, Object>> rawLeaf =
                                 (List<Map<String, Object>>) growthDoc.get("leaf");
                         List<ChartData> leafData = new ArrayList<>();
-//                        if (rawLeaf != null) {
-//                            for (int i = 0; i < rawLeaf.size(); i++) {
-//                                Map<String, Object> e = rawLeaf.get(i);
-//                                Number n = (Number) e.get("number_of_leaf");
-//                                if (n != null) leafData.add(new ChartData(i, n.floatValue()));
-//                            }
-//                        }
                         if (rawLeaf != null) {
                             for (int i = 0; i < rawLeaf.size(); i++) {
                                 Map<String, Object> e = rawLeaf.get(i);
@@ -154,7 +143,10 @@ public class StatisticActivity extends AppCompatActivity {
                                         ? new SimpleDateFormat("dd/MM").format(ts.toDate())
                                         : "N/A";
 
-                                if (n != null) leafData.add(new ChartData(i, n.floatValue(), label));
+                                if (n != null && ts != null) {
+                                    leafData.add(new ChartData(ts.toDate(), n.floatValue(), label));
+                                }
+
                             }
                         }
 
@@ -162,13 +154,6 @@ public class StatisticActivity extends AppCompatActivity {
                         List<Map<String, Object>> rawFlower =
                                 (List<Map<String, Object>>) growthDoc.get("flower");
                         List<ChartData> flowerData = new ArrayList<>();
-//                        if (rawFlower != null) {
-//                            for (int i = 0; i < rawFlower.size(); i++) {
-//                                Map<String, Object> e = rawFlower.get(i);
-//                                Number n = (Number) e.get("number_of_flower");
-//                                if (n != null) flowerData.add(new ChartData(i, n.floatValue()));
-//                            }
-//                        }
                         if (rawFlower != null) {
                             for (int i = 0; i < rawFlower.size(); i++) {
                                 Map<String, Object> e = rawFlower.get(i);
@@ -178,7 +163,9 @@ public class StatisticActivity extends AppCompatActivity {
                                         ? new SimpleDateFormat("dd/MM").format(ts.toDate())
                                         : "N/A";
 
-                                if (n != null) flowerData.add(new ChartData(i, n.floatValue(), label));
+                                if (n != null && ts != null) {
+                                    flowerData.add(new ChartData(ts.toDate(), n.floatValue(), label));
+                                }
                             }
                         }
 
@@ -186,13 +173,6 @@ public class StatisticActivity extends AppCompatActivity {
                         List<Map<String, Object>> rawFruit =
                                 (List<Map<String, Object>>) growthDoc.get("fruit");
                         List<ChartData> fruitData = new ArrayList<>();
-//                        if (rawFruit != null) {
-//                            for (int i = 0; i < rawFruit.size(); i++) {
-//                                Map<String, Object> e = rawFruit.get(i);
-//                                Number n = (Number) e.get("number_of_fruit");
-//                                if (n != null) fruitData.add(new ChartData(i, n.floatValue()));
-//                            }
-//                        }
                         if (rawFruit != null) {
                             for (int i = 0; i < rawFruit.size(); i++) {
                                 Map<String, Object> e = rawFruit.get(i);
@@ -202,7 +182,9 @@ public class StatisticActivity extends AppCompatActivity {
                                         ? new SimpleDateFormat("dd/MM").format(ts.toDate())
                                         : "N/A";
 
-                                if (n != null) fruitData.add(new ChartData(i, n.floatValue(), label));
+                                if (n != null && ts != null) {
+                                    fruitData.add(new ChartData(ts.toDate(), n.floatValue(), label));
+                                }
                             }
                         }
 
@@ -221,4 +203,3 @@ public class StatisticActivity extends AppCompatActivity {
                 });
     }
 }
-

@@ -3,20 +3,24 @@ package com.example.myplantcare.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Date;
+
 public class ChartData implements Parcelable {
-    private int xValue;
+    private Date date;
     private float yValue;
     private String label;
 
-    public ChartData(int xValue, float yValue,String label) {
-        this.xValue = xValue;
+    public ChartData(Date date, float yValue, String label) {
+        this.date = date;
         this.yValue = yValue;
         this.label = label;
     }
 
     protected ChartData(Parcel in) {
-        xValue = in.readInt();
-        yValue = in.readFloat();
+        long timeMillis = in.readLong();
+        this.date = new Date(timeMillis);
+        this.yValue = in.readFloat();
+        this.label = in.readString();
     }
 
     public static final Creator<ChartData> CREATOR = new Creator<ChartData>() {
@@ -24,6 +28,7 @@ public class ChartData implements Parcelable {
         public ChartData createFromParcel(Parcel in) {
             return new ChartData(in);
         }
+
         @Override
         public ChartData[] newArray(int size) {
             return new ChartData[size];
@@ -31,18 +36,27 @@ public class ChartData implements Parcelable {
     };
 
     @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(date.getTime());
+        dest.writeFloat(yValue);
+        dest.writeString(label);
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(xValue);
-        dest.writeFloat(yValue);
+    // Getters
+    public Date getDate() {
+        return date;
     }
 
-    // getters
-    public int getXValue() { return xValue; }
-    public float getYValue() { return yValue; }
-    public String getLabel() { return label != null ? label : ""; }
+    public float getYValue() {
+        return yValue;
+    }
+
+    public String getLabel() {
+        return label != null ? label : "";
+    }
 }
