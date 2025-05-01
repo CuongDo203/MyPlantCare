@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     tools:context=".fragments.DetailNoteFragment">
 
-    <!-- Layout chính: thông tin và danh sách -->
     <LinearLayout
         android:id="@+id/layout_detail_note"
         android:layout_width="match_parent"
@@ -14,10 +13,8 @@
         android:background="@android:color/white"
         android:padding="16dp">
 
-        <!-- Toolbar -->
         <include layout="@layout/insider_toolbar" />
 
-        <!-- Thông tin ghi chú -->
         <EditText
             android:id="@+id/et_note_title"
             android:layout_width="match_parent"
@@ -29,7 +26,11 @@
             android:layout_marginTop="8dp"
             android:layout_marginBottom="4dp"
             android:background="@null"
-            android:inputType="textCapSentences" />
+            android:inputType="textCapSentences"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp" />
 
 
         <TextView
@@ -41,7 +42,6 @@
             android:textColor="#666666"
             android:layout_marginBottom="8dp" />
 
-        <!-- Nội dung mô tả ghi chú -->
         <EditText
             android:id="@+id/tv_note_content"
             android:layout_width="match_parent"
@@ -54,7 +54,6 @@
             android:gravity="top|start"
             android:visibility="gone" />
 
-        <!-- Danh sách item -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler_detail_notes"
             android:layout_width="match_parent"
@@ -67,7 +66,6 @@
             android:contentDescription="@string/note_list_desc" />
     </LinearLayout>
 
-    <!-- Nút thêm item -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_note_item"
         android:layout_width="wrap_content"
@@ -79,7 +77,6 @@
         android:tint="@android:color/white"
         android:backgroundTint="#4CAF50" />
 
-    <!-- ProgressBar giữa màn hình -->
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleLarge"
@@ -89,4 +86,3 @@
         android:visibility="gone" />
 
 </FrameLayout>
-

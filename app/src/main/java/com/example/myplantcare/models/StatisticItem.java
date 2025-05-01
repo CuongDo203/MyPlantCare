@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StatisticItem implements Parcelable {
+    private String plantId;
     private String treeName;
     private List<ChartData> heights;
     private List<ChartData> leaf;
@@ -14,11 +15,12 @@ public class StatisticItem implements Parcelable {
     private List<ChartData> fruit;
 
 
-    public StatisticItem(String treeName,
+    public StatisticItem(String plantId,String treeName,
                          List<ChartData> heights,
                          List<ChartData> leaf,
                          List<ChartData> flower,
                          List<ChartData> fruit) {
+        this.plantId   = plantId;
         this.treeName = treeName;
         this.heights  = heights;
         this.leaf     = leaf;
@@ -27,6 +29,7 @@ public class StatisticItem implements Parcelable {
     }
 
     protected StatisticItem(Parcel in) {
+        plantId = in.readString();
         treeName = in.readString();
         heights  = in.createTypedArrayList(ChartData.CREATOR);
         leaf     = in.createTypedArrayList(ChartData.CREATOR);
@@ -51,6 +54,7 @@ public class StatisticItem implements Parcelable {
     }
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(plantId);
         dest.writeString(treeName);
         dest.writeTypedList(heights);
         dest.writeTypedList(leaf);
@@ -58,10 +62,15 @@ public class StatisticItem implements Parcelable {
         dest.writeTypedList(fruit);
     }
 
+
     // getters
     public String getTreeName() { return treeName; }
     public List<ChartData> getHeights() { return heights; }
     public List<ChartData> getLeaf() { return leaf; }
     public List<ChartData> getFlower() { return flower; }
     public List<ChartData> getFruit() { return fruit; }
+
+
+    public String getPlantId() {return plantId;}
+
 }

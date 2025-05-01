@@ -3,6 +3,7 @@ package com.example.myplantcare.activities;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -58,6 +59,7 @@ public class StatisticActivity extends AppCompatActivity {
 
         // Nhận myPlantId (có thể null)
         myPlantId = getIntent().getStringExtra("id");
+        Log.d("StatisticActivity", "myPlantId nhận được: " + myPlantId);
 
         // RecyclerView + Adapter
         recyclerViewStatistics = findViewById(R.id.recyclerViewStatistics);
@@ -65,7 +67,7 @@ public class StatisticActivity extends AppCompatActivity {
         statisticList = new ArrayList<>();
         adapter = new StatisticAdapter(this, statisticList, item -> {
             Intent intent = new Intent(StatisticActivity.this, DetailStatisticActivity.class);
-            // Truyền Parcelable StatisticItem (không cast sang Serializable)
+            intent.putExtra("id", item.getPlantId());
             intent.putExtra("statisticItem", item);
             startActivity(intent);
         });
@@ -190,6 +192,7 @@ public class StatisticActivity extends AppCompatActivity {
 
                         // Tạo StatisticItem với đủ 4 loại dữ liệu
                         StatisticItem item = new StatisticItem(
+                                plantId,
                                 plantName,
                                 heightsData,
                                 leafData,

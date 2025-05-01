@@ -110,6 +110,7 @@ public class StatisticAdapter extends RecyclerView.Adapter<StatisticAdapter.Stat
                     return sdf.format(new Date((long) value));
                 }
             });
+            xAxis.setEnabled(false);
 
             // Y axis
             YAxis yAxis = lineChart.getAxisLeft();
