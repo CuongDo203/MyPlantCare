@@ -109,23 +109,18 @@ public class StatisticActivity extends AppCompatActivity {
                 .collection("my_plants")
                 .document(plantId)
                 .collection("Growth")
+                .document(plantId)  // lấy đúng 1 document có id trùng plantId
                 .get()
-                .addOnSuccessListener(queryGrowth -> {
-                    for (QueryDocumentSnapshot growthDoc : queryGrowth) {
+                .addOnSuccessListener(growthDoc -> {
+                    if (growthDoc.exists()) {
                         // --- heights ---
-                        List<Map<String, Object>> rawHeights =
-                                (List<Map<String, Object>>) growthDoc.get("heights");
+                        List<Map<String, Object>> rawHeights = (List<Map<String, Object>>) growthDoc.get("heights");
                         List<ChartData> heightsData = new ArrayList<>();
                         if (rawHeights != null) {
-                            for (int i = 0; i < rawHeights.size(); i++) {
-                                Map<String, Object> e = rawHeights.get(i);
+                            for (Map<String, Object> e : rawHeights) {
                                 Number h = (Number) e.get("height");
                                 Timestamp ts = (Timestamp) e.get("date");
-                                String label = ts != null
-                                        ? new SimpleDateFormat("dd/MM").format(ts.toDate())
-                                        : "N/A";
-
-                                //if (h != null) heightsData.add(new ChartData(i, h.floatValue(), label));
+                                String label = ts != null ? new SimpleDateFormat("dd/MM").format(ts.toDate()) : "N/A";
                                 if (h != null && ts != null) {
                                     heightsData.add(new ChartData(ts.toDate(), h.floatValue(), label));
                                 }
@@ -133,38 +128,27 @@ public class StatisticActivity extends AppCompatActivity {
                         }
 
                         // --- leaf ---
-                        List<Map<String, Object>> rawLeaf =
-                                (List<Map<String, Object>>) growthDoc.get("leaf");
+                        List<Map<String, Object>> rawLeaf = (List<Map<String, Object>>) growthDoc.get("leaf");
                         List<ChartData> leafData = new ArrayList<>();
                         if (rawLeaf != null) {
-                            for (int i = 0; i < rawLeaf.size(); i++) {
-                                Map<String, Object> e = rawLeaf.get(i);
+                            for (Map<String, Object> e : rawLeaf) {
                                 Number n = (Number) e.get("number_of_leaf");
                                 Timestamp ts = (Timestamp) e.get("date");
-                                String label = ts != null
-                                        ? new SimpleDateFormat("dd/MM").format(ts.toDate())
-                                        : "N/A";
-
+                                String label = ts != null ? new SimpleDateFormat("dd/MM").format(ts.toDate()) : "N/A";
                                 if (n != null && ts != null) {
                                     leafData.add(new ChartData(ts.toDate(), n.floatValue(), label));
                                 }
-
                             }
                         }
 
                         // --- flower ---
-                        List<Map<String, Object>> rawFlower =
-                                (List<Map<String, Object>>) growthDoc.get("flower");
+                        List<Map<String, Object>> rawFlower = (List<Map<String, Object>>) growthDoc.get("flower");
                         List<ChartData> flowerData = new ArrayList<>();
                         if (rawFlower != null) {
-                            for (int i = 0; i < rawFlower.size(); i++) {
-                                Map<String, Object> e = rawFlower.get(i);
+                            for (Map<String, Object> e : rawFlower) {
                                 Number n = (Number) e.get("number_of_flower");
                                 Timestamp ts = (Timestamp) e.get("date");
-                                String label = ts != null
-                                        ? new SimpleDateFormat("dd/MM").format(ts.toDate())
-                                        : "N/A";
-
+                                String label = ts != null ? new SimpleDateFormat("dd/MM").format(ts.toDate()) : "N/A";
                                 if (n != null && ts != null) {
                                     flowerData.add(new ChartData(ts.toDate(), n.floatValue(), label));
                                 }
@@ -172,25 +156,20 @@ public class StatisticActivity extends AppCompatActivity {
                         }
 
                         // --- fruit ---
-                        List<Map<String, Object>> rawFruit =
-                                (List<Map<String, Object>>) growthDoc.get("fruit");
+                        List<Map<String, Object>> rawFruit = (List<Map<String, Object>>) growthDoc.get("fruit");
                         List<ChartData> fruitData = new ArrayList<>();
                         if (rawFruit != null) {
-                            for (int i = 0; i < rawFruit.size(); i++) {
-                                Map<String, Object> e = rawFruit.get(i);
+                            for (Map<String, Object> e : rawFruit) {
                                 Number n = (Number) e.get("number_of_fruit");
                                 Timestamp ts = (Timestamp) e.get("date");
-                                @SuppressLint("SimpleDateFormat") String label = ts != null
-                                        ? new SimpleDateFormat("dd/MM").format(ts.toDate())
-                                        : "N/A";
-
+                                String label = ts != null ? new SimpleDateFormat("dd/MM").format(ts.toDate()) : "N/A";
                                 if (n != null && ts != null) {
                                     fruitData.add(new ChartData(ts.toDate(), n.floatValue(), label));
                                 }
                             }
                         }
 
-                        // Tạo StatisticItem với đủ 4 loại dữ liệu
+                        // Add item
                         StatisticItem item = new StatisticItem(
                                 plantId,
                                 plantName,
@@ -199,10 +178,11 @@ public class StatisticActivity extends AppCompatActivity {
                                 flowerData,
                                 fruitData
                         );
-
                         statisticList.add(item);
+                        adapter.notifyDataSetChanged();
+                    } else {
+                        Log.w("GrowthData", "No growth data for plantId: " + plantId);
                     }
-                    adapter.notifyDataSetChanged();
                 });
     }
 }

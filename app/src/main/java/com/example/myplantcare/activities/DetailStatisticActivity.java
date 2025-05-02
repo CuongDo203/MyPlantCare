@@ -1,5 +1,6 @@
 package com.example.myplantcare.activities;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.graphics.Color;
 import android.util.Log;
@@ -26,7 +27,10 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,7 +41,6 @@ import java.util.Locale;
 import java.util.Map;
 
 public class DetailStatisticActivity extends AppCompatActivity {
-
     private static final String TAG = "DetailStatisticAct";
 
     private LineChart chartHeights, chartOthers;
@@ -47,7 +50,9 @@ public class DetailStatisticActivity extends AppCompatActivity {
     private String plantId;
     private String userId;
     private FirebaseFirestore db;
+    private DocumentReference growthRef;
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,17 +64,12 @@ public class DetailStatisticActivity extends AppCompatActivity {
         toolbarBackButton = toolbar.findViewById(R.id.toolbar_back_button);
         toolbarBackButton.setOnClickListener(v -> finish());
 
-        // Firebase
+        // Firebase init
         db = FirebaseFirestore.getInstance();
         userId = FirebaseAuth.getInstance().getUid();
-        plantId = getIntent().getStringExtra("id"); // phải truyền "id" trong Intent
-        Log.d("DetailStatisticActivity", "myPlantId nhận được: " + plantId);
+        plantId = getIntent().getStringExtra("id");
+        Log.d("DetailStatisticActivity","plantId nhận được là" + plantId);
 
-        // Charts
-        chartHeights = findViewById(R.id.lineChartHeights);
-        chartOthers  = findViewById(R.id.lineChartOthers);
-
-        // Lấy StatisticItem
         StatisticItem item = getIntent().getParcelableExtra("statisticItem");
         if (item == null) {
             Log.e(TAG, "Không nhận được StatisticItem");
@@ -77,32 +77,86 @@ public class DetailStatisticActivity extends AppCompatActivity {
         }
         toolbarTitle.setText("Thống kê " + item.getTreeName());
 
-        // --- Chart Chiều cao ---
-        List<Entry> entriesH = new ArrayList<>();
-        for (ChartData d : item.getHeights()) {
-            entriesH.add(new Entry(
-                    d.getDate().getTime(),
-                    d.getYValue()
-            ));
-        }
-        setupTimeLineChart(chartHeights, entriesH, "Chiều cao (cm)");
+        // Reference to fixed Growth doc
+        growthRef = db.collection("users")
+                .document(userId)
+                .collection("my_plants")
+                .document(plantId)
+                .collection("Growth")
+                .document(plantId);
 
-        // --- Chart Lá / Hoa / Quả ---
-        // Mảng List<ChartData>[] truyền vào đúng kiểu List
-        @SuppressWarnings("unchecked")
-        List<ChartData>[] others = new List[]{
-                item.getLeaf(),
-                item.getFlower(),
-                item.getFruit()
-        };
-        setupTimeLineMultiChart(chartOthers,
-                new String[]{"Lá", "Hoa", "Quả"},
-                others
-        );
+        // Charts
+        chartHeights = findViewById(R.id.lineChartHeights);
+        chartOthers  = findViewById(R.id.lineChartOthers);
 
-        // --- FAB thêm thông số ---
+        // FAB to add
         FloatingActionButton fab = findViewById(R.id.fab_add_growth);
         fab.setOnClickListener(v -> showAddDialog());
+
+        fetchAndRedraw();
+    }
+
+    private void fetchAndRedraw() {
+        growthRef.get()
+                .addOnSuccessListener(doc -> {
+                    if (!doc.exists()) return;
+
+                    // Parse heights
+                    List<ChartData> heightsData = new ArrayList<>();
+                    List<Map<String, Object>> rawHeights = (List<Map<String, Object>>) doc.get("heights");
+                    if (rawHeights != null) {
+                        for (Map<String, Object> e : rawHeights) {
+                            Timestamp ts = (Timestamp) e.get("date");
+                            Number val = (Number) e.get("height");
+                            if (ts != null && val != null) {
+                                String label = new SimpleDateFormat("dd/MM", Locale.getDefault())
+                                        .format(ts.toDate());
+                                heightsData.add(new ChartData(ts.toDate(), val.floatValue(), label));
+                            }
+                        }
+                    }
+
+                    // Parse others
+                    List<ChartData> leafData = parseArrayField(doc, "leaf", "number_of_leaf");
+                    List<ChartData> flowerData = parseArrayField(doc, "flower", "number_of_flower");
+                    List<ChartData> fruitData = parseArrayField(doc, "fruit", "number_of_fruit");
+
+                    // Draw heights chart
+                    List<Entry> entriesH = new ArrayList<>();
+                    for (ChartData d : heightsData) {
+                        entriesH.add(new Entry(d.getDate().getTime(), d.getYValue()));
+                    }
+                    setupTimeLineChart(chartHeights, entriesH, "Chiều cao (cm)");
+
+                    // Draw others chart
+                    @SuppressWarnings("unchecked")
+                    List<ChartData>[] otherLists = new List[]{leafData, flowerData, fruitData};
+                    setupTimeLineMultiChart(chartOthers, new String[]{"Lá", "Hoa", "Quả"}, otherLists);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Fetch growth failed", e);
+                    Toast.makeText(this, "Không tải được dữ liệu", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private List<ChartData> parseArrayField(
+            com.google.firebase.firestore.DocumentSnapshot doc,
+            String fieldName,
+            String valueKey) {
+        List<ChartData> listData = new ArrayList<>();
+        List<Map<String, Object>> raw = (List<Map<String, Object>>) doc.get(fieldName);
+        if (raw != null) {
+            for (Map<String, Object> e : raw) {
+                Timestamp ts = (Timestamp) e.get("date");
+                Number val = (Number) e.get(valueKey);
+                if (ts != null && val != null) {
+                    String label = new SimpleDateFormat("dd/MM", Locale.getDefault())
+                            .format(ts.toDate());
+                    listData.add(new ChartData(ts.toDate(), val.floatValue(), label));
+                }
+            }
+        }
+        return listData;
     }
 
     private void setupTimeLineChart(LineChart chart, List<Entry> entries, String label) {
@@ -124,12 +178,10 @@ public class DetailStatisticActivity extends AppCompatActivity {
 
         XAxis x = chart.getXAxis();
         x.setPosition(XAxis.XAxisPosition.BOTTOM);
-        x.setGranularity(24 * 60 * 60 * 1000f); // 1 ngày = 86400000 ms
+        x.setGranularity(24 * 60 * 60 * 1000f);
         x.setValueFormatter(new ValueFormatter() {
-            private final SimpleDateFormat sdf =
-                    new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            @Override
-            public String getFormattedValue(float value) {
+            private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            @Override public String getFormattedValue(float value) {
                 return sdf.format(new Date((long) value));
             }
         });
@@ -138,8 +190,7 @@ public class DetailStatisticActivity extends AppCompatActivity {
 
         YAxis y = chart.getAxisLeft();
         y.setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
+            @Override public String getFormattedValue(float value) {
                 return String.valueOf((int) value);
             }
         });
@@ -150,17 +201,14 @@ public class DetailStatisticActivity extends AppCompatActivity {
 
     private void setupTimeLineMultiChart(LineChart chart, String[] titles, List<ChartData>[] dataLists) {
         LineData data = new LineData();
-        int[] colors = new int[]{ Color.MAGENTA, Color.YELLOW, Color.CYAN };
+        int[] colors = new int[]{Color.MAGENTA, Color.YELLOW, Color.CYAN};
 
         for (int i = 0; i < titles.length; i++) {
             List<Entry> entries = new ArrayList<>();
             List<ChartData> list = dataLists[i];
             if (list != null) {
                 for (ChartData d : list) {
-                    entries.add(new Entry(
-                            d.getDate().getTime(),
-                            d.getYValue()
-                    ));
+                    entries.add(new Entry(d.getDate().getTime(), d.getYValue()));
                 }
             }
             LineDataSet ds = new LineDataSet(entries, titles[i]);
@@ -179,10 +227,8 @@ public class DetailStatisticActivity extends AppCompatActivity {
         x.setPosition(XAxis.XAxisPosition.BOTTOM);
         x.setGranularity(24 * 60 * 60 * 1000f);
         x.setValueFormatter(new ValueFormatter() {
-            private final SimpleDateFormat sdf =
-                    new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            @Override
-            public String getFormattedValue(float value) {
+            private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            @Override public String getFormattedValue(float value) {
                 return sdf.format(new Date((long) value));
             }
         });
@@ -191,8 +237,7 @@ public class DetailStatisticActivity extends AppCompatActivity {
 
         YAxis y = chart.getAxisLeft();
         y.setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
+            @Override public String getFormattedValue(float value) {
                 return String.valueOf((int) value);
             }
         });
@@ -209,7 +254,6 @@ public class DetailStatisticActivity extends AppCompatActivity {
         TextInputEditText etFruit  = view.findViewById(R.id.etFruit);
         TextView tvDate            = view.findViewById(R.id.tvDate);
 
-        // Hiển thị ngày giờ hiện tại
         Date now = new Date();
         tvDate.setText(new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(now));
 
@@ -222,24 +266,42 @@ public class DetailStatisticActivity extends AppCompatActivity {
                     String flStr = etFlower.getText().toString().trim();
                     String frStr = etFruit.getText().toString().trim();
 
-                    Map<String, Object> payload = new HashMap<>();
-                    payload.put("date", Timestamp.now());
-                    if (!hStr.isEmpty())  payload.put("height", Double.parseDouble(hStr));
-                    if (!lfStr.isEmpty()) payload.put("number_of_leaf", Integer.parseInt(lfStr));
-                    if (!flStr.isEmpty()) payload.put("number_of_flower", Integer.parseInt(flStr));
-                    if (!frStr.isEmpty()) payload.put("number_of_fruit", Integer.parseInt(frStr));
+                    Map<String, Object> updates = new HashMap<>();
+                    Timestamp nowTs = Timestamp.now();
 
-                    db.collection("users")
-                            .document(userId)
-                            .collection("my_plants")
-                            .document(plantId)
-                            .collection("Growth")
-                            .add(payload)
-                            .addOnSuccessListener(ref -> {
+                    if (!hStr.isEmpty()) {
+                        Map<String, Object> heightEntry = new HashMap<>();
+                        heightEntry.put("date", nowTs);
+                        heightEntry.put("height", Double.parseDouble(hStr));
+                        updates.put("heights", FieldValue.arrayUnion(heightEntry));
+                    }
+                    if (!lfStr.isEmpty()) {
+                        Map<String, Object> leafEntry = new HashMap<>();
+                        leafEntry.put("date", nowTs);
+                        leafEntry.put("number_of_leaf", Integer.parseInt(lfStr));
+                        updates.put("leaf", FieldValue.arrayUnion(leafEntry));
+                    }
+                    if (!flStr.isEmpty()) {
+                        Map<String, Object> flowerEntry = new HashMap<>();
+                        flowerEntry.put("date", nowTs);
+                        flowerEntry.put("number_of_flower", Integer.parseInt(flStr));
+                        updates.put("flower", FieldValue.arrayUnion(flowerEntry));
+                    }
+                    if (!frStr.isEmpty()) {
+                        Map<String, Object> fruitEntry = new HashMap<>();
+                        fruitEntry.put("date", nowTs);
+                        fruitEntry.put("number_of_fruit", Integer.parseInt(frStr));
+                        updates.put("fruit", FieldValue.arrayUnion(fruitEntry));
+                    }
+
+                    growthRef.set(updates, SetOptions.merge())
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d(TAG, "Firestore merge OK – các mảng đã được cập nhật");
                                 Toast.makeText(this, "Đã thêm thành công!", Toast.LENGTH_SHORT).show();
-                                recreate(); // load lại toàn bộ activity để fetch + redraw
+                                fetchAndRedraw();
                             })
                             .addOnFailureListener(e -> {
+                                Log.e(TAG, "Firestore merge lỗi", e);
                                 Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                             });
                 })
@@ -247,6 +309,5 @@ public class DetailStatisticActivity extends AppCompatActivity {
                 .show();
     }
 }
-
 
 
