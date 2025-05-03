@@ -23,7 +23,6 @@ public class NotificationActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private NotificationAdapter adapter;
     private FirebaseFirestore db;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,10 +38,8 @@ public class NotificationActivity extends AppCompatActivity {
         });
         recyclerView.setAdapter(adapter);
 
-
         Button clear = findViewById(R.id.clear_button_notification);
         clear.setOnClickListener(v -> showDeleteConfirmationDialog());
-
         ImageView image = findViewById(R.id.arrow_back_notification);
         image.setOnClickListener(v -> {
             Intent i = new Intent(NotificationActivity.this, MainActivity.class);
