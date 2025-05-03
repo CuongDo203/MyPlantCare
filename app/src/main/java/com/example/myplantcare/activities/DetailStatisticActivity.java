@@ -166,8 +166,8 @@ public class DetailStatisticActivity extends AppCompatActivity {
             return;
         }
         LineDataSet ds = new LineDataSet(entries, label);
-        ds.setColor(Color.GREEN);
-        ds.setCircleColor(Color.GREEN);
+        ds.setColor(0xFF74542E); // doi mau
+        ds.setCircleColor(0xFF74542E); // doi mau
         ds.setLineWidth(2f);
         ds.setCircleRadius(4f);
 
@@ -178,6 +178,7 @@ public class DetailStatisticActivity extends AppCompatActivity {
 
         XAxis x = chart.getXAxis();
         x.setPosition(XAxis.XAxisPosition.BOTTOM);
+        x.setTextColor(Color.BLACK); //them moi
         x.setGranularity(24 * 60 * 60 * 1000f);
         x.setValueFormatter(new ValueFormatter() {
             private final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
@@ -189,6 +190,7 @@ public class DetailStatisticActivity extends AppCompatActivity {
         x.setDrawGridLines(false);
 
         YAxis y = chart.getAxisLeft();
+        y.setTextColor(Color.BLACK); //them moi
         y.setValueFormatter(new ValueFormatter() {
             @Override public String getFormattedValue(float value) {
                 return String.valueOf((int) value);
@@ -201,7 +203,7 @@ public class DetailStatisticActivity extends AppCompatActivity {
 
     private void setupTimeLineMultiChart(LineChart chart, String[] titles, List<ChartData>[] dataLists) {
         LineData data = new LineData();
-        int[] colors = new int[]{Color.MAGENTA, Color.YELLOW, Color.CYAN};
+        int[] colors = new int[]{0xFF31E331, 0xFFDC6EC2, 0xFFDBE72E};
 
         for (int i = 0; i < titles.length; i++) {
             List<Entry> entries = new ArrayList<>();

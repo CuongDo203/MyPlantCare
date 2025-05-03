@@ -1,5 +1,6 @@
 package com.example.myplantcare.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
@@ -36,7 +37,7 @@ public class StatisticAdapter extends RecyclerView.Adapter<StatisticAdapter.Stat
     }
 
     private final Context context;
-    private final List<StatisticItem> statisticList;
+    private List<StatisticItem> statisticList;
     private final OnItemClickListener listener;
 
     public StatisticAdapter(Context context, List<StatisticItem> statisticList, OnItemClickListener listener) {
@@ -87,10 +88,10 @@ public class StatisticAdapter extends RecyclerView.Adapter<StatisticAdapter.Stat
 
             // Configure DataSet
             LineDataSet dataSet = new LineDataSet(entries, "Chiều cao theo ngày");
-            dataSet.setColor(Color.GREEN);
+            dataSet.setColor(0xFF74542E);
             dataSet.setLineWidth(2f);
             dataSet.setCircleRadius(4f);
-            dataSet.setCircleColor(Color.GREEN);
+            dataSet.setCircleColor(0xFF74542E);
             dataSet.setValueTextColor(Color.BLACK);
             dataSet.setDrawValues(false);
 
@@ -99,6 +100,9 @@ public class StatisticAdapter extends RecyclerView.Adapter<StatisticAdapter.Stat
 
             // XAxis as date
             XAxis xAxis = lineChart.getXAxis();
+            xAxis.setAxisLineColor(0xff000000); //
+            xAxis.setDrawGridLines(true);
+            xAxis.setTextColor(0xff000000);
             xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
             xAxis.setDrawGridLines(false);
             xAxis.setGranularity(24 * 60 * 60 * 1000f);
@@ -114,6 +118,10 @@ public class StatisticAdapter extends RecyclerView.Adapter<StatisticAdapter.Stat
 
             // Y axis
             YAxis yAxis = lineChart.getAxisLeft();
+            yAxis.setAxisLineColor(0xff000000);
+            yAxis.setGridColor(0xFF666666);
+            yAxis.setDrawGridLines(true);
+            yAxis.setTextColor(0xff000000);
             yAxis.setTextColor(Color.DKGRAY);
             yAxis.setTextSize(12f);
             yAxis.setValueFormatter(new ValueFormatter() {
@@ -133,6 +141,13 @@ public class StatisticAdapter extends RecyclerView.Adapter<StatisticAdapter.Stat
 
             itemView.setOnClickListener(v -> listener.onItemClick(item));
         }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void updateList(List<StatisticItem> newList) {
+        this.statisticList.clear();
+        this.statisticList.addAll(newList);
+        notifyDataSetChanged();
     }
 }
 

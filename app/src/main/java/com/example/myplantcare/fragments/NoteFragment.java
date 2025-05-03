@@ -75,7 +75,7 @@ public class NoteFragment extends Fragment {
         adapter.setOnItemClickListener(note -> {
             Bundle bundle = new Bundle();
             bundle.putString("noteTitle", note.getTitle());
-            bundle.putString("noteContent", note.getContent());
+            //bundle.putString("noteContent", note.getContent());
             bundle.putString("noteDate", note.getDate().toString());
 
             DetailNoteFragment detailFragment = new DetailNoteFragment();
@@ -124,7 +124,7 @@ public class NoteFragment extends Fragment {
         for (Note note : originalNoteList) {
             String formattedDate = note.getDate().format(formatter);
             if (note.getTitle().toLowerCase().contains(lowerCaseQuery) ||
-                    note.getContent().toLowerCase().contains(lowerCaseQuery) ||
+                    //ote.getContent().toLowerCase().contains(lowerCaseQuery) ||
                     formattedDate.toLowerCase().contains(lowerCaseQuery)) {
                 filteredNoteList.add(note);
             }

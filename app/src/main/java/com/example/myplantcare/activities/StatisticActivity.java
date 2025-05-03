@@ -25,6 +25,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
+
+import java.text.Normalizer;
+import java.util.regex.Pattern;
+
+
 /** @noinspection unchecked*/
 public class StatisticActivity extends AppCompatActivity {
 
@@ -71,6 +79,22 @@ public class StatisticActivity extends AppCompatActivity {
             intent.putExtra("statisticItem", item);
             startActivity(intent);
         });
+
+        EditText searchEditText = findViewById(R.id.etSearchStatistic);
+
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                filterStatistics(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+
         recyclerViewStatistics.setAdapter(adapter);
 
         // Bắt đầu load dữ liệu
@@ -113,7 +137,6 @@ public class StatisticActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(growthDoc -> {
                     if (growthDoc.exists()) {
-                        // --- heights ---
                         List<Map<String, Object>> rawHeights = (List<Map<String, Object>>) growthDoc.get("heights");
                         List<ChartData> heightsData = new ArrayList<>();
                         if (rawHeights != null) {
@@ -185,4 +208,25 @@ public class StatisticActivity extends AppCompatActivity {
                     }
                 });
     }
+
+    private void filterStatistics(String query) {
+        String q = removeAccents(query).toLowerCase().trim();
+        List<StatisticItem> filteredList = new ArrayList<>();
+        for (StatisticItem item : statisticList) {
+            // giả sử getter trả về tên cây:
+            String name = item.getTreeName();
+            String nameNorm = removeAccents(name).toLowerCase();
+            if (nameNorm.contains(q)) {
+                filteredList.add(item);
+            }
+        }
+        adapter.updateList(filteredList);
+    }
+
+    private String removeAccents(String s) {
+        String normalized = Normalizer.normalize(s, Normalizer.Form.NFD);
+        // loại bỏ các ký tự thuộc nhóm Mark (dấu)
+        return normalized.replaceAll("\\p{M}", "");
+    }
+
 }

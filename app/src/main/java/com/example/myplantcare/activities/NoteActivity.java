@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
-import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,7 +16,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -26,37 +24,33 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.myplantcare.R;
 import com.example.myplantcare.adapters.MyPlantAdapterForSelectDialog;
 import com.example.myplantcare.adapters.NoteAdapter;
-import com.example.myplantcare.fragments.SelectPlantDialog;
+import com.example.myplantcare.models.DetailNote;
 import com.example.myplantcare.models.MyPlantModel;
 import com.example.myplantcare.models.Note;
 import com.example.myplantcare.models.NoteSectionItem;
 import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
+
+import java.text.Normalizer;
+
 
 public class NoteActivity extends AppCompatActivity {
 
@@ -129,7 +123,7 @@ public class NoteActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recyclerViewNotes);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new NoteAdapter(this, new ArrayList<>(), userId, myPlantId);
+        adapter = new NoteAdapter(this, new ArrayList<>(), userId);
         recyclerView.setAdapter(adapter);
 
         adapter.setOnItemClickListener(note -> {
@@ -147,28 +141,46 @@ public class NoteActivity extends AppCompatActivity {
     }
 
     private void filterNotes(String query) {
-        filteredNoteList.clear();
-        String lowerCaseQuery = query.toLowerCase().trim();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        // 1. Chuẩn hoá query
+        String q = stripAccents(query).toLowerCase().trim();
 
-        if (TextUtils.isEmpty(lowerCaseQuery)) {
-            List<NoteSectionItem> allNotes = categorizeNotes(originalNoteList);
-            adapter.setNotes(allNotes);
+        // 2. Nếu query rỗng thì show tất cả
+        if (q.isEmpty()) {
+            adapter.setNotes(categorizeNotes(originalNoteList));
             return;
         }
 
+        filteredNoteList.clear();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
         for (Note note : originalNoteList) {
-            String formattedDate = note.getDate().format(formatter);
-            if (note.getTitle().toLowerCase().contains(lowerCaseQuery) ||
-                    note.getContent().toLowerCase().contains(lowerCaseQuery) ||
-                    formattedDate.toLowerCase().contains(lowerCaseQuery)) {
+            // 3. Normalize title và date
+            String titleNorm = stripAccents(note.getTitle()).toLowerCase();
+            String dateStr   = note.getDate().format(formatter);
+            String dateNorm  = stripAccents(dateStr).toLowerCase();
+
+            // 4. Build một chuỗi chứa tất cả text trong content
+            StringBuilder sb = new StringBuilder();
+            for (DetailNote item : note.getContent()) {
+                sb.append(item.getText()).append(" ");
+            }
+            String contentAll = sb.toString().trim();
+            String contentNorm = stripAccents(contentAll).toLowerCase();
+
+            // 5. So sánh query với title, content hoặc date
+            if (titleNorm.contains(q)
+                    || contentNorm.contains(q)
+                    || dateNorm.contains(q)) {
                 filteredNoteList.add(note);
             }
         }
 
+        // 6. Chuyển thành sections và cập nhật adapter
         List<NoteSectionItem> filteredSections = categorizeNotes(filteredNoteList);
         adapter.setNotes(filteredSections);
     }
+
+
 
     private void startListeningToNotes() {
         if (userId == null) {
@@ -241,7 +253,6 @@ public class NoteActivity extends AppCompatActivity {
                     onAllNotesLoaded();
                 });
     }
-
     @SuppressLint("NotifyDataSetChanged")
     private void handleRealtimeNoteData(QuerySnapshot snapshots, String plantId) {
         if (snapshots == null) return;
@@ -249,26 +260,46 @@ public class NoteActivity extends AppCompatActivity {
 
         for (DocumentChange dc : snapshots.getDocumentChanges()) {
             DocumentSnapshot doc = dc.getDocument();
-            String id      = doc.getId();
-            String title   = doc.getString("title");
-            String summary = doc.getString("summary");
-            Timestamp ts   = doc.getTimestamp("lastUpdated");
+            String id    = doc.getId();
+            String title = doc.getString("title");
+            Timestamp ts = doc.getTimestamp("lastUpdated");
 
-            if (title == null || summary == null || ts == null) {
+            if (title == null || ts == null) {
                 Log.w("NoteActivity", "Ghi chú thiếu dữ liệu, bỏ qua: " + id);
                 continue;
             }
 
+            // 1) Chuyển timestamp → LocalDate
             LocalDate date = ts.toDate()
                     .toInstant()
                     .atZone(ZoneId.systemDefault())
                     .toLocalDate();
-            // Dùng constructor 4-arg rồi setter, hoặc constructor 5-arg nếu bạn đã thêm
-            Note note = new Note(id, title, summary, date,plantId);
 
-            Log.d("NoteActivity", "handleRealtimeNoteData: noteId=" + id
-                    + " assigned plantId=" + note.getMyPlantId());
+            // 2) Đọc List<Map> từ Firestore
+            Object rawContent = doc.get("content");
+            List<DetailNote> content = new ArrayList<>();
 
+            if (rawContent instanceof List) {
+                // Schema mới: content là List<Map<String,Object>>
+                @SuppressWarnings("unchecked")
+                List<Map<String,Object>> rawItems = (List<Map<String,Object>>) rawContent;
+                for (Map<String,Object> m : rawItems) {
+                    String text     = m.get("text")     != null ? m.get("text").toString()     : "";
+                    String imageUrl = m.get("imageUrl") != null ? m.get("imageUrl").toString() : "";
+                    content.add(new DetailNote(text, imageUrl));
+                }
+            } else if (rawContent instanceof String) {
+                // Fallback schema cũ: content chỉ là một String
+                String oldText = (String) rawContent;
+                content.add(new DetailNote(oldText, ""));
+            }
+            // else: cả hai null hoặc loại khác, content = empty list
+
+
+            // 3) Tạo Note với constructor mới
+            Note note = new Note(id, title, content, date, plantId);
+
+            // 4) Xử lý DocumentChange
             switch (dc.getType()) {
                 case ADDED:
                     noteList.add(note);
@@ -423,6 +454,7 @@ public class NoteActivity extends AppCompatActivity {
     }
 
     // 2. Lấy danh sách cây của tôi
+    @SuppressLint("NotifyDataSetChanged")
     private void fetchMyPlants(List<MyPlantModel> plantList, MyPlantAdapterForSelectDialog adapter) {
         db.collection("users").document(userId)
                 .collection("my_plants")
@@ -445,30 +477,44 @@ public class NoteActivity extends AppCompatActivity {
     private void createNoteForPlant(MyPlantModel plant) {
         String noteId = UUID.randomUUID().toString();
 
+        // 1) Khởi tạo list items rỗng
+        List<Map<String, Object>> items = new ArrayList<>();
+        // Nếu muốn khởi sẵn một dòng blank:
+        Map<String, Object> blank = new HashMap<>();
+        blank.put("text", "");
+        blank.put("imageUrl", "");
+        items.add(blank);
+
+        // 2) Chuẩn bị data để set()
         Map<String, Object> noteData = new HashMap<>();
-        noteData.put("title", "Ghi chú mới");
-        noteData.put("content", "");
-        noteData.put("summary", "");                     // Tóm tắt ban đầu rỗng
-        noteData.put("imageUrls", new ArrayList<String>());
+        noteData.put("title", "Tiêu đề");              // đặt title rỗng, người dùng chỉnh sau
+        noteData.put("summary", "");            // summary có thể lấy từ items.get(0).text
+        noteData.put("content", items);           // đây là mảng map mới
         noteData.put("lastUpdated", FieldValue.serverTimestamp());
 
+        // 3) Viết lên Firestore
         db.collection("users").document(userId)
                 .collection("my_plants").document(plant.getId())
                 .collection("notes").document(noteId)
                 .set(noteData)
                 .addOnSuccessListener(unused -> {
                     Toast.makeText(this, "Tạo ghi chú thành công!", Toast.LENGTH_SHORT).show();
-
-                    // Optional: mở DetailNoteActivity nếu muốn
+                    // Mở DetailNoteActivity ngay để người dùng bắt đầu nhập
                     Intent intent = new Intent(this, DetailNoteActivity.class);
-                    intent.putExtra("noteId", noteId);
-                    intent.putExtra("id", plant.getId());
-                    intent.putExtra("userId", userId);
+                    intent.putExtra("userId",  userId);
+                    intent.putExtra("id",      plant.getId());
+                    intent.putExtra("noteId",  noteId);
                     startActivity(intent);
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("NoteActivity", "Lỗi khi tạo ghi chú: " + e.getMessage());
+                    Log.e("NoteActivity", "Lỗi khi tạo ghi chú: " + e.getMessage(), e);
                     Toast.makeText(this, "Tạo ghi chú thất bại!", Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    private String stripAccents(String s) {
+        String normalized = Normalizer.normalize(s, Normalizer.Form.NFD);
+        // Xoá hết các ký tự dấu (Mark)
+        return normalized.replaceAll("\\p{M}", "");
     }
 }

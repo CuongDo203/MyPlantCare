@@ -33,7 +33,7 @@ public class DetailNoteFragment extends Fragment {
     private final ActivityResultLauncher<String> imagePickerLauncher =
             registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
                 if (uri != null && selectedPosition != -1) {
-                    noteList.get(selectedPosition).setImageUri(uri);
+                    //noteList.get(selectedPosition).setImageUri(uri);
                     adapter.notifyItemChanged(selectedPosition);
                 }
             });

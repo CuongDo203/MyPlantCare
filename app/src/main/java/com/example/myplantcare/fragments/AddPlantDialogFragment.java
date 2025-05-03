@@ -43,8 +43,16 @@ import com.google.firebase.Timestamp; // Import Timestamp
 
 import java.io.File; // Có thể vẫn cần nếu bạn dùng FileUtils ở đâu đó khác
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.firestore.DocumentReference;
+
 
 public class AddPlantDialogFragment extends DialogFragment {
     private static final String TAG = "AddPlantDialogFragment"; // Sử dụng TAG nhất quán
@@ -66,6 +74,7 @@ public class AddPlantDialogFragment extends DialogFragment {
     private ActivityResultLauncher<Intent> imagePickerLauncher;
 
     private String userId;
+    private String myPlantId;
 
     public static AddPlantDialogFragment newInstance(String myPlantId, String userId) { // Thêm userId
         AddPlantDialogFragment fragment = new AddPlantDialogFragment();
@@ -90,11 +99,14 @@ public class AddPlantDialogFragment extends DialogFragment {
 
     }
 
+
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             userId = getArguments().getString("user_id");
+            myPlantId = getArguments().getString("my_plant_id");
         }
         // Đăng ký launcher để xử lý kết quả chọn ảnh
         imagePickerLauncher = registerForActivityResult(
@@ -230,26 +242,65 @@ public class AddPlantDialogFragment extends DialogFragment {
         showLoading(true); // Bắt đầu hiển thị trạng thái tải
 
         // Tạo callback xử lý kết quả lưu Firestore (chung cho cả 2 trường hợp có/không ảnh)
+//        FirestoreCallback<Void> saveToFirestoreCallback = new FirestoreCallback<Void>() {
+//            @Override
+//            public void onSuccess(Void data) {
+//                Log.d(TAG, "Plant saved to Firestore successfully.");
+//                Toast.makeText(requireContext(), "Cây đã được lưu", Toast.LENGTH_SHORT).show();
+//                showLoading(false); // Ẩn loading
+//                // Gọi listener nếu được gán
+//                if (onSavePlantListener != null) {
+//                    onSavePlantListener.onSavePlant();
+//                }
+//                dismiss(); // Đóng dialog
+//            }
+//
+//            @Override
+//            public void onError(Exception e) {
+//                Log.e(TAG, "Error saving plant to Firestore: " + e.getMessage(), e);
+//                Toast.makeText(requireContext(), "Lỗi khi lưu cây: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+//                showLoading(false); // Ẩn loading
+//            }
+//        };
         FirestoreCallback<Void> saveToFirestoreCallback = new FirestoreCallback<Void>() {
             @Override
             public void onSuccess(Void data) {
                 Log.d(TAG, "Plant saved to Firestore successfully.");
                 Toast.makeText(requireContext(), "Cây đã được lưu", Toast.LENGTH_SHORT).show();
-                showLoading(false); // Ẩn loading
-                // Gọi listener nếu được gán
+                showLoading(false);
+
+                // Tạo luôn document Growth/{myPlantId}
+                DocumentReference growthRef = FirebaseFirestore.getInstance()
+                        .collection("users")
+                        .document(userId)
+                        .collection("my_plants")
+                        .document(myPlantId)
+                        .collection("Growth")
+                        .document(myPlantId);
+
+                Map<String,Object> empty = new HashMap<>();
+                empty.put("heights", new ArrayList<>());
+                empty.put("leaf",    new ArrayList<>());
+                empty.put("flower",  new ArrayList<>());
+                empty.put("fruit",   new ArrayList<>());
+                growthRef.set(empty, SetOptions.merge())
+                        .addOnSuccessListener(__ -> Log.d(TAG, "Growth doc created"))
+                        .addOnFailureListener(e -> Log.e(TAG, "Error creating Growth doc", e));
+
                 if (onSavePlantListener != null) {
                     onSavePlantListener.onSavePlant();
                 }
-                dismiss(); // Đóng dialog
+                dismiss();
             }
 
             @Override
             public void onError(Exception e) {
                 Log.e(TAG, "Error saving plant to Firestore: " + e.getMessage(), e);
                 Toast.makeText(requireContext(), "Lỗi khi lưu cây: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                showLoading(false); // Ẩn loading
+                showLoading(false);
             }
         };
+
 
 
         if(selectedImageUri != null) {
