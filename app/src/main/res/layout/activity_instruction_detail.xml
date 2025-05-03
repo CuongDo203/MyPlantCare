@@ -1,0 +1,75 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:id="@+id/scheduleContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingBottom="8dp">
+            <!-- Back icon (placeholder) -->
+            <ImageView
+                android:id="@+id/arrow_back_instruction_detail"
+                android:layout_width="wrap_content"
+                android:layout_height="16dp"
+                android:src="@drawable/arrow_notification" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/logo"
+                    android:layout_marginBottom="4dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="PlantCare"
+                    android:textColor="#007F5F"
+                    android:textStyle="bold"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <!-- Placeholder for right space -->
+            <View
+                android:layout_width="24dp"
+                android:layout_height="24dp" />
+        </LinearLayout>
+        <!-- Ghi chú -->
+        <TextView
+            android:id="@+id/noteTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#00425A"
+            android:textSize="16sp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone"/>
+
+        <!-- Tiêu đề danh sách lịch trình (ẩn mặc định) -->
+        <TextView
+            android:id="@+id/scheduleTitleTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📋 Lịch trình chăm sóc cây trưởng thành"
+            android:textColor="#00425A"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:visibility="gone"
+            android:layout_marginBottom="12dp" />
+
+    </LinearLayout>
+</ScrollView>

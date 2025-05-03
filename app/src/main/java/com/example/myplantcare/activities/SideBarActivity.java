@@ -63,7 +63,15 @@ public class SideBarActivity extends AppCompatActivity {
         else {
             Toast.makeText(SideBarActivity.this, "Null", Toast.LENGTH_SHORT).show();
         }
-
+        LinearLayout btnCareInstruction = findViewById(R.id.itemGuide);
+        btnCareInstruction.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent();
+                i.setClass(SideBarActivity.this, CareInstructionActivity.class);
+                startActivity(i);
+            }
+        });
     }
     public void logoutUser() {
 
@@ -168,6 +176,8 @@ public class SideBarActivity extends AppCompatActivity {
             Toast.makeText(SideBarActivity.this, "Đăng xuất bị hủy", Toast.LENGTH_SHORT).show();
             dialog.dismiss();
         });
+
+
 
     }
 }
