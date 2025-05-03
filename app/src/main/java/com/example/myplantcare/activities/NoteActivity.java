@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.Button;
@@ -25,17 +27,14 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -62,13 +61,33 @@ public class NoteActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         loadNotesFromFirestore();
 
+//        etSearchNote = findViewById(R.id.etSearchNote);
+//        etSearchNote.addTextChangedListener(new TextWatcher() {
+//            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+//            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                filterNotes(s.toString());
+//            }
+//            @Override public void afterTextChanged(Editable s) {}
+//        });
+
         etSearchNote = findViewById(R.id.etSearchNote);
+
+        // Cho phép nhập cả chữ có dấu và số
+        etSearchNote.setRawInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+
         etSearchNote.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filterNotes(s.toString());
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Sử dụng trim() để loại bỏ khoảng trắng dư
+                String query = s.toString().trim();
+                filterNotes(query);
             }
-            @Override public void afterTextChanged(Editable s) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {}
         });
 
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.insider_toolbar);
@@ -97,11 +116,17 @@ public class NoteActivity extends AppCompatActivity {
         selectPlantDialog.show(getSupportFragmentManager(), "SelectPlantDialog");
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     private void filterNotes(String query) {
         filteredNoteList.clear();
         String lowerCaseQuery = query.toLowerCase().trim();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        // Nếu không có từ khóa lọc, hiển thị tất cả
+        if (TextUtils.isEmpty(lowerCaseQuery)) {
+            List<NoteSectionItem> allNotes = categorizeNotes(originalNoteList);
+            adapter.setNotes(allNotes);
+            return;
+        }
 
         for (Note note : originalNoteList) {
             String formattedDate = note.getDate().format(formatter);
@@ -112,8 +137,8 @@ public class NoteActivity extends AppCompatActivity {
             }
         }
 
-        List<NoteSectionItem> filteredNoteSectionList = categorizeNotes(filteredNoteList);
-        adapter.setNotes(filteredNoteSectionList);
+        List<NoteSectionItem> filteredSections = categorizeNotes(filteredNoteList);
+        adapter.setNotes(filteredSections);
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -131,17 +156,10 @@ public class NoteActivity extends AppCompatActivity {
                         String title = doc.getString("title");
                         String summary = doc.getString("summary");
                         Timestamp timestamp = doc.getTimestamp("lastUpdated");
-                        String dateStr = null;
 
-                        if (timestamp != null) {
-                            Date date = timestamp.toDate();
-                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                            dateStr = sdf.format(date);
-                        }
-
-                        if (title != null && summary != null && dateStr != null) {
-                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                            LocalDate date = LocalDate.parse(dateStr, formatter);
+                        if (title != null && summary != null && timestamp != null) {
+                            LocalDate date = timestamp.toDate().toInstant()
+                                    .atZone(ZoneId.systemDefault()).toLocalDate();
                             Note note = new Note(doc.getId(), title, summary, date);
                             noteList.add(note);
                         } else {
@@ -162,42 +180,41 @@ public class NoteActivity extends AppCompatActivity {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private List<NoteSectionItem> categorizeNotes(List<Note> noteList) {
-
+    private List<NoteSectionItem> categorizeNotes(List<Note> notes) {
         Map<String, List<Note>> groupedNotes = new HashMap<>();
-
-
-        for (Note note : noteList) {
+        for (Note note : notes) {
             String section = getDateSection(note.getDate());
             groupedNotes.computeIfAbsent(section, k -> new ArrayList<>()).add(note);
         }
-
 
         List<String> sectionOrder = new ArrayList<>();
         sectionOrder.add("7 ngày trước");
         sectionOrder.add("30 ngày trước");
 
-
-        Set<String> remainingSections = new TreeSet<>((a, b) -> Integer.parseInt(b) - Integer.parseInt(a));
+        // Nhóm theo năm giảm dần
+        Set<String> remainingYears = new TreeSet<>((a, b) -> Integer.parseInt(b) - Integer.parseInt(a));
         for (String key : groupedNotes.keySet()) {
             if (!sectionOrder.contains(key)) {
-                remainingSections.add(key);
+                remainingYears.add(key);
             }
         }
-        sectionOrder.addAll(remainingSections);
+        sectionOrder.addAll(remainingYears);
 
-
-        List<NoteSectionItem> noteSectionItems = new ArrayList<>();
+        List<NoteSectionItem> sectionItems = new ArrayList<>();
         for (String section : sectionOrder) {
-            noteSectionItems.add(new NoteSectionItem(section));
-            for (Note note : groupedNotes.get(section)) {
-                noteSectionItems.add(new NoteSectionItem(note)); 
+            sectionItems.add(new NoteSectionItem(section));  // Header
+            List<Note> noteGroup = groupedNotes.get(section);
+            if (noteGroup != null) {
+                // Sắp xếp ghi chú trong nhóm theo ngày giảm dần
+                noteGroup.sort((n1, n2) -> n2.getDate().compareTo(n1.getDate()));
+                for (Note note : noteGroup) {
+                    sectionItems.add(new NoteSectionItem(note));  // Item
+                }
             }
         }
 
-        return noteSectionItems;
+        return sectionItems;
     }
-
 
     private String getDateSection(LocalDate date) {
         LocalDate today = LocalDate.now();
@@ -207,10 +224,9 @@ public class NoteActivity extends AppCompatActivity {
             return "7 ngày trước";
         } else if (daysBetween <= 30) {
             return "30 ngày trước";
-        } else if (date.getYear() == today.getYear()) {
-            return String.valueOf(date.getYear());
         } else {
             return String.valueOf(date.getYear());
         }
     }
+
 }

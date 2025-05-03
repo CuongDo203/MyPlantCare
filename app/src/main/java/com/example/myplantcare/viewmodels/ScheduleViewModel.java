@@ -108,7 +108,7 @@ public class ScheduleViewModel extends ViewModel {
         _isMarkingUnmarking.setValue(true); // Bật trạng thái loading cho thao tác
 
         // Gọi Repository để thêm task log
-        scheduleRepository.markScheduleCompleted(userId, scheduleItem.getMyPlant().getId(), scheduleItem.getSchedule().getId(), currentLoadedDate, new FirestoreCallback<Void>() {
+        scheduleRepository.markScheduleCompleted(userId, scheduleItem.getMyPlant().getId(), scheduleItem.getSchedule().getId(),scheduleItem.getTaskName(), currentLoadedDate, new FirestoreCallback<Void>() {
             @Override
             public void onSuccess(Void result) {
                 _isMarkingUnmarking.postValue(false); // Tắt loading

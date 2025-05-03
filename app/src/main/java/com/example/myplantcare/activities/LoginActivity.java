@@ -25,9 +25,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private TextView txtRegisterNow;
     private ImageView ivTogglePassword;
     private boolean isPasswordVisible = false;
-
     private TextView btnForgetPassword;
-    // Firebase Authentication instance
     private FirebaseAuth mAuth;
     FirebaseFirestore db;
     @Override

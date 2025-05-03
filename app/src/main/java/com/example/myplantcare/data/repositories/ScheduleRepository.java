@@ -21,6 +21,6 @@ public interface ScheduleRepository {
                                           FirestoreCallback<Pair<Map<String, List<ScheduleWithMyPlantInfo>>,
                                                   Map<String, List<ScheduleWithMyPlantInfo>>>> callback);
 
-    void markScheduleCompleted(String userId, String myPlantId, String scheduleId, Calendar date, FirestoreCallback<Void> callback);
+    void markScheduleCompleted(String userId, String myPlantId, String scheduleId,String taskName, Calendar date, FirestoreCallback<Void> callback);
     void unmarkScheduleCompleted(String userId, String myPlantId, String scheduleId, Calendar date, FirestoreCallback<Void> callback);
 }

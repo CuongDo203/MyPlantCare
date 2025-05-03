@@ -91,7 +91,7 @@ public class HomeViewModel extends ViewModel {
                 + task.getMyPlant().getId() + " on date: " + todayZeroTime.getTime());
 
         // Call the repository method to mark the task completed
-        scheduleRepository.markScheduleCompleted(userId, task.getMyPlant().getId(), task.getSchedule().getId(), todayZeroTime, new FirestoreCallback<Void>() {
+        scheduleRepository.markScheduleCompleted(userId, task.getMyPlant().getId(), task.getSchedule().getId(), task.getTaskName(), todayZeroTime, new FirestoreCallback<Void>() {
             @Override
             public void onSuccess(Void result) {
                 Log.d(TAG, "Task marked completed successfully: " + task.getSchedule().getId());
