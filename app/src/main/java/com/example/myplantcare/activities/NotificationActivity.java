@@ -103,7 +103,6 @@ public class NotificationActivity extends AppCompatActivity {
                     }
                 });
     }
-
 private void fetchNotificationsByUserId(String userId) {
     // Truy vấn đến subcollection "notifications" của user với userId
     db.collection("users") // Collection cha "users"

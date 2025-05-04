@@ -149,6 +149,7 @@ public class SideBarActivity extends AppCompatActivity {
         if (user != null) {
             // Để thay đổi mật khẩu, bạn cần phải xác thực mật khẩu cũ
             // Đầu tiên, bạn phải tái đăng nhập người dùng bằng mật khẩu cũ
+
             AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), currentPassword);
 
             user.reauthenticate(credential)  // Tái đăng nhập người dùng bằng mật khẩu cũ

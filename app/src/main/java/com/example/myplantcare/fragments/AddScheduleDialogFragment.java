@@ -515,11 +515,13 @@ public class AddScheduleDialogFragment extends DialogFragment implements AddPlan
     private void setPeriodicNotification(MyPlantModel myPlant, ScheduleModel schedule) {
         // Kiểm tra tần suất lặp lại từ ScheduleModel (số ngày lặp lại)
         int frequencyInDays = schedule.getFrequency();  // frequency được lưu dưới dạng số ngày
+
         if (frequencyInDays <= 0) {
             // Nếu tần suất không hợp lệ, không tạo thông báo
             Log.d("Notification", "Tần suất không hợp lệ");
             return;
         }
+
         // Lấy thời gian thông báo từ ScheduleModel (biến time là Timestamp)
         Timestamp timestamp = schedule.getTime();  // Giả sử time là Timestamp
         if (timestamp == null) {
@@ -527,6 +529,7 @@ public class AddScheduleDialogFragment extends DialogFragment implements AddPlan
             return;
         }
         schedule.getTime();
+
         // Chuyển Timestamp thành Calendar
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(timestamp.toDate().getTime());  // Chuyển đổi Timestamp thành Date rồi lấy mili giây
@@ -540,17 +543,21 @@ public class AddScheduleDialogFragment extends DialogFragment implements AddPlan
         calendar.set(Calendar.MINUTE, minute);
         calendar.set(Calendar.SECOND, 0);  // Đặt giây = 0 để tránh việc trễ thông báo
         calendar.set(Calendar.MILLISECOND, 0);  // Đặt mili giây = 0
+
         // Nếu thời gian đã qua trong ngày, đặt thời gian cho ngày tiếp theo
         if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
             calendar.add(Calendar.DATE, 1);  // Thêm một ngày nếu thời gian đã qua
         }
+
         // Kiểm tra getActivity() có null không trước khi sử dụng
         if (getActivity() == null) {
             Log.e("Notification", "Activity không được đính kèm!");
             return;
         }
+
         Intent intent = new Intent(getActivity(), NotificationReceiver.class);  // NotificationReceiver là BroadcastReceiver
         DocumentReference docRef = db.collection("tasks").document(schedule.getTaskId());
+
         // Lấy document từ Firestore
         docRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
