@@ -1,0 +1,405 @@
+Index: app/src/main/java/com/example/myplantcare/activities/NoteActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.myplantcare.activities;\r\n\r\nimport android.annotation.SuppressLint;\r\nimport android.content.Intent;\r\nimport android.os.Bundle;\r\nimport android.text.Editable;\r\nimport android.text.TextWatcher;\r\nimport android.util.Log;\r\nimport android.widget.Button;\r\nimport android.widget.EditText;\r\nimport android.widget.ImageButton;\r\nimport android.widget.TextView;\r\nimport android.widget.Toast;\r\n\r\nimport androidx.appcompat.app.AppCompatActivity;\r\nimport androidx.recyclerview.widget.LinearLayoutManager;\r\nimport androidx.recyclerview.widget.RecyclerView;\r\n\r\nimport com.example.myplantcare.R;\r\nimport com.example.myplantcare.adapters.NoteAdapter;\r\nimport com.example.myplantcare.fragments.SelectPlantDialog;\r\nimport com.example.myplantcare.models.Note;\r\nimport com.example.myplantcare.models.NoteSectionItem;\r\nimport com.google.firebase.Timestamp;\r\nimport com.google.firebase.firestore.FirebaseFirestore;\r\nimport com.google.firebase.firestore.QueryDocumentSnapshot;\r\n\r\nimport java.text.SimpleDateFormat;\r\nimport java.time.LocalDate;\r\nimport java.time.format.DateTimeFormatter;\r\nimport java.time.temporal.ChronoUnit;\r\nimport java.util.ArrayList;\r\nimport java.util.Date;\r\nimport java.util.HashMap;\r\nimport java.util.List;\r\nimport java.util.Locale;\r\nimport java.util.Map;\r\nimport java.util.Objects;\r\nimport java.util.Set;\r\nimport java.util.TreeSet;\r\n\r\npublic class NoteActivity extends AppCompatActivity {\r\n\r\n    FirebaseFirestore db;\r\n\r\n    private List<Note> originalNoteList = new ArrayList<>();\r\n    private List<Note> filteredNoteList = new ArrayList<>();\r\n    private final List<Note> noteList = new ArrayList<>();\r\n\r\n    private RecyclerView recyclerView;\r\n    private NoteAdapter adapter;\r\n    private TextView toolbarTitle;\r\n    private ImageButton toolbarBackButton;\r\n    private EditText etSearchNote;\r\n\r\n    @SuppressLint(\"SetTextI18n\")\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        setContentView(R.layout.activity_note);\r\n\r\n        db = FirebaseFirestore.getInstance();\r\n        loadNotesFromFirestore();\r\n\r\n        etSearchNote = findViewById(R.id.etSearchNote);\r\n        etSearchNote.addTextChangedListener(new TextWatcher() {\r\n            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}\r\n            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {\r\n                filterNotes(s.toString());\r\n            }\r\n            @Override public void afterTextChanged(Editable s) {}\r\n        });\r\n\r\n        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.insider_toolbar);\r\n        toolbarTitle = toolbar.findViewById(R.id.toolbar_title);\r\n        toolbarBackButton = toolbar.findViewById(R.id.toolbar_back_button);\r\n        toolbarTitle.setText(\"Ghi chú\");\r\n        toolbarBackButton.setOnClickListener(v -> finish());\r\n\r\n        recyclerView = findViewById(R.id.recyclerViewNotes);\r\n        recyclerView.setLayoutManager(new LinearLayoutManager(this));\r\n        adapter = new NoteAdapter(this, new ArrayList<>());\r\n        recyclerView.setAdapter(adapter);\r\n\r\n        adapter.setOnItemClickListener(note -> {\r\n            Intent intent = new Intent(NoteActivity.this, DetailNoteActivity.class);\r\n            intent.putExtra(\"noteId\", note.getId());\r\n            startActivity(intent);\r\n        });\r\n\r\n        Button btnCreateNote = findViewById(R.id.btnCreateNote);\r\n        btnCreateNote.setOnClickListener(v -> showSelectPlantDialog());\r\n    }\r\n\r\n    private void showSelectPlantDialog() {\r\n        SelectPlantDialog selectPlantDialog = new SelectPlantDialog();\r\n        selectPlantDialog.show(getSupportFragmentManager(), \"SelectPlantDialog\");\r\n    }\r\n\r\n    @SuppressLint(\"NotifyDataSetChanged\")\r\n    private void filterNotes(String query) {\r\n        filteredNoteList.clear();\r\n        String lowerCaseQuery = query.toLowerCase().trim();\r\n        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(\"dd/MM/yyyy\");\r\n\r\n        for (Note note : originalNoteList) {\r\n            String formattedDate = note.getDate().format(formatter);\r\n            if (note.getTitle().toLowerCase().contains(lowerCaseQuery) ||\r\n                    note.getContent().toLowerCase().contains(lowerCaseQuery) ||\r\n                    formattedDate.toLowerCase().contains(lowerCaseQuery)) {\r\n                filteredNoteList.add(note);\r\n            }\r\n        }\r\n\r\n        List<NoteSectionItem> filteredNoteSectionList = categorizeNotes(filteredNoteList);\r\n        adapter.setNotes(filteredNoteSectionList);\r\n    }\r\n\r\n    @SuppressLint(\"NotifyDataSetChanged\")\r\n    private void loadNotesFromFirestore() {\r\n        db.collection(\"notes\")\r\n                .get()\r\n                .addOnSuccessListener(queryDocumentSnapshots -> {\r\n                    Log.d(\"NoteActivity\", \"Tải dữ liệu thành công. Số lượng: \" + queryDocumentSnapshots.size());\r\n\r\n                    noteList.clear();\r\n                    originalNoteList.clear();\r\n                    filteredNoteList.clear();\r\n\r\n                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {\r\n                        String title = doc.getString(\"title\");\r\n                        String summary = doc.getString(\"summary\");\r\n                        Timestamp timestamp = doc.getTimestamp(\"lastUpdated\");\r\n                        String dateStr = null;\r\n\r\n                        if (timestamp != null) {\r\n                            Date date = timestamp.toDate();\r\n                            SimpleDateFormat sdf = new SimpleDateFormat(\"yyyy-MM-dd\", Locale.getDefault());\r\n                            dateStr = sdf.format(date);\r\n                        }\r\n\r\n                        if (title != null && summary != null && dateStr != null) {\r\n                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(\"yyyy-MM-dd\");\r\n                            LocalDate date = LocalDate.parse(dateStr, formatter);\r\n                            Note note = new Note(doc.getId(), title, summary, date);\r\n                            noteList.add(note);\r\n                        } else {\r\n                            Log.w(\"NoteActivity\", \"Bỏ qua document thiếu dữ liệu: \" + doc.getId());\r\n                        }\r\n                    }\r\n\r\n                    originalNoteList.addAll(noteList);\r\n                    filteredNoteList.addAll(noteList);\r\n\r\n                    List<NoteSectionItem> categorizedNotes = categorizeNotes(noteList);\r\n                    adapter.setNotes(categorizedNotes);\r\n                })\r\n                .addOnFailureListener(e -> {\r\n                    Log.e(\"NoteActivity\", \"Lỗi khi tải dữ liệu từ Firestore: \" + e.getMessage(), e);\r\n                    Toast.makeText(this, \"Lỗi tải dữ liệu: \" + e.getMessage(), Toast.LENGTH_SHORT).show();\r\n                });\r\n    }\r\n\r\n    @SuppressLint(\"NotifyDataSetChanged\")\r\n    private List<NoteSectionItem> categorizeNotes(List<Note> noteList) {\r\n\r\n        Map<String, List<Note>> groupedNotes = new HashMap<>();\r\n\r\n\r\n        for (Note note : noteList) {\r\n            String section = getDateSection(note.getDate());\r\n            groupedNotes.computeIfAbsent(section, k -> new ArrayList<>()).add(note);\r\n        }\r\n\r\n\r\n        List<String> sectionOrder = new ArrayList<>();\r\n        sectionOrder.add(\"7 ngày trước\");\r\n        sectionOrder.add(\"30 ngày trước\");\r\n\r\n\r\n        Set<String> remainingSections = new TreeSet<>((a, b) -> Integer.parseInt(b) - Integer.parseInt(a));\r\n        for (String key : groupedNotes.keySet()) {\r\n            if (!sectionOrder.contains(key)) {\r\n                remainingSections.add(key);\r\n            }\r\n        }\r\n        sectionOrder.addAll(remainingSections);\r\n\r\n\r\n        List<NoteSectionItem> noteSectionItems = new ArrayList<>();\r\n        for (String section : sectionOrder) {\r\n            noteSectionItems.add(new NoteSectionItem(section));\r\n            for (Note note : groupedNotes.get(section)) {\r\n                noteSectionItems.add(new NoteSectionItem(note)); \r\n            }\r\n        }\r\n\r\n        return noteSectionItems;\r\n    }\r\n\r\n\r\n    private String getDateSection(LocalDate date) {\r\n        LocalDate today = LocalDate.now();\r\n        long daysBetween = ChronoUnit.DAYS.between(date, today);\r\n\r\n        if (daysBetween <= 7) {\r\n            return \"7 ngày trước\";\r\n        } else if (daysBetween <= 30) {\r\n            return \"30 ngày trước\";\r\n        } else if (date.getYear() == today.getYear()) {\r\n            return String.valueOf(date.getYear());\r\n        } else {\r\n            return String.valueOf(date.getYear());\r\n        }\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/example/myplantcare/activities/NoteActivity.java b/app/src/main/java/com/example/myplantcare/activities/NoteActivity.java
+--- a/app/src/main/java/com/example/myplantcare/activities/NoteActivity.java	(revision c3ca2407234fee7f04431198e6e35640c7933baa)
++++ b/app/src/main/java/com/example/myplantcare/activities/NoteActivity.java	(date 1745675556695)
+@@ -22,7 +22,9 @@
+ import com.example.myplantcare.models.Note;
+ import com.example.myplantcare.models.NoteSectionItem;
+ import com.google.firebase.Timestamp;
++import com.google.firebase.firestore.CollectionReference;
+ import com.google.firebase.firestore.FirebaseFirestore;
++import com.google.firebase.firestore.Query;
+ import com.google.firebase.firestore.QueryDocumentSnapshot;
+ 
+ import java.text.SimpleDateFormat;
+@@ -39,6 +41,182 @@
+ import java.util.Set;
+ import java.util.TreeSet;
+ 
++//public class NoteActivity extends AppCompatActivity {
++//
++//    FirebaseFirestore db;
++//
++//    private List<Note> originalNoteList = new ArrayList<>();
++//    private List<Note> filteredNoteList = new ArrayList<>();
++//    private final List<Note> noteList = new ArrayList<>();
++//
++//    private RecyclerView recyclerView;
++//    private NoteAdapter adapter;
++//    private TextView toolbarTitle;
++//    private ImageButton toolbarBackButton;
++//    private EditText etSearchNote;
++//
++//    @SuppressLint("SetTextI18n")
++//    @Override
++//    protected void onCreate(Bundle savedInstanceState) {
++//        super.onCreate(savedInstanceState);
++//        setContentView(R.layout.activity_note);
++//
++//        db = FirebaseFirestore.getInstance();
++//        loadNotesFromFirestore();
++//
++//        etSearchNote = findViewById(R.id.etSearchNote);
++//        etSearchNote.addTextChangedListener(new TextWatcher() {
++//            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
++//            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
++//                filterNotes(s.toString());
++//            }
++//            @Override public void afterTextChanged(Editable s) {}
++//        });
++//
++//        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.insider_toolbar);
++//        toolbarTitle = toolbar.findViewById(R.id.toolbar_title);
++//        toolbarBackButton = toolbar.findViewById(R.id.toolbar_back_button);
++//        toolbarTitle.setText("Ghi chú");
++//        toolbarBackButton.setOnClickListener(v -> finish());
++//
++//        recyclerView = findViewById(R.id.recyclerViewNotes);
++//        recyclerView.setLayoutManager(new LinearLayoutManager(this));
++//        adapter = new NoteAdapter(this, new ArrayList<>());
++//        recyclerView.setAdapter(adapter);
++//
++//        adapter.setOnItemClickListener(note -> {
++//            Intent intent = new Intent(NoteActivity.this, DetailNoteActivity.class);
++//            intent.putExtra("noteId", note.getId());
++//            startActivity(intent);
++//        });
++//
++//        Button btnCreateNote = findViewById(R.id.btnCreateNote);
++//        btnCreateNote.setOnClickListener(v -> showSelectPlantDialog());
++//    }
++//
++//    private void showSelectPlantDialog() {
++//        SelectPlantDialog selectPlantDialog = new SelectPlantDialog();
++//        selectPlantDialog.show(getSupportFragmentManager(), "SelectPlantDialog");
++//    }
++//
++//    @SuppressLint("NotifyDataSetChanged")
++//    private void filterNotes(String query) {
++//        filteredNoteList.clear();
++//        String lowerCaseQuery = query.toLowerCase().trim();
++//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
++//
++//        for (Note note : originalNoteList) {
++//            String formattedDate = note.getDate().format(formatter);
++//            if (note.getTitle().toLowerCase().contains(lowerCaseQuery) ||
++//                    note.getContent().toLowerCase().contains(lowerCaseQuery) ||
++//                    formattedDate.toLowerCase().contains(lowerCaseQuery)) {
++//                filteredNoteList.add(note);
++//            }
++//        }
++//
++//        List<NoteSectionItem> filteredNoteSectionList = categorizeNotes(filteredNoteList);
++//        adapter.setNotes(filteredNoteSectionList);
++//    }
++//
++//    @SuppressLint("NotifyDataSetChanged")
++//    private void loadNotesFromFirestore() {
++//        db.collection("notes")
++//                .get()
++//                .addOnSuccessListener(queryDocumentSnapshots -> {
++//                    Log.d("NoteActivity", "Tải dữ liệu thành công. Số lượng: " + queryDocumentSnapshots.size());
++//
++//                    noteList.clear();
++//                    originalNoteList.clear();
++//                    filteredNoteList.clear();
++//
++//                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
++//                        String title = doc.getString("title");
++//                        String summary = doc.getString("summary");
++//                        Timestamp timestamp = doc.getTimestamp("lastUpdated");
++//                        String dateStr = null;
++//
++//                        if (timestamp != null) {
++//                            Date date = timestamp.toDate();
++//                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
++//                            dateStr = sdf.format(date);
++//                        }
++//
++//                        if (title != null && summary != null && dateStr != null) {
++//                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
++//                            LocalDate date = LocalDate.parse(dateStr, formatter);
++//                            Note note = new Note(doc.getId(), title, summary, date);
++//                            noteList.add(note);
++//                        } else {
++//                            Log.w("NoteActivity", "Bỏ qua document thiếu dữ liệu: " + doc.getId());
++//                        }
++//                    }
++//
++//                    originalNoteList.addAll(noteList);
++//                    filteredNoteList.addAll(noteList);
++//
++//                    List<NoteSectionItem> categorizedNotes = categorizeNotes(noteList);
++//                    adapter.setNotes(categorizedNotes);
++//                })
++//                .addOnFailureListener(e -> {
++//                    Log.e("NoteActivity", "Lỗi khi tải dữ liệu từ Firestore: " + e.getMessage(), e);
++//                    Toast.makeText(this, "Lỗi tải dữ liệu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
++//                });
++//    }
++//
++//    @SuppressLint("NotifyDataSetChanged")
++//    private List<NoteSectionItem> categorizeNotes(List<Note> noteList) {
++//
++//        Map<String, List<Note>> groupedNotes = new HashMap<>();
++//
++//
++//        for (Note note : noteList) {
++//            String section = getDateSection(note.getDate());
++//            groupedNotes.computeIfAbsent(section, k -> new ArrayList<>()).add(note);
++//        }
++//
++//
++//        List<String> sectionOrder = new ArrayList<>();
++//        sectionOrder.add("7 ngày trước");
++//        sectionOrder.add("30 ngày trước");
++//
++//
++//        Set<String> remainingSections = new TreeSet<>((a, b) -> Integer.parseInt(b) - Integer.parseInt(a));
++//        for (String key : groupedNotes.keySet()) {
++//            if (!sectionOrder.contains(key)) {
++//                remainingSections.add(key);
++//            }
++//        }
++//        sectionOrder.addAll(remainingSections);
++//
++//
++//        List<NoteSectionItem> noteSectionItems = new ArrayList<>();
++//        for (String section : sectionOrder) {
++//            noteSectionItems.add(new NoteSectionItem(section));
++//            for (Note note : groupedNotes.get(section)) {
++//                noteSectionItems.add(new NoteSectionItem(note));
++//            }
++//        }
++//
++//        return noteSectionItems;
++//    }
++//
++//
++//    private String getDateSection(LocalDate date) {
++//        LocalDate today = LocalDate.now();
++//        long daysBetween = ChronoUnit.DAYS.between(date, today);
++//
++//        if (daysBetween <= 7) {
++//            return "7 ngày trước";
++//        } else if (daysBetween <= 30) {
++//            return "30 ngày trước";
++//        } else if (date.getYear() == today.getYear()) {
++//            return String.valueOf(date.getYear());
++//        } else {
++//            return String.valueOf(date.getYear());
++//        }
++//    }
++//}
++
+ public class NoteActivity extends AppCompatActivity {
+ 
+     FirebaseFirestore db;
+@@ -53,6 +231,9 @@
+     private ImageButton toolbarBackButton;
+     private EditText etSearchNote;
+ 
++    private String selectedPlantId = null;
++    private String selectedPlantName = null;
++
+     @SuppressLint("SetTextI18n")
+     @Override
+     protected void onCreate(Bundle savedInstanceState) {
+@@ -60,9 +241,13 @@
+         setContentView(R.layout.activity_note);
+ 
+         db = FirebaseFirestore.getInstance();
+-        loadNotesFromFirestore();
++
++        // Lấy dữ liệu từ Intent
++        selectedPlantId = getIntent().getStringExtra("plantId");
++        selectedPlantName = getIntent().getStringExtra("plantName");
+ 
+         etSearchNote = findViewById(R.id.etSearchNote);
++
+         etSearchNote.addTextChangedListener(new TextWatcher() {
+             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+@@ -90,6 +275,13 @@
+ 
+         Button btnCreateNote = findViewById(R.id.btnCreateNote);
+         btnCreateNote.setOnClickListener(v -> showSelectPlantDialog());
++
++        // Nếu vào từ cây cụ thể thì hiện tên cây lên etSearchNote
++        if (selectedPlantName != null) {
++            etSearchNote.setHint(selectedPlantName);
++        }
++
++        loadNotesFromFirestore();
+     }
+ 
+     private void showSelectPlantDialog() {
+@@ -118,8 +310,18 @@
+ 
+     @SuppressLint("NotifyDataSetChanged")
+     private void loadNotesFromFirestore() {
+-        db.collection("notes")
+-                .get()
++        CollectionReference notesRef = db.collection("notes");
++        Query query;
++
++        if (selectedPlantId != null) {
++            // Nếu có plantId, chỉ lấy ghi chú của cây đó
++            query = notesRef.whereEqualTo("plantId", selectedPlantId);
++        } else {
++            // Nếu không, lấy tất cả ghi chú
++            query = notesRef;
++        }
++
++        query.get()
+                 .addOnSuccessListener(queryDocumentSnapshots -> {
+                     Log.d("NoteActivity", "Tải dữ liệu thành công. Số lượng: " + queryDocumentSnapshots.size());
+ 
+@@ -161,23 +363,18 @@
+                 });
+     }
+ 
+-    @SuppressLint("NotifyDataSetChanged")
+     private List<NoteSectionItem> categorizeNotes(List<Note> noteList) {
+-
+         Map<String, List<Note>> groupedNotes = new HashMap<>();
+ 
+-
+         for (Note note : noteList) {
+             String section = getDateSection(note.getDate());
+             groupedNotes.computeIfAbsent(section, k -> new ArrayList<>()).add(note);
+         }
+ 
+-
+         List<String> sectionOrder = new ArrayList<>();
+         sectionOrder.add("7 ngày trước");
+         sectionOrder.add("30 ngày trước");
+ 
+-
+         Set<String> remainingSections = new TreeSet<>((a, b) -> Integer.parseInt(b) - Integer.parseInt(a));
+         for (String key : groupedNotes.keySet()) {
+             if (!sectionOrder.contains(key)) {
+@@ -186,19 +383,17 @@
+         }
+         sectionOrder.addAll(remainingSections);
+ 
+-
+         List<NoteSectionItem> noteSectionItems = new ArrayList<>();
+         for (String section : sectionOrder) {
+             noteSectionItems.add(new NoteSectionItem(section));
+             for (Note note : groupedNotes.get(section)) {
+-                noteSectionItems.add(new NoteSectionItem(note)); 
++                noteSectionItems.add(new NoteSectionItem(note));
+             }
+         }
+ 
+         return noteSectionItems;
+     }
+ 
+-
+     private String getDateSection(LocalDate date) {
+         LocalDate today = LocalDate.now();
+         long daysBetween = ChronoUnit.DAYS.between(date, today);
+@@ -213,4 +408,4 @@
+             return String.valueOf(date.getYear());
+         }
+     }
+-}
+\ No newline at end of file
++}
+Index: app/src/main/res/layout/item_statistic.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<androidx.cardview.widget.CardView xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    xmlns:card_view=\"http://schemas.android.com/apk/res-auto\"\r\n    android:layout_width=\"match_parent\"\r\n    android:layout_height=\"wrap_content\"\r\n    android:layout_margin=\"16dp\"\r\n    card_view:cardCornerRadius=\"12dp\"\r\n    card_view:cardElevation=\"4dp\">\r\n\r\n    <LinearLayout\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:orientation=\"vertical\">\r\n\r\n        <!-- Nội dung -->\r\n        <LinearLayout\r\n            android:layout_width=\"match_parent\"\r\n            android:layout_height=\"wrap_content\"\r\n            android:orientation=\"vertical\"\r\n            android:padding=\"16dp\">\r\n\r\n            <TextView\r\n                android:id=\"@+id/textViewTreeName\"\r\n                android:layout_width=\"wrap_content\"\r\n                android:layout_height=\"wrap_content\"\r\n                android:text=\"Cây ABC\"\r\n                android:textStyle=\"bold\"\r\n                android:textSize=\"18sp\"\r\n                android:paddingBottom=\"8dp\" />\r\n\r\n            <com.github.mikephil.charting.charts.LineChart\r\n                android:id=\"@+id/lineChartDetail\"\r\n                android:layout_width=\"match_parent\"\r\n                android:layout_height=\"300dp\"\r\n                android:layout_marginTop=\"8dp\" />\r\n        </LinearLayout>\r\n    </LinearLayout>\r\n</androidx.cardview.widget.CardView>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/item_statistic.xml b/app/src/main/res/layout/item_statistic.xml
+--- a/app/src/main/res/layout/item_statistic.xml	(revision c3ca2407234fee7f04431198e6e35640c7933baa)
++++ b/app/src/main/res/layout/item_statistic.xml	(date 1745665607206)
+@@ -5,7 +5,8 @@
+     android:layout_height="wrap_content"
+     android:layout_margin="16dp"
+     card_view:cardCornerRadius="12dp"
+-    card_view:cardElevation="4dp">
++    card_view:cardElevation="4dp"
++    card_view:cardBackgroundColor="#5C9160">
+ 
+     <LinearLayout
+         android:layout_width="match_parent"
+Index: .idea/deploymentTargetSelector.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"deploymentTargetSelector\">\r\n    <selectionStates>\r\n      <SelectionState runConfigName=\"app\">\r\n        <option name=\"selectionMode\" value=\"DROPDOWN\" />\r\n        <DropdownSelection timestamp=\"2025-04-22T16:17:57.717876100Z\">\r\n          <Target type=\"DEFAULT_BOOT\">\r\n            <handle>\r\n              <DeviceId pluginId=\"LocalEmulator\" identifier=\"path=C:\\Users\\Huong Sen\\.android\\avd\\Medium_Phone_2_2.avd\" />\r\n            </handle>\r\n          </Target>\r\n        </DropdownSelection>\r\n        <DialogSelection />\r\n      </SelectionState>\r\n    </selectionStates>\r\n  </component>\r\n</project>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/deploymentTargetSelector.xml b/.idea/deploymentTargetSelector.xml
+--- a/.idea/deploymentTargetSelector.xml	(revision c3ca2407234fee7f04431198e6e35640c7933baa)
++++ b/.idea/deploymentTargetSelector.xml	(date 1745665409917)
+@@ -4,10 +4,10 @@
+     <selectionStates>
+       <SelectionState runConfigName="app">
+         <option name="selectionMode" value="DROPDOWN" />
+-        <DropdownSelection timestamp="2025-04-22T16:17:57.717876100Z">
++        <DropdownSelection timestamp="2025-04-26T11:00:52.992454500Z">
+           <Target type="DEFAULT_BOOT">
+             <handle>
+-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Huong Sen\.android\avd\Medium_Phone_2_2.avd" />
++              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Huong Sen\.android\avd\Medium_Phone_3.avd" />
+             </handle>
+           </Target>
+         </DropdownSelection>
+@@ -15,4 +15,4 @@
+       </SelectionState>
+     </selectionStates>
+   </component>
+-</project>
++</project>
+\ No newline at end of file
+Index: app/src/main/res/layout/activity_statistic.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    xmlns:tools=\"http://schemas.android.com/tools\"\r\n    android:id=\"@+id/noteLayout\"\r\n    android:layout_width=\"match_parent\"\r\n    android:layout_height=\"match_parent\"\r\n    android:orientation=\"vertical\"\r\n    android:padding=\"16dp\"\r\n    android:background=\"@color/white\"\r\n    tools:context=\".activities.StatisticActivity\">\r\n\r\n    <!-- Thanh tiêu đề -->\r\n    <include layout=\"@layout/insider_toolbar\" />\r\n\r\n    <!-- Danh sách thống kê -->\r\n    <androidx.recyclerview.widget.RecyclerView\r\n        android:id=\"@+id/recyclerViewStatistics\"\r\n        android:layout_width=\"match_parent\"\r\n        android:layout_height=\"0dp\"\r\n        android:layout_weight=\"1\"\r\n        android:clipToPadding=\"false\"\r\n        android:scrollbars=\"vertical\"\r\n        android:contentDescription=\"@string/note_list_desc\"/>\r\n\r\n</LinearLayout>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/activity_statistic.xml b/app/src/main/res/layout/activity_statistic.xml
+--- a/app/src/main/res/layout/activity_statistic.xml	(revision c3ca2407234fee7f04431198e6e35640c7933baa)
++++ b/app/src/main/res/layout/activity_statistic.xml	(date 1745674857992)
+@@ -12,6 +12,29 @@
+     <!-- Thanh tiêu đề -->
+     <include layout="@layout/insider_toolbar" />
+ 
++    <LinearLayout
++        android:layout_width="match_parent"
++        android:layout_height="wrap_content"
++        android:orientation="horizontal"
++        android:gravity="center_vertical"
++        android:layout_marginBottom="12dp">
++
++        <EditText
++            android:id="@+id/etSearchNote"
++            android:layout_width="0dp"
++            android:layout_height="wrap_content"
++            android:layout_marginEnd="8dp"
++            android:layout_weight="1"
++            android:background="@drawable/bg_edittext_note"
++            android:drawableStart="@drawable/ic_search"
++            android:drawablePadding="8dp"
++            android:hint="@string/search_hint"
++            android:inputType="text"
++            android:padding="12dp"
++            android:textColor="@color/black"
++            android:textColorHint="#777777" />
++    </LinearLayout>
++
+     <!-- Danh sách thống kê -->
+     <androidx.recyclerview.widget.RecyclerView
+         android:id="@+id/recyclerViewStatistics"

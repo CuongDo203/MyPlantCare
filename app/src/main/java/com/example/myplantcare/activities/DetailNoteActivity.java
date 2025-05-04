@@ -90,37 +90,6 @@ public class DetailNoteActivity extends AppCompatActivity {
 
     }
 
-//    private void fetchNoteDetails(String noteId) {
-//        db.collection("notes").document(noteId)
-//                .get()
-//                .addOnSuccessListener(documentSnapshot -> {
-//                    if (documentSnapshot.exists()) {
-//                        String title = documentSnapshot.getString("title");
-//                        String content = documentSnapshot.getString("content");
-//                        Timestamp timestamp = documentSnapshot.getTimestamp("lastUpdated");
-//                        String dateStr = null;
-//
-//                        if (timestamp != null) {
-//                            Date date = timestamp.toDate();
-//                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-//                            dateStr = sdf.format(date);
-//                        }
-//
-//
-//                        TextView tvNoteTitle = findViewById(R.id.tv_note_title);
-//                        TextView tvNoteDate = findViewById(R.id.tv_note_date);
-//                        EditText etNoteContent = findViewById(R.id.tv_note_content);
-//
-//                        tvNoteTitle.setText(title);
-//                        tvNoteDate.setText(dateStr);
-//                        etNoteContent.setText(content);
-//                    }
-//                })
-//                .addOnFailureListener(e -> {
-//                    Log.e("DetailNoteActivity", "Lỗi khi tải ghi chú: " + e.getMessage());
-//                    Toast.makeText(DetailNoteActivity.this, "Lỗi tải dữ liệu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-//                });
-//    }
 private void fetchNoteDetails(String noteId) {
     db.collection("notes").document(noteId)
             .get()
@@ -155,6 +124,5 @@ private void fetchNoteDetails(String noteId) {
                 Log.e("DetailNoteActivity", "Lỗi khi tải ghi chú: " + e.getMessage());
                 Toast.makeText(DetailNoteActivity.this, "Lỗi tải dữ liệu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             });
-}
-
+    }
 }

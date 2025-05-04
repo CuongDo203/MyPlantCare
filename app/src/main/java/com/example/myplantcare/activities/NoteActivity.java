@@ -24,16 +24,21 @@ import com.example.myplantcare.fragments.SelectPlantDialog;
 import com.example.myplantcare.models.Note;
 import com.example.myplantcare.models.NoteSectionItem;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -61,14 +66,6 @@ public class NoteActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         loadNotesFromFirestore();
 
-//        etSearchNote = findViewById(R.id.etSearchNote);
-//        etSearchNote.addTextChangedListener(new TextWatcher() {
-//            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-//            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                filterNotes(s.toString());
-//            }
-//            @Override public void afterTextChanged(Editable s) {}
-//        });
 
         etSearchNote = findViewById(R.id.etSearchNote);
 
