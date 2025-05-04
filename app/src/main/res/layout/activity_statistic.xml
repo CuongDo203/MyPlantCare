@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/noteLayout"
@@ -12,6 +11,23 @@
     <!-- Thanh tiêu đề -->
     <include layout="@layout/insider_toolbar" />
 
+    <!-- Thanh tìm kiếm -->
+    <EditText
+        android:id="@+id/etSearchStatistic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:drawableStart="@drawable/ic_search"
+        android:background="@drawable/bg_edittext_note"
+        android:drawablePadding="8dp"
+        android:hint="Tìm kiếm thống kê theo tên cây ..."
+        android:imeOptions="actionSearch"
+        android:importantForAutofill="no"
+        android:inputType="text"
+        android:padding="12dp"
+        android:textColor="@color/black"
+        android:textColorHint="#777777" />
+
     <!-- Danh sách thống kê -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewStatistics"
@@ -20,6 +36,5 @@
         android:layout_weight="1"
         android:clipToPadding="false"
         android:scrollbars="vertical"
-        android:contentDescription="@string/note_list_desc"/>
-
+        android:contentDescription="@string/note_list_desc" />
 </LinearLayout>

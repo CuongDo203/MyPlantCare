@@ -10,5 +10,4 @@
         android:color="#4CAF8F" /> <!-- Màu viền đậm hơn nền -->
 
     <!-- Bo góc -->
-    <corners android:radius="16dp" />
 </shape>

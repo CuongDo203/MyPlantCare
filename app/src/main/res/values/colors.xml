@@ -17,4 +17,7 @@
     <color name="tab_selected_color">#FFB700</color>
     <color name="fab_bg">#D3C786</color>
     <color name="log_task_bg">#F7EACF</color>
+    <color name="green">#4CAF50</color>
+    <color name="black_strong">#000000</color>
+    <color name="green_focus">#4CAF50</color>
 </resources>

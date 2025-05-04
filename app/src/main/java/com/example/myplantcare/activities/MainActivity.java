@@ -32,6 +32,7 @@ import com.example.myplantcare.fragments.NoteFragment;
 import com.example.myplantcare.fragments.PlantFragment;
 import com.example.myplantcare.fragments.ScheduleFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
 
 import android.view.View;
 
@@ -43,6 +44,9 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.Home
 
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
+
+    private String userId;
+    private String myPlantId;
     ImageView ivMenu;
     private static final int REQUEST_CODE_SIDEBAR = 100;
 
@@ -55,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.Home
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        myPlantId = getIntent().getStringExtra("id");
 
         Toolbar toolbar = findViewById(R.id.topAppBar);
         setSupportActionBar(toolbar);
@@ -89,11 +95,17 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.Home
                 fragment = new PlantFragment();
             } else if (itemId == R.id.nav_note) {
                 Intent intent = new Intent(MainActivity.this, NoteActivity.class);
+//                intent.putExtra("userId", userId);
+//                intent.putExtra("id", myPlantsId);  // Nếu là tất cả notes thì myPlantsId = null
+                intent.putExtra("userId", FirebaseAuth.getInstance().getCurrentUser().getUid());
+                intent.putExtra("id", myPlantId);
                 startActivity(intent);
                 return true;
             }
             else if (itemId == R.id.nav_statics){
                 Intent intent = new Intent(MainActivity.this, StatisticActivity.class);
+                intent.putExtra("userId", FirebaseAuth.getInstance().getCurrentUser().getUid());
+                intent.putExtra("id", myPlantId);
                 startActivity(intent);
                 return true;
             }
@@ -164,7 +176,6 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.Home
                 }
             }
         }
-
 
         // Yêu cầu quyền thông báo Android 13 trở lên
         requestNotificationPermission();

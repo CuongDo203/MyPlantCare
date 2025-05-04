@@ -44,8 +44,16 @@ import com.google.firebase.Timestamp; // Import Timestamp
 
 import java.io.File; // Có thể vẫn cần nếu bạn dùng FileUtils ở đâu đó khác
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.firestore.DocumentReference;
+
 
 public class AddPlantDialogFragment extends DialogFragment {
     private static final String TAG = "AddPlantDialogFragment"; // Sử dụng TAG nhất quán
@@ -70,6 +78,7 @@ public class AddPlantDialogFragment extends DialogFragment {
     }
 
     private OnSavePlantListener onSavePlantListener;
+    private String myPlantId;
 
     public void setOnSavePlantListener(OnSavePlantListener listener) {
         this.onSavePlantListener = listener;
@@ -92,6 +101,7 @@ public class AddPlantDialogFragment extends DialogFragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             userId = getArguments().getString("user_id");
+            myPlantId = getArguments().getString("my_plant_id");
         }
         // Đăng ký launcher để xử lý kết quả chọn ảnh
         imagePickerLauncher = registerForActivityResult(

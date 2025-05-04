@@ -36,7 +36,6 @@ public class MyPlantUpdateActivity extends AppCompatActivity implements View.OnC
     private Button buttonSaveGeneralInfo, buttonAddGrowthRecord;
     private ImageView btnBack;
     private ProgressBar progressBar;
-
     private String currentUserId;
     private String currentMyPlantId;
     private UpdateMyPlantViewModel viewModel;
@@ -46,17 +45,20 @@ public class MyPlantUpdateActivity extends AppCompatActivity implements View.OnC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_plant_update);
         Intent intent = getIntent();
+
         if(intent != null && intent.getExtras() != null) {
             Bundle extras = intent.getExtras();
             currentMyPlantId = extras.getString("id");
             currentUserId = extras.getString("userId");
         }
+
         if (currentUserId == null || currentMyPlantId == null) {
             Log.e(TAG, "User ID or MyPlant ID is missing. Cannot load data.");
             Toast.makeText(this, "Lỗi: Không tìm thấy thông tin cây.", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
+
         initContents();
         setUpListeners();
     }
@@ -83,7 +85,6 @@ public class MyPlantUpdateActivity extends AppCompatActivity implements View.OnC
                 return (T) new UpdateMyPlantViewModel(currentUserId, currentMyPlantId);
             }
         }).get(UpdateMyPlantViewModel.class);
-
     }
 
     private void setUpListeners() {
@@ -119,7 +120,6 @@ public class MyPlantUpdateActivity extends AppCompatActivity implements View.OnC
                     setResult(Activity.RESULT_OK);
                     finish();
                 }
-
             }
         });
     }
@@ -134,11 +134,13 @@ public class MyPlantUpdateActivity extends AppCompatActivity implements View.OnC
             editTextNickname.requestFocus();
             return;
         }
+
         if (location.isEmpty()) {
             editTextLocation.setError("Vị trí không được để trống");
             editTextLocation.requestFocus();
             return;
         }
+
         if (status.isEmpty()) {
             editTextStatus.setError("Trạng thái không được để trống");
             editTextStatus.requestFocus();

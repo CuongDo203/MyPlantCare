@@ -1,16 +1,19 @@
 //package com.example.myplantcare.models;
+//
 //import android.net.Uri;
 //
 //public class DetailNote {
-//    private Uri imageUri;
-//    private String noteText;
+//    private Uri imageUri;     // Đường dẫn ảnh nếu có
+//    private String noteText;  // Nội dung ghi chú
 //
 //    public DetailNote() {
 //        this.imageUri = null;
 //        this.noteText = "";
 //    }
 //
-//    public DetailNote(Uri parse, String s) {
+//    public DetailNote(Uri imageUri, String noteText) {
+//        this.imageUri = imageUri;
+//        this.noteText = noteText;
 //    }
 //
 //    public Uri getImageUri() {
@@ -28,44 +31,49 @@
 //    public void setNoteText(String noteText) {
 //        this.noteText = noteText;
 //    }
+//
+//    public boolean hasImage() {
+//        return imageUri != null;
+//    }
 //}
+// DO NOT DELETE
 
 package com.example.myplantcare.models;
 
-import android.net.Uri;
-
 public class DetailNote {
-    private Uri imageUri;     // Đường dẫn ảnh nếu có
-    private String noteText;  // Nội dung ghi chú
+    private String text;      // Nội dung ghi chú (mỗi dòng)
+    private String imageUrl;  // URL hoặc đường dẫn ảnh tương ứng
 
+    // Constructor mặc định (Firestore cần)
     public DetailNote() {
-        this.imageUri = null;
-        this.noteText = "";
+        this.text = "";
+        this.imageUrl = "";
     }
 
-    public DetailNote(Uri imageUri, String noteText) {
-        this.imageUri = imageUri;
-        this.noteText = noteText;
+    // Constructor đầy đủ
+    public DetailNote(String text, String imageUrl) {
+        this.text = text;
+        this.imageUrl = imageUrl;
     }
 
-    public Uri getImageUri() {
-        return imageUri;
+    // Getter / Setter cho text
+    public String getText() {
+        return text;
+    }
+    public void setText(String text) {
+        this.text = text;
     }
 
-    public void setImageUri(Uri imageUri) {
-        this.imageUri = imageUri;
+    // Getter / Setter cho imageUrl
+    public String getImageUrl() {
+        return imageUrl;
+    }
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
-    public String getNoteText() {
-        return noteText;
-    }
-
-    public void setNoteText(String noteText) {
-        this.noteText = noteText;
-    }
-
+    // Kiểm tra có ảnh hay không
     public boolean hasImage() {
-        return imageUri != null;
+        return imageUrl != null && !imageUrl.isEmpty();
     }
 }
-

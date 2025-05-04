@@ -3,29 +3,24 @@ package com.example.myplantcare.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class ChartData implements Parcelable {
-    private float xValue;
-    private float yValue;
+import java.util.Date;
 
-    public ChartData(float xValue, float yValue) {
-        this.xValue = xValue;
+public class ChartData implements Parcelable {
+    private Date date;
+    private float yValue;
+    private String label;
+
+    public ChartData(Date date, float yValue, String label) {
+        this.date = date;
         this.yValue = yValue;
+        this.label = label;
     }
 
     protected ChartData(Parcel in) {
-        xValue = in.readFloat();
-        yValue = in.readFloat();
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeFloat(xValue);
-        dest.writeFloat(yValue);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
+        long timeMillis = in.readLong();
+        this.date = new Date(timeMillis);
+        this.yValue = in.readFloat();
+        this.label = in.readString();
     }
 
     public static final Creator<ChartData> CREATOR = new Creator<ChartData>() {
@@ -40,11 +35,28 @@ public class ChartData implements Parcelable {
         }
     };
 
-    public float getXValue() {
-        return xValue;
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong(date.getTime());
+        dest.writeFloat(yValue);
+        dest.writeString(label);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    // Getters
+    public Date getDate() {
+        return date;
     }
 
     public float getYValue() {
         return yValue;
+    }
+
+    public String getLabel() {
+        return label != null ? label : "";
     }
 }
