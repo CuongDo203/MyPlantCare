@@ -63,6 +63,7 @@ public class SideBarActivity extends AppCompatActivity {
         else {
             Toast.makeText(SideBarActivity.this, "Null", Toast.LENGTH_SHORT).show();
         }
+        // Chuyển sang care_instruction activity
         LinearLayout btnCareInstruction = findViewById(R.id.itemGuide);
         btnCareInstruction.setOnClickListener(new View.OnClickListener() {
             @Override
