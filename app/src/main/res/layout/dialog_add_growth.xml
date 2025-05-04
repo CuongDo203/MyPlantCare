@@ -37,7 +37,6 @@
             android:hint="Chiều cao (cm)"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             app:boxStrokeColor="@android:color/black"
-            app:boxStrokeColorFocused="@color/green_focus"
             app:boxBackgroundMode="outline">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etHeight"
@@ -56,7 +55,6 @@
             android:layout_marginTop="8dp"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             app:boxStrokeColor="@android:color/black"
-            app:boxStrokeColorFocused="@color/green_focus"
             app:boxBackgroundMode="outline">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etLeaf"
@@ -75,7 +73,6 @@
             android:layout_marginTop="8dp"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             app:boxStrokeColor="@android:color/black"
-            app:boxStrokeColorFocused="@color/green_focus"
             app:boxBackgroundMode="outline">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etFlower"
@@ -94,7 +91,6 @@
             android:layout_marginTop="8dp"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             app:boxStrokeColor="@android:color/black"
-            app:boxStrokeColorFocused="@color/green_focus"
             app:boxBackgroundMode="outline">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etFruit"

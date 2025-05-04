@@ -304,7 +304,7 @@ public class NoteAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             vh.tvNoteContent.setText(summary);
 
             // 3. Date đã format
-            vh.tvNoteDate.setText("Tạo ngày " + note.getFormattedDate());
+            vh.tvNoteDate.setText("Cập nhật lần cuối " + note.getFormattedDate());
 
             // 4. Delete
             vh.ivDeleteNote.setOnClickListener(v -> {
