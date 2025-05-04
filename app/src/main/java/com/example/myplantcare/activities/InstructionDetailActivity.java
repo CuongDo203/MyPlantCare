@@ -1,24 +1,20 @@
 package com.example.myplantcare.activities;
-
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.example.myplantcare.R;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-
 public class InstructionDetailActivity extends AppCompatActivity {
     private LinearLayout scheduleContainer;
     private TextView noteTextView;
-
     private FirebaseFirestore db;
 
     @Override
@@ -49,6 +45,26 @@ public class InstructionDetailActivity extends AppCompatActivity {
     }
 
     private void loadInstructionsFromFirestore(String plantName, String city, String season) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        // 🔹 1. Lấy note từ document chính
+        db.collection("care_instructions")
+                .document(plantName)
+                .get()
+                .addOnSuccessListener(plantDoc -> {
+                    String note = plantDoc.getString("note");
+                    if (note != null && !note.isEmpty()) {
+                        noteTextView.setText("📝 Lưu ý\n" + note);
+                        noteTextView.setVisibility(View.VISIBLE);
+                    } else {
+                        Log.w("Firestore", "Không có trường 'note' trong document chính.");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", "Lỗi khi lấy note từ document chính: " + e.getMessage());
+                });
+
+        // 🔹 2. Truy vấn search_fillter để lấy danh sách lịch trình
         db.collection("care_instructions")
                 .document(plantName)
                 .collection("search_fillter")
@@ -57,21 +73,14 @@ public class InstructionDetailActivity extends AppCompatActivity {
                 .get()
                 .addOnSuccessListener(querySnapshots -> {
                     if (!querySnapshots.isEmpty()) {
-                        DocumentSnapshot filterDoc = querySnapshots.getDocuments().get(0);
-                        String note = filterDoc.getString("note");
+                        DocumentSnapshot matchedDoc = querySnapshots.getDocuments().get(0);
 
-                        // Hiển thị ghi chú nếu có
-                        if (note != null && !note.isEmpty()) {
-                            noteTextView.setText("📝 Lưu ý\n" + note);
-                            noteTextView.setVisibility(View.VISIBLE);
-                        }
-
-                        // Lấy tham chiếu tiêu đề và hiển thị nếu có lịch trình
+                        // 🟢 Thêm tiêu đề lịch trình nếu có
                         TextView scheduleTitleTextView = findViewById(R.id.scheduleTitleTextView);
                         scheduleTitleTextView.setVisibility(View.VISIBLE);
 
-                        // Lấy và hiển thị danh sách lịch trình
-                        filterDoc.getReference().collection("schedules")
+                        // 🟢 Truy vấn các schedules
+                        matchedDoc.getReference().collection("schedules")
                                 .get()
                                 .addOnSuccessListener(scheduleSnapshots -> {
                                     for (DocumentSnapshot doc : scheduleSnapshots) {
@@ -90,8 +99,15 @@ public class InstructionDetailActivity extends AppCompatActivity {
                                 });
                     } else {
                         Toast.makeText(this, "Không tìm thấy lịch trình phù hợp", Toast.LENGTH_SHORT).show();
+                        Log.w("Firestore", "Không có document nào thỏa mãn city & season.");
                     }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firestore", "Lỗi khi lấy lịch trình: " + e.getMessage());
                 });
     }
+
+
+
 
 }

@@ -19,6 +19,7 @@ import com.google.firebase.firestore.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class CareInstructionActivity extends AppCompatActivity {
     private Spinner plantSpinner;
@@ -194,6 +195,5 @@ public class CareInstructionActivity extends AppCompatActivity {
                     Toast.makeText(this, "Lỗi tải mùa: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
-
 
 }
