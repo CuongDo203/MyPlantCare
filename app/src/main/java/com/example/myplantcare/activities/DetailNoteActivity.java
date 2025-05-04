@@ -92,7 +92,7 @@ public class DetailNoteActivity extends AppCompatActivity {
         storageRoot = storage.getReference();
 
         // Khởi tạo ImageRepository
-        imageRepository = new ImageRepositoryImpl(this);
+        imageRepository = new ImageRepositoryImpl();
 
         // Toolbar
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.insider_toolbar);

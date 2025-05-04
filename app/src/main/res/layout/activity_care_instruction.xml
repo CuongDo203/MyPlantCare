@@ -108,7 +108,7 @@
                         android:alpha="0.7" />
 
                     <TextView
-                        android:id="@+id/plantAgeTextView"
+                        android:id="@+id/plantPositionTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
@@ -118,17 +118,17 @@
                         android:textStyle="bold" />
 
                     <!-- Tình trạng -->
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
+                        android:alpha="0.7"
                         android:text="Tình trạng"
                         android:textColor="#00425A"
-                        android:textSize="14sp"
-                        android:alpha="0.7" />
+                        android:textSize="14sp" />
 
                     <TextView
-                        android:id="@+id/plantSizeTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
