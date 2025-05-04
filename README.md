@@ -41,8 +41,7 @@ PlantCare là ứng dụng hỗ trợ người dùng trong việc chăm sóc câ
 ## 🚀 Công Nghệ Sử Dụng
 - **Ngôn ngữ lập trình:** Java
 - **Framework:** Android SDK
-- **Cơ sở dữ liệu:** Firebase / SQLite
-- **Kiến trúc:** Microservices với REST API
+- **Cơ sở dữ liệu:** Firebase
 
 ## 📌 Hướng Dẫn Cài Đặt
 1. Clone repo: `git clone https://github.com/hduy1305/MyPlantCare.git`
