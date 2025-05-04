@@ -2,10 +2,10 @@
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Nội dung chính (LinearLayout cũ) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -23,7 +23,8 @@
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_marginTop="16dp"
-            android:paddingBottom="8dp"/>
+            android:paddingBottom="8dp"
+            tools:ignore="HardcodedText" />
 
         <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/lineChartHeights"
@@ -40,9 +41,205 @@
             android:layout_width="match_parent"
             android:layout_height="250dp"
             android:layout_marginTop="8dp"/>
+
+        <!-- === PHẦN ẢNH CÂY & CHỈ SỐ BỔ SUNG === -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- Ảnh cây với nút đổi -->
+            <FrameLayout
+                android:layout_width="120dp"
+                android:layout_height="120dp">
+
+                <ImageView
+                    android:id="@+id/imageViewPlantStatistic"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    />
+
+                <ImageButton
+                    android:id="@+id/buttonChangeImageStatistic"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:padding="12dp"
+                    android:layout_gravity="top|end"
+                    android:layout_margin="4dp"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_camera"
+                    android:contentDescription="Đổi ảnh"
+                    app:tint="#000"
+                    tools:ignore="HardcodedText" />
+
+            </FrameLayout>
+
+            <!-- Danh sách chỉ số -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="12dp">
+
+                <!-- Ẩm đất -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="6dp">
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_water_drop"
+                        app:tint="#4CAF50" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ẩm đất"
+                        android:textSize="14sp"
+                        android:layout_marginStart="8dp"
+                        tools:ignore="HardcodedText" />
+                </LinearLayout>
+
+                <!-- Nhiệt độ phòng -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="6dp">
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_thermometer"
+                        app:tint="#FF9800" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nhiệt độ phòng"
+                        android:textSize="14sp"
+                        android:layout_marginStart="8dp"
+                        tools:ignore="HardcodedText" />
+                </LinearLayout>
+
+                <!-- Cường độ ánh sáng -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="6dp">
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_sun"
+                        app:tint="#FFC107" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Cường độ ánh sáng"
+                        android:textSize="14sp"
+                        android:layout_marginStart="8dp"
+                        tools:ignore="HardcodedText" />
+                </LinearLayout>
+
+                <!-- Độ pH của đất -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="6dp">
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_ph"
+                        app:tint="#3F51B5" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Độ pH của đất"
+                        android:textSize="14sp"
+                        android:layout_marginStart="8dp"
+                        tools:ignore="HardcodedText" />
+                </LinearLayout>
+
+                <!-- Tình trạng lá -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="6dp">
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_leaf"
+                        app:tint="#4CAF50"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tình trạng lá"
+                        android:textSize="14sp"
+                        android:layout_marginStart="8dp"
+                        tools:ignore="HardcodedText" />
+                </LinearLayout>
+
+                <!-- Tình trạng rễ -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="6dp">
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_roots"
+                        app:tint="#795548"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tình trạng rễ"
+                        android:textSize="14sp"
+                        android:layout_marginStart="8dp"
+                        tools:ignore="HardcodedText" />
+                </LinearLayout>
+
+                <!-- Mức độ sâu bệnh -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    tools:ignore="UseCompoundDrawables">
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_pest"
+                        app:tint="#F44336"
+                        tools:ignore="ContentDescription" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Mức độ sâu bệnh"
+                        android:textSize="14sp"
+                        android:layout_marginStart="8dp"
+                        tools:ignore="HardcodedText" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+        <!-- === HẾT PHẦN ẢNH & CHỈ SỐ === -->
     </LinearLayout>
 
-    <!-- FAB nổi lên trên, ở góc dưới-phải -->
+
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_growth"
         android:layout_width="wrap_content"
@@ -53,5 +250,6 @@
         app:fabSize="normal"
         android:contentDescription="Thêm thông số"
         android:tint="@android:color/white"
-        app:backgroundTint="#4CAF50"/>
+        app:backgroundTint="#4CAF50"
+        tools:ignore="HardcodedText" />
 </FrameLayout>

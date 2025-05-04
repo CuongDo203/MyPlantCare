@@ -75,7 +75,8 @@
         android:contentDescription="Thêm ghi chú"
         android:src="@drawable/ic_plus"
         android:tint="@android:color/white"
-        android:backgroundTint="#4CAF50" />
+        android:backgroundTint="#4CAF50"
+        tools:ignore="HardcodedText" />
 
     <ProgressBar
         android:id="@+id/progressBar"

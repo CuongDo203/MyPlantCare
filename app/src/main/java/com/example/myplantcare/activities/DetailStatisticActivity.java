@@ -6,9 +6,12 @@ import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -52,6 +55,11 @@ public class DetailStatisticActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private DocumentReference growthRef;
 
+    private ImageView imageViewPlant;
+    private ImageButton buttonChangeImage;
+    private ActivityResultLauncher<String> pickImageLauncher;
+
+
     @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +96,22 @@ public class DetailStatisticActivity extends AppCompatActivity {
         // Charts
         chartHeights = findViewById(R.id.lineChartHeights);
         chartOthers  = findViewById(R.id.lineChartOthers);
+
+        imageViewPlant    = findViewById(R.id.imageViewPlantStatistic);
+        buttonChangeImage = findViewById(R.id.buttonChangeImageStatistic);
+
+        pickImageLauncher = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri != null) {
+                        // Hiển thị ảnh lên ImageView
+                        imageViewPlant.setImageURI(uri);
+
+                        // TODO: nếu cần lưu lên Firebase Storage hoặc Firestore, upload ở đây
+                        // uploadImageToFirebase(uri);
+                    }
+                }
+        );
 
         // FAB to add
         FloatingActionButton fab = findViewById(R.id.fab_add_growth);

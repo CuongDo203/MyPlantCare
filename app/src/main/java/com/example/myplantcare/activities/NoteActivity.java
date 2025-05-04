@@ -77,6 +77,7 @@ public class NoteActivity extends AppCompatActivity {
 
     private String userId;
     private String myPlantId;
+    private String treeName;
 
     private MyPlantModel selectedPlant;
 
@@ -97,6 +98,7 @@ public class NoteActivity extends AppCompatActivity {
         Log.d("NoteActivity", "userId nhận được: " + userId);
         myPlantId = getIntent().getStringExtra("id");
         Log.d("NoteActivity", "myPlantId nhận được: " + myPlantId);
+        treeName = getIntent().getStringExtra("treeName");
 
         etSearchNote = findViewById(R.id.etSearchNote);
         etSearchNote.setRawInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
@@ -117,8 +119,13 @@ public class NoteActivity extends AppCompatActivity {
 
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.insider_toolbar);
         toolbarTitle = toolbar.findViewById(R.id.toolbar_title);
+        if(myPlantId != null){
+            toolbarTitle.setText("Ghi chú " + treeName);
+        }else{
+            toolbarTitle.setText("Toàn bộ ghi chú");
+        }
         toolbarBackButton = toolbar.findViewById(R.id.toolbar_back_button);
-        toolbarTitle.setText("Ghi chú");
+//        toolbarTitle.setText("Ghi chú");
         toolbarBackButton.setOnClickListener(v -> finish());
 
         recyclerView = findViewById(R.id.recyclerViewNotes);

@@ -147,6 +147,7 @@ public class MyPlantAdapter extends RecyclerView.Adapter<MyPlantAdapter.MyPlantV
 //            intent.putExtra("plantName", myPlant.getNickname());
             intent.putExtra("userId", FirebaseAuth.getInstance().getCurrentUser().getUid());
             intent.putExtra("id", myPlant.getId()); // Dùng ID của MyPlantModel, không phải Plant template ID
+            intent.putExtra("treeName",myPlant.getNickname());
             holder.itemView.getContext().startActivity(intent);
         });
     }
