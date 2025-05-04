@@ -336,7 +336,7 @@ public class ScheduleFragment extends Fragment implements
     }
 
     private void showAddScheduleDialog() {
-        AddScheduleDialogFragment addScheduleDialogFragment = AddScheduleDialogFragment.newInstance(null, userId);
+        AddScheduleDialogFragment addScheduleDialogFragment = AddScheduleDialogFragment.newInstance(null, userId, null);
         addScheduleDialogFragment.show(getParentFragmentManager(), "ADD_SCHEDULE_DIALOG");
     }
 

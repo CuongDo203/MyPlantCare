@@ -363,7 +363,7 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
             Log.d(TAG, "Add Schedule button clicked.");
             if (currentUserId != null && myPlantId != null) {
                 // Tạo instance của DialogFragment bằng newInstance() factory method
-                AddScheduleDialogFragment addScheduleDialogFragment = AddScheduleDialogFragment.newInstance(myPlantId, currentUserId);
+                AddScheduleDialogFragment addScheduleDialogFragment = AddScheduleDialogFragment.newInstance(myPlantId, currentUserId, null);
                 addScheduleDialogFragment.setOnScheduleSavedListener(() -> {
                     Log.d(TAG, "AddScheduleDialogFragment reported schedule saved.");
                     if (myPlantDetailViewModel != null) {
@@ -381,7 +381,6 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
         }
     }
 
-    // --- Logic đổi ảnh ---
     private void checkPermissionsAndOpenPicker() {
         String permission;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

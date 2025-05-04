@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MyPlantUpdateActivity extends AppCompatActivity implements View.OnClickListener {
-
     private static final String TAG = "MyPlantUpdateActivity";
 
     private TextInputEditText editTextNickname, editTextLocation, editTextStatus;
@@ -46,7 +45,6 @@ public class MyPlantUpdateActivity extends AppCompatActivity implements View.OnC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_plant_update);
-
         Intent intent = getIntent();
         if(intent != null && intent.getExtras() != null) {
             Bundle extras = intent.getExtras();

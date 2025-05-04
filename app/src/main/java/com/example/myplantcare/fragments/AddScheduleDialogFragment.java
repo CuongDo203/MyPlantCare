@@ -64,14 +64,10 @@ public class AddScheduleDialogFragment extends DialogFragment implements AddPlan
     private EditText editTextNote;
     private Button buttonAddPlant, buttonSaveSchedule;
     private ImageButton buttonCloseDialog;
-
     private LinearLayout layoutCustomFrequencyDays; // <-- Layout cha mới
     private EditText editTextCustomFrequencyDays;
-
     private Calendar selectedDateCalendar = Calendar.getInstance();
-//    private MyPlantListViewModel myPlantListViewModel;
     private AddScheduleViewModel addScheduleViewModel;
-
     private List<MyPlantModel> userPlants = new ArrayList<>();
     private List<TaskModel> allTasks = new ArrayList<>();
     private List<String> frequencyOptions = new ArrayList<>();
@@ -84,6 +80,7 @@ public class AddScheduleDialogFragment extends DialogFragment implements AddPlan
     private String selectedFrequencyText = null;
     private Calendar selectedStartTime;
     private int selectedCustomDays = -1;
+    private String scheduleIdToEdit;
 
     public interface OnScheduleSavedListener {
         void onScheduleSaved();
@@ -95,11 +92,12 @@ public class AddScheduleDialogFragment extends DialogFragment implements AddPlan
         this.onScheduleSavedListener = listener;
     }
 
-    public static AddScheduleDialogFragment newInstance(String plantId, String userId) {
+    public static AddScheduleDialogFragment newInstance(String plantId, String userId, String scheduleId) {
         AddScheduleDialogFragment fragment = new AddScheduleDialogFragment();
         Bundle args = new Bundle();
         args.putString("myPlantId", plantId);
         args.putString("userId", userId);
+        args.putString("scheduleId", scheduleId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -111,6 +109,7 @@ public class AddScheduleDialogFragment extends DialogFragment implements AddPlan
         if (getArguments() != null) {
             myPlantId = getArguments().getString("myPlantId");
             userId = getArguments().getString("userId");
+            scheduleIdToEdit = getArguments().getString("scheduleId");
         }
         if (TextUtils.isEmpty(userId)) {
             Toast.makeText(getContext(), "Lỗi: Không có thông tin người dùng.", Toast.LENGTH_SHORT).show();
@@ -125,10 +124,22 @@ public class AddScheduleDialogFragment extends DialogFragment implements AddPlan
         LayoutInflater inflater = requireActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.dialog_add_schedule, null);
         initContents(view);
-        addScheduleViewModel = new ViewModelProvider(this, new AddScheduleViewModel.Factory(userId, myPlantId)).get(AddScheduleViewModel.class);
+        addScheduleViewModel = new ViewModelProvider(this, new AddScheduleViewModel.Factory(userId, myPlantId, null)).get(AddScheduleViewModel.class);
         setupSpinners();
         setupObservers();
         setupClickListeners();
+
+        if (scheduleIdToEdit != null && !scheduleIdToEdit.isEmpty()) {
+            title.setText("Cập nhật lịch trình");
+            buttonSaveSchedule.setText("Cập nhật lịch trình");
+            buttonAddPlant.setVisibility(View.GONE); // Ẩn nút thêm cây khi chỉnh sửa
+            spinnerPlant.setEnabled(false); // Không cho phép đổi cây khi chỉnh sửa lịch trình
+        } else {
+            title.setText("Thêm lịch trình mới");
+            buttonSaveSchedule.setText("Lưu lịch trình");
+            buttonAddPlant.setVisibility(View.VISIBLE);
+            spinnerPlant.setEnabled(true);
+        }
 
         builder.setView(view);
         AlertDialog dialog = builder.create();
@@ -182,17 +193,28 @@ public class AddScheduleDialogFragment extends DialogFragment implements AddPlan
                 addScheduleViewModel.clearErrorMessage(); // Xóa lỗi sau khi hiển thị
             }
         });
+        addScheduleViewModel.scheduleToEdit.observe(this, schedule -> {
+            if (schedule != null) {
+                Log.d(TAG, "Observed scheduleToEdit: " + schedule.getScheduleId());
+                // Điền dữ liệu lên UI khi nhận được schedule để chỉnh sửa
+                fillDataWhenUpdate(schedule);
+            } else {
+                // Xử lý trường hợp không tải được schedule khi ở chế độ chỉnh sửa
+                if (scheduleIdToEdit != null && !scheduleIdToEdit.isEmpty()) {
+                    Toast.makeText(getContext(), "Không tải được dữ liệu lịch trình.", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "scheduleToEdit observer received null for ID: " + scheduleIdToEdit);
+                }
+            }
+        });
     }
 
     private void updateTaskSpinner(List<TaskModel> tasks) {
         Log.d("AddScheduleDialogFragment", "updateTaskSpinner called"+ tasks.size());
         if (tasks != null) {
             List<String> taskNames = new ArrayList<>();
-            // Thêm item gợi ý/placeholder đầu tiên nếu cần thiết
-            // taskNames.add("Chọn công việc...");
             allTasks = tasks;
             for (TaskModel task : tasks) {
-                taskNames.add(task.getName()); // Sử dụng tên hiển thị
+                taskNames.add(task.getName());
             }
             // Cập nhật Adapter cho Spinner task
             ArrayAdapter<String> taskAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, taskNames);
@@ -203,12 +225,6 @@ public class AddScheduleDialogFragment extends DialogFragment implements AddPlan
             spinnerTask.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    // Bỏ qua item placeholder nếu có
-                    // if (position > 0) { // Nếu có placeholder ở vị trí 0
-                    //      selectedTask = allTasks.get(position - 1);
-                    // } else {
-                    //      selectedTask = null; // placeholder
-                    // }
                     if (position < allTasks.size()) { // Đảm bảo vị trí hợp lệ
                         selectedTask = allTasks.get(position); // Lưu task được chọn
                         Log.d("AddScheduleDialogFragment", "Task selected: " + selectedTask.getName() + ", ID: " + selectedTask.getId());
@@ -248,25 +264,25 @@ public class AddScheduleDialogFragment extends DialogFragment implements AddPlan
     }
     private void updatePlantSpinner(List<MyPlantModel> plants) {
         List<String> plantNames = new ArrayList<>();
-        plantNames.add("Chọn 1 cây..."); // Thêm item gợi ý/placeholder đầu tiên
+        plantNames.add("Chọn 1 cây...");
         int selectedPlantPosition = -1;
         if (plants != null && !plants.isEmpty()) {
             userPlants = plants;
             for (int i = 0; i < plants.size(); i++) {
                 MyPlantModel plant = plants.get(i);
-                plantNames.add(plant.getNickname()); // Sử dụng nickname
+                plantNames.add(plant.getNickname());
                 // Nếu đang ở chi tiết cây cụ thể, tìm vị trí của cây đó
                 if (!TextUtils.isEmpty(myPlantId) && plant.getId() != null && plant.getId().equals(myPlantId)) {
-                    selectedPlantPosition = i;
+                    selectedPlantPosition = i+1;
                 }
             }
             ArrayAdapter<String> plantAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, plantNames);
             plantAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             spinnerPlant.setAdapter(plantAdapter);
 
-
             // Nếu mở từ chi tiết cây, chọn sẵn cây đó trong Spinner
-            if (!TextUtils.isEmpty(myPlantId) && selectedPlantPosition != -1) {
+            if (selectedPlantPosition != -1) {
+                Log.d(TAG, "selectedPlantPosition: " + selectedPlantPosition);
                 spinnerPlant.setSelection(selectedPlantPosition);
             } else if (plants.size() > 0) {
                 // Nếu không mở từ chi tiết cây, chọn cây đầu tiên mặc định
@@ -300,11 +316,6 @@ public class AddScheduleDialogFragment extends DialogFragment implements AddPlan
             spinnerPlant.setAdapter(emptyPlantAdapter);
             Toast.makeText(getContext(), "Không tìm thấy cây nào.", Toast.LENGTH_SHORT).show();
         }
-
-
-        ArrayAdapter<String> plantAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, plantNames);
-        plantAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerPlant.setAdapter(plantAdapter);
     }
 
     private void showAddPlantDialog() {
@@ -379,8 +390,6 @@ public class AddScheduleDialogFragment extends DialogFragment implements AddPlan
         if (userId != null && selectedPlant != null && selectedPlant.getId() != null) {
             Log.d("AddScheduleDialogFragment", "Saving schedule for plant ID: " + selectedPlant.getId() + " and user ID: " + userId);
             addScheduleViewModel.addSchedule(selectedPlant.getId(), newSchedule);
-
-
             // Đặt thông báo định kỳ
             setPeriodicNotification(selectedPlant, newSchedule);
         } else {
@@ -435,7 +444,6 @@ public class AddScheduleDialogFragment extends DialogFragment implements AddPlan
                     // Cập nhật TextView hiển thị ngày
                     updateStartDateLabel();
                 }, year, month, day);
-
         // Giới hạn ngày có thể chọn (tùy chọn)
         datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
         datePickerDialog.show();
@@ -469,7 +477,6 @@ public class AddScheduleDialogFragment extends DialogFragment implements AddPlan
         ArrayAdapter<String> taskAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, new ArrayList<>());
         taskAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerTask.setAdapter(taskAdapter);
-
         // ---- Tần suất ----
         frequencyOptions.clear();
         frequencyOptions.add("Hàng ngày");
@@ -485,7 +492,6 @@ public class AddScheduleDialogFragment extends DialogFragment implements AddPlan
                 String selectedOption = (String) parent.getItemAtPosition(position);
                 Log.d("AddScheduleDialogFragment", "Frequency selected: " + selectedOption);
                 selectedFrequencyText = selectedOption; // Lưu text tùy chọn đã chọn
-
                 // *** Logic hiển thị/ẩn EditText số ngày ***
                 if ("x ngày 1 lần".equals(selectedOption)) {
                     layoutCustomFrequencyDays.setVisibility(View.VISIBLE);
@@ -507,14 +513,12 @@ public class AddScheduleDialogFragment extends DialogFragment implements AddPlan
 
     private void setPeriodicNotification(MyPlantModel myPlant, ScheduleModel schedule) {
         // Kiểm tra tần suất lặp lại từ ScheduleModel (số ngày lặp lại)
-        int frequencyInDays = schedule.getFrequency();  // Giả sử frequency được lưu dưới dạng số ngày
-
+        int frequencyInDays = schedule.getFrequency();  // frequency được lưu dưới dạng số ngày
         if (frequencyInDays <= 0) {
             // Nếu tần suất không hợp lệ, không tạo thông báo
             Log.d("Notification", "Tần suất không hợp lệ");
             return;
         }
-
         // Lấy thời gian thông báo từ ScheduleModel (biến time là Timestamp)
         Timestamp timestamp = schedule.getTime();  // Giả sử time là Timestamp
         if (timestamp == null) {
@@ -535,21 +539,17 @@ public class AddScheduleDialogFragment extends DialogFragment implements AddPlan
         calendar.set(Calendar.MINUTE, minute);
         calendar.set(Calendar.SECOND, 0);  // Đặt giây = 0 để tránh việc trễ thông báo
         calendar.set(Calendar.MILLISECOND, 0);  // Đặt mili giây = 0
-
         // Nếu thời gian đã qua trong ngày, đặt thời gian cho ngày tiếp theo
         if (calendar.getTimeInMillis() < System.currentTimeMillis()) {
             calendar.add(Calendar.DATE, 1);  // Thêm một ngày nếu thời gian đã qua
         }
-
         // Kiểm tra getActivity() có null không trước khi sử dụng
         if (getActivity() == null) {
             Log.e("Notification", "Activity không được đính kèm!");
             return;
         }
-
         Intent intent = new Intent(getActivity(), NotificationReceiver.class);  // NotificationReceiver là BroadcastReceiver
         DocumentReference docRef = db.collection("tasks").document(schedule.getTaskId());
-
         // Lấy document từ Firestore
         docRef.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
