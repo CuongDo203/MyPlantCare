@@ -142,6 +142,32 @@ public class AddScheduleViewModel extends ViewModel {
         });
     }
 
+    public void updateSchedule(String myPlantId, ScheduleModel scheduleModel) {
+        if(userId == null || myPlantId == null || scheduleModel == null) {
+            _errorMessage.postValue("Lỗi: Thiếu thông tin để cập nhật lịch trình.");
+            return;
+        }
+        _isLoading.setValue(true);
+        _errorMessage.setValue(null);
+        _saveResult.setValue(false);
+
+        scheduleRepository.updateSchedule(userId, myPlantId, scheduleModel, new FirestoreCallback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                Log.d(TAG, "Schedule updated successfully for plant ID: " + myPlantId + ", Schedule ID: " + scheduleModel.getId());
+                _saveResult.postValue(true); // Thông báo cập nhật thành công
+                _isLoading.setValue(false); // Kết thúc loading
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Log.e(TAG, "Error updating schedule for plant ID: " + myPlantId + ", Schedule ID: " + scheduleModel.getId(), e);
+                _errorMessage.postValue("Lỗi cập nhật lịch trình: " + e.getMessage());
+                _saveResult.postValue(false); // Thông báo cập nhật thất bại
+                _isLoading.setValue(false); // Kết thúc loading
+            }
+        });
+    }
     public void clearSaveResult() {
         _saveResult.postValue(null);
     }

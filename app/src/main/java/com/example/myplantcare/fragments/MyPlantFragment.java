@@ -339,7 +339,7 @@ public class MyPlantFragment extends Fragment {
         }
     }
 
-    private void openPlantDetailActivity(MyPlantModel plant) {
+    private void    openPlantDetailActivity(MyPlantModel plant) {
         Intent intent = new Intent(requireContext(), MyPlantDetailActivity.class);
         // Cần đảm bảo các key ở đây khớp với các key trong MyPlantDetailActivity.getAndDisplayPlantData()
         intent.putExtra("id", plant.getId()); // Truyền ID cây

@@ -36,11 +36,13 @@ import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.myplantcare.R;
+import com.example.myplantcare.data.responses.ScheduleDisplayItem;
 import com.example.myplantcare.models.MyPlantModel;
 import com.example.myplantcare.models.ScheduleModel;
 import com.example.myplantcare.models.TaskModel;
 
 import com.example.myplantcare.receivers.NotificationReceiver;
+import com.example.myplantcare.utils.DateUtils;
 import com.example.myplantcare.viewmodels.AddScheduleViewModel;
 import com.example.myplantcare.viewmodels.MyPlantListViewModel;
 import com.google.firebase.Timestamp;
@@ -55,9 +57,10 @@ import java.util.List;
 import java.util.Locale;
 
 public class AddScheduleDialogFragment extends DialogFragment implements AddPlantDialogFragment.OnSavePlantListener{
+    private static final String TAG = "AddScheduleDialogFragment";
     FirebaseFirestore db;
     private Spinner spinnerPlant, spinnerTask, spinnerFrequency;
-    private TextView textViewStartDate, textViewStartTime;
+    private TextView textViewStartDate, textViewStartTime, title;
     private EditText editTextNote;
     private Button buttonAddPlant, buttonSaveSchedule;
     private ImageButton buttonCloseDialog;
@@ -232,6 +235,17 @@ public class AddScheduleDialogFragment extends DialogFragment implements AddPlan
         }
     }
 
+    public void fillDataWhenUpdate(ScheduleDisplayItem schedule) {
+        Log.d(TAG, "fillDataWhenUpdate called");
+//        if(schedule!=null) {
+//            title.setText("Cập nhật lịch trình");
+//            textViewStartDate.setText(DateUtils.formatTimestamp(schedule.getStartDate(), DateUtils.DATE_FORMAT_DISPLAY));
+//            textViewStartTime.setText(DateUtils.formatTimestampToTimeString(schedule.getTime()));
+//            selectedDateCalendar.setTime(schedule.getStartDate().toDate());
+//            selectedStartTime = Calendar.getInstance();
+//            selectedStartTime.setTime(schedule.getTime().toDate());
+//        }
+    }
     private void updatePlantSpinner(List<MyPlantModel> plants) {
         List<String> plantNames = new ArrayList<>();
         plantNames.add("Chọn 1 cây..."); // Thêm item gợi ý/placeholder đầu tiên
@@ -423,7 +437,7 @@ public class AddScheduleDialogFragment extends DialogFragment implements AddPlan
                 }, year, month, day);
 
         // Giới hạn ngày có thể chọn (tùy chọn)
-        // datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
+        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
         datePickerDialog.show();
     }
 
@@ -443,6 +457,7 @@ public class AddScheduleDialogFragment extends DialogFragment implements AddPlan
         buttonCloseDialog = view.findViewById(R.id.button_close_dialog);
         layoutCustomFrequencyDays = view.findViewById(R.id.layout_custom_frequency_days);
         editTextCustomFrequencyDays = view.findViewById(R.id.edit_text_custom_frequency_days);
+        title = view.findViewById(R.id.title);
     }
     private void setupSpinners() {
         // ---- Cây ----

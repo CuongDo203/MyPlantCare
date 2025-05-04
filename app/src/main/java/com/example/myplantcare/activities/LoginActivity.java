@@ -155,12 +155,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             if (newUser) {
                                 String uid = user.getUid();
                                 Map<String, Object> userInfo = new HashMap<>();
-                                userInfo.put("name", "Nguyễn Văn A");
+                                userInfo.put("name", "Người dùng");
                                 userInfo.put("email", trimmedEmail);
                                 userInfo.put("phone", "");
                                 userInfo.put("dob", "");
                                 userInfo.put("role", "");
                                 userInfo.put("cityId", "");
+                                userInfo.put("avatar", "");
 
                                 db.collection("users").document(uid)
                                         .set(userInfo)

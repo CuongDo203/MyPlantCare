@@ -15,22 +15,8 @@ import java.util.Map;
 
 public class ImageRepositoryImpl implements ImageRepository {
 
-    private Cloudinary cloudinary;
-    private String cloudName = "djugptpce";
-
     public ImageRepositoryImpl() {
-//        initCloudinary(context);
     }
-
-//    private void initCloudinary(Context context) {
-//        Map<String, String> config = new HashMap<>();
-//        config.put("cloud_name", cloudName);
-//        config.put("api_key", "949566295821873");
-//        config.put("api_secret", "iK5cmT1V3lWXIsvSTjrq0TMxOcg");
-//        MediaManager.init(context, config);
-//
-//
-//    }
 
     public void uploadImage(Uri imageUri, FirestoreCallback<String> callback) {
         if (imageUri == null) {

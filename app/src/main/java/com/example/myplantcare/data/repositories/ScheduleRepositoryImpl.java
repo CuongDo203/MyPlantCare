@@ -74,6 +74,36 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
     }
 
     @Override
+    public void updateSchedule(String userId, String myPlantId, ScheduleModel schedule, FirestoreCallback<Void> callback) {
+        if (userId == null || userId.isEmpty() || myPlantId == null || myPlantId.isEmpty() || schedule == null || schedule.getId() == null || schedule.getId().isEmpty()) {
+            Log.e(TAG, "updateSchedule failed: userId, myPlantId, schedule, or schedule ID is null/empty.");
+            if (callback != null) {
+                callback.onError(new IllegalArgumentException("User ID, Plant ID, Schedule object, or Schedule ID is invalid."));
+            }
+            return;
+        }
+        DocumentReference scheduleRef = userRef
+                .document(userId)
+                .collection(Constants.MY_PLANTS_COLLECTION)
+                .document(myPlantId)
+                .collection(Constants.SCHEDULES_COLLECTION)
+                .document(schedule.getId());
+        scheduleRef.set(schedule) // Ghi đè toàn bộ document
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Schedule updated successfully. Schedule ID: " + schedule.getId() + " for plant: " + myPlantId);
+                    if (callback != null) {
+                        callback.onSuccess(null); // Thông báo thành công
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error updating schedule. Schedule ID: " + schedule.getId() + " for plant: " + myPlantId, e);
+                    if (callback != null) {
+                        callback.onError(e); // Thông báo thất bại
+                    }
+                });
+    }
+
+    @Override
     public void getTodaySchedulesGroupedByTask(String userId, FirestoreCallback<Map<String, List<ScheduleWithMyPlantInfo>>> callback) { // Cập nhật kiểu Callback
         CollectionReference myPlantsRef = db.collection(Constants.USERS_COLLECTION).document(userId).collection(Constants.MY_PLANTS_COLLECTION);
 
