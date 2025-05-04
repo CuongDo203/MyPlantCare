@@ -119,12 +119,9 @@ public class MyPlantListViewModel extends ViewModel {
                 // Lọc theo loại cây (Species ID)
                 // currentFilterSpeciesId sẽ là null nếu chọn "Tất cả loại"
                 if (!TextUtils.isEmpty(this.currentFilterType)) {
-                    // Giả định MyPlantModel có phương thức getSpeciesId() trả về String
                     String plantSpeciesId = plant.getSpeciesId() != null ? plant.getSpeciesId() : "";
                     matchesType = this.currentFilterType.equals(plantSpeciesId);
                 }
-
-                // Thêm vào danh sách lọc nếu khớp cả hai tiêu chí (hoặc không có tiêu chí)
                 if (matchesSearch && matchesType) {
                     filteredList.add(plant);
                 }
@@ -149,15 +146,13 @@ public class MyPlantListViewModel extends ViewModel {
             public void onSuccess(Void result) {
                 Log.d("MyPlantListViewModel", "Plant deleted successfully: " + plantId);
                 _errorMessage.postValue("Đã xóa cây thành công!"); // Báo cáo thành công
-                loadMyPlants(); // <-- Tải lại để refresh danh sách
+                loadMyPlants();
             }
 
             @Override
             public void onError(Exception e) {
                 Log.e("MyPlantListViewModel", "Error deleting plant: " + plantId, e);
-                _errorMessage.postValue("Lỗi xóa cây: " + e.getMessage()); // Báo cáo lỗi
-
-                // _isLoading.setValue(false); // Kết thúc loading nếu có cờ riêng cho xóa
+                _errorMessage.postValue("Lỗi xóa cây: " + e.getMessage());
             }
         });
     }

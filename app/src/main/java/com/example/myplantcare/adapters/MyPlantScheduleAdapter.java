@@ -26,7 +26,7 @@ public class MyPlantScheduleAdapter extends RecyclerView.Adapter<MyPlantSchedule
 
     public interface OnScheduleItemClickListener {
         void onDeleteClick(ScheduleDisplayItem schedule); // Xử lý click nút xóa
-        // Thêm các sự kiện click khác nếu cần
+        void onScheduleItemClick(ScheduleDisplayItem schedule);
     }
 
     public MyPlantScheduleAdapter(OnScheduleItemClickListener listener) {
@@ -69,6 +69,15 @@ public class MyPlantScheduleAdapter extends RecyclerView.Adapter<MyPlantSchedule
             }
             else {
                 Log.w(TAG, "OnScheduleItemClickListener is null. Delete click not handled.");
+            }
+        });
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onScheduleItemClick(schedule);
+                Log.d(TAG, "Item clicked for schedule ID: " + schedule.getScheduleId());
+            }
+            else {
+                Log.w(TAG, "OnScheduleItemClickListener is null. Item click not handled.");
             }
         });
     }

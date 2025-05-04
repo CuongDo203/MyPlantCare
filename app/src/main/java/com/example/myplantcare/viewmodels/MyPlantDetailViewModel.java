@@ -254,13 +254,7 @@ public class MyPlantDetailViewModel extends ViewModel {
             Log.d(TAG, "Combined data updated. Display items size: " + displayItems.size());
 
         } else {
-            // Dữ liệu chưa đủ để kết hợp (một trong hai danh sách vẫn là null)
-            // Giữ trạng thái loading nếu một trong hai nguồn vẫn đang tải
-            // Nếu cả 2 nguồn đều null khi tải xong (ví dụ: load lỗi), _schedules sẽ không bao giờ được set
-            // Xử lý trường hợp lỗi tải trong onError của từng repository
             Log.d(TAG, "Data not ready for combining. rawSchedules=" + (rawSchedules != null) + ", tasks=" + (tasks != null));
-            // Không set _isLoadingSchedules = false ở đây, chờ đến khi cả 2 nguồn đều cập nhật
-            // (combineLatestData sẽ được gọi lại)
         }
     }
 
@@ -294,7 +288,6 @@ public class MyPlantDetailViewModel extends ViewModel {
         });
     }
 
-    // Phương thức thêm lịch trình (Di chuyển từ Fragment)
     public void addSchedule(ScheduleModel schedule) {
         if (userId == null || myPlantId == null || schedule == null) {
             _operationResult.postValue("Lỗi: Dữ liệu lịch trình không hợp lệ.");

@@ -17,6 +17,7 @@ import com.example.myplantcare.utils.FirestoreCallback;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +53,7 @@ public class HomeViewModel extends ViewModel {
         this.userId = userId;
     }
 
-    public void fetchWeatherData(String cityName, String apiKey, String units, String lang) {
+    public void fetchWeatherDataByCityName(String cityName, String apiKey, String units, String lang) {
         _isLoading.setValue(true); // Bắt đầu loading
 
         weatherRepository.getCurrentWeatherLiveData(cityName, apiKey, units, lang).observeForever(response -> {
@@ -64,6 +65,19 @@ public class HomeViewModel extends ViewModel {
             }
             // Cần remove observer này khi ViewModel bị cleared để tránh memory leak nếu Repo là singleton
 
+        });
+    }
+
+    public void fetchWeatherDataByCoordinates(double lat, double lon, String apiKey, String units, String lang) {
+        _isLoadingWeather.setValue(true);
+
+        weatherRepository.getCurrentWeatherLiveDataByCoordinates(lat, lon, apiKey, units, lang).observeForever(response -> {
+            _isLoadingWeather.setValue(false);
+            if (response != null) {
+                _weatherData.setValue(response);
+            } else {
+                _errorMessage.setValue("Không thể tải dữ liệu thời tiết");
+            }
         });
     }
 
@@ -110,13 +124,13 @@ public class HomeViewModel extends ViewModel {
         if (userId == null || userId.isEmpty()) {
             Log.w(TAG, "fetchTodayUncompletedTasks: userId is null or empty.");
             _errorMessage.postValue("Lỗi: Không thể tải danh sách công việc do thiếu thông tin người dùng.");
-            _isLoadingTasks.postValue(false); // Ensure loading is off
+            _isLoadingTasks.postValue(false);
             return;
         }
 
-        _isLoadingTasks.setValue(true); // Start task loading
+        _isLoadingTasks.setValue(true);
 
-        Calendar today = Calendar.getInstance(); // Get today's date
+        Calendar today = Calendar.getInstance();
 
         // Use the repository method to get schedules for today, grouped and split
         scheduleRepository.getSchedulesForDateGroupedByTask(userId, today, new FirestoreCallback<Pair<Map<String, List<ScheduleWithMyPlantInfo>>, Map<String, List<ScheduleWithMyPlantInfo>>>>() {
@@ -131,7 +145,7 @@ public class HomeViewModel extends ViewModel {
                         List<ScheduleWithMyPlantInfo> tasksForThisName = entry.getValue();
                         if (tasksForThisName != null) {
                             for (ScheduleWithMyPlantInfo task : tasksForThisName) {
-                                task.setTaskName(taskName); // <--- GÁN GIÁ TRỊ VÀO ĐÂY
+                                task.setTaskName(taskName);
                                 uncompletedTasks.add(task);
                             }
                         }
@@ -140,7 +154,12 @@ public class HomeViewModel extends ViewModel {
                 } else {
                     Log.d(TAG, "No uncompleted tasks found for today or resultPair/first is null.");
                 }
-                // Cập nhật LiveData với danh sách phẳng
+                uncompletedTasks.sort(new Comparator<ScheduleWithMyPlantInfo>() {
+                    @Override
+                    public int compare(ScheduleWithMyPlantInfo o1, ScheduleWithMyPlantInfo o2) {
+                        return o1.getSchedule().getTime().compareTo(o2.getSchedule().getTime());
+                    }
+                });
                 _todayUncompletedTasks.postValue(uncompletedTasks);
             }
 

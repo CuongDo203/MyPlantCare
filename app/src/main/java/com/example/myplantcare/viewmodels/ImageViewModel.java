@@ -21,7 +21,7 @@ public class ImageViewModel extends ViewModel {
     private ImageRepository imageRepository;
 
     public ImageViewModel(Context context) {
-        imageRepository = new ImageRepositoryImpl(context);
+        imageRepository = new ImageRepositoryImpl();
     }
 
     public void uploadImage(Uri imageUri, FirestoreCallback<String> callback) {

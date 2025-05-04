@@ -68,9 +68,9 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
     private MyPlantDetailViewModel myPlantDetailViewModel;
     private LottieAnimationView lottieNoSchedule;
 
-    private FrameLayout plantImageContainer; // Container around image and Lottie
+    private FrameLayout plantImageContainer;
     private LottieAnimationView lottieImageLoading;
-    private ProgressBar progressBarSchedules; // Tham chiếu ProgressBar
+    private ProgressBar progressBarSchedules;
     private LinearLayout emptySchedulesView;
 
     @Override
@@ -363,7 +363,7 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
             Log.d(TAG, "Add Schedule button clicked.");
             if (currentUserId != null && myPlantId != null) {
                 // Tạo instance của DialogFragment bằng newInstance() factory method
-                AddScheduleDialogFragment addScheduleDialogFragment = AddScheduleDialogFragment.newInstance(myPlantId, currentUserId);
+                AddScheduleDialogFragment addScheduleDialogFragment = AddScheduleDialogFragment.newInstance(myPlantId, currentUserId, null);
                 addScheduleDialogFragment.setOnScheduleSavedListener(() -> {
                     Log.d(TAG, "AddScheduleDialogFragment reported schedule saved.");
                     if (myPlantDetailViewModel != null) {
@@ -381,7 +381,6 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
         }
     }
 
-    // --- Logic đổi ảnh ---
     private void checkPermissionsAndOpenPicker() {
         String permission;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -446,11 +445,32 @@ public class MyPlantDetailActivity extends AppCompatActivity implements View.OnC
             public void onDeleteClick(ScheduleDisplayItem schedule) {
                 showDeleteScheduleConfirmationDialog(schedule);
             }
-            // TODO: Implement các click listener khác của ScheduleAdapter nếu có
+
+            @Override
+            public void onScheduleItemClick(ScheduleDisplayItem schedule) {
+                Log.d(TAG, "Schedule item clicked for editing: " + schedule.getScheduleId());
+                if (currentUserId != null && myPlantId != null && schedule != null && schedule.getScheduleId() != null) {
+                    // Mở dialog AddScheduleDialogFragment ở chế độ chỉnh sửa
+//                    AddScheduleDialogFragment editScheduleDialogFragment = AddScheduleDialogFragment.newInstance(myPlantId, currentUserId); // Truyền scheduleId
+//                    editScheduleDialogFragment.setOnScheduleSavedListener(() -> {
+//                        Log.d(TAG, "AddScheduleDialogFragment reported schedule saved (edit mode).");
+//                        // Tải lại lịch trình sau khi thêm/cập nhật thành công
+//                        if (myPlantDetailViewModel != null) {
+//                            myPlantDetailViewModel.loadPlantSchedulesAndTasks();
+//                            Log.d(TAG, "Triggering loadPlantSchedulesAndTasks() after dialog saved (edit mode).");
+//                        } else {
+//                            Log.w(TAG, "ViewModel is null, cannot load schedules after dialog saved (edit mode).");
+//                        }
+//                    });
+//                    editScheduleDialogFragment.show(getSupportFragmentManager(), "EDIT_SCHEDULE_DIALOG");
+//                    editScheduleDialogFragment.fillDataWhenUpdate(schedule);
+                } else {
+                    Log.e(TAG, "Cannot open EditScheduleDialog: userId, plantId, schedule, or schedule ID is null.");
+                }
+            }
         });
         recyclerViewSchedules.setLayoutManager(new LinearLayoutManager(this)); // LayoutManager (ví dụ: dọc)
         recyclerViewSchedules.setAdapter(myPlantScheduleAdapter);
-
     }
 
     private void showDeletePlantConfirmationDialog() {

@@ -22,6 +22,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -67,6 +69,36 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
                     Log.e("ScheduleRepository", "Error adding schedule for plant: " + myPlantId, e);
                     if (callback != null) {
                         callback.onError(e); // Thông báo thất bại kèm Exception
+                    }
+                });
+    }
+
+    @Override
+    public void updateSchedule(String userId, String myPlantId, ScheduleModel schedule, FirestoreCallback<Void> callback) {
+        if (userId == null || userId.isEmpty() || myPlantId == null || myPlantId.isEmpty() || schedule == null || schedule.getId() == null || schedule.getId().isEmpty()) {
+            Log.e(TAG, "updateSchedule failed: userId, myPlantId, schedule, or schedule ID is null/empty.");
+            if (callback != null) {
+                callback.onError(new IllegalArgumentException("User ID, Plant ID, Schedule object, or Schedule ID is invalid."));
+            }
+            return;
+        }
+        DocumentReference scheduleRef = userRef
+                .document(userId)
+                .collection(Constants.MY_PLANTS_COLLECTION)
+                .document(myPlantId)
+                .collection(Constants.SCHEDULES_COLLECTION)
+                .document(schedule.getId());
+        scheduleRef.set(schedule) // Ghi đè toàn bộ document
+                .addOnSuccessListener(aVoid -> {
+                    Log.d(TAG, "Schedule updated successfully. Schedule ID: " + schedule.getId() + " for plant: " + myPlantId);
+                    if (callback != null) {
+                        callback.onSuccess(null); // Thông báo thành công
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error updating schedule. Schedule ID: " + schedule.getId() + " for plant: " + myPlantId, e);
+                    if (callback != null) {
+                        callback.onError(e); // Thông báo thất bại
                     }
                 });
     }
@@ -371,7 +403,22 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
                     }
                 }
                 Log.d(TAG, "Collected " + allDueScheduleTuples.size() + " due schedule tuples across all plants.");
+                Collections.sort(allDueScheduleTuples, new Comparator<ScheduleCompletionTuple>() {
+                    @Override
+                    public int compare(ScheduleCompletionTuple tuple1, ScheduleCompletionTuple tuple2) {
+                        Timestamp time1 = tuple1.schedule != null ? tuple1.schedule.getTime() : null;
+                        Timestamp time2 = tuple2.schedule != null ? tuple2.schedule.getTime() : null;
 
+                        // Xử lý trường hợp null: đặt các lịch trình không có thời gian ở cuối danh sách
+                        if (time1 == null && time2 == null) return 0; // Cả hai đều null -> coi như bằng nhau
+                        if (time1 == null) return 1; // time1 null, time2 không null -> time1 đứng sau time2
+                        if (time2 == null) return -1; // time2 null, time1 không null -> time1 đứng trước time2
+
+                        // So sánh Timestamp: compareTo trả về <0 nếu time1 < time2, 0 nếu bằng, >0 nếu time1 > time2
+                        return time1.compareTo(time2); // Sắp xếp tăng dần (sớm đến muộn)
+                    }
+                });
+                Log.d(TAG, "Sorted due schedule tuples by time.");
                 // --- BƯỚC 4: Thu thập tất cả các Task ID duy nhất từ các tuples đến hạn ---
                 List<String> uniqueTaskIds = new ArrayList<>();
                 for (ScheduleCompletionTuple tuple : allDueScheduleTuples) {
@@ -406,7 +453,7 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
                         taskNameFetchTasks.add(taskFetch); // Thêm Task fetch Task document vào danh sách chờ
                     }
                 }
-                // --- BƯỚC 6: Đợi tất cả các Task lấy tên Task hoàn tất và gom nhóm lịch trình ---
+                // --- Đợi tất cả các Task lấy tên Task hoàn tất và gom nhóm lịch trình ---
                 Tasks.whenAll(taskNameFetchTasks).addOnSuccessListener(v -> {
                     Log.d(TAG, "All task name fetch tasks completed. Grouping schedules by task name and completion status.");
                     // Khởi tạo hai map cuối cùng: một cho lịch trình chưa hoàn thành, một cho đã hoàn thành
@@ -423,6 +470,9 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
                             }
                             // Tạo đối tượng wrapper cuối cùng
                             ScheduleWithMyPlantInfo swmpi = new ScheduleWithMyPlantInfo(tuple.schedule, tuple.myPlant);
+
+                            swmpi.setTaskName(taskName);
+                            swmpi.setCompletedOnDate(tuple.isCompleted);
                             // Thêm đối tượng vào map tương ứng dựa trên trạng thái hoàn thành
                             if (tuple.isCompleted) {
                                 finalCompletedMap.computeIfAbsent(taskName, k -> new ArrayList<>()).add(swmpi);
@@ -433,7 +483,6 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
                             Log.w(TAG, "Skipping invalid tuple during final grouping.");
                         }
                     }
-
                     Log.d(TAG, "Final grouping completed. Uncompleted groups: " + finalUncompletedMap.size() + ", Completed groups: " + finalCompletedMap.size());
                     // --- BƯỚC 7: Trả về kết quả cuối cùng qua callback ---
                     callback.onSuccess(new Pair<>(finalUncompletedMap, finalCompletedMap));
@@ -441,7 +490,6 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
                     Log.e(TAG, "Error waiting for task name fetch tasks", e);
                     callback.onError(e);
                 });
-
             }).addOnFailureListener(e -> {
                 Log.e(TAG, "Error collecting all schedule completion tuples", e);
                 callback.onError(e);
@@ -454,7 +502,6 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
 
     @Override
     public void unmarkScheduleCompleted(String userId, String myPlantId, String scheduleId, Calendar date, FirestoreCallback<Void> callback) {
-        // Kiểm tra tham số đầu vào
         if (userId == null || userId.isEmpty() || myPlantId == null || myPlantId.isEmpty() || scheduleId == null || scheduleId.isEmpty() || date == null) {
             Log.w(TAG, "unmarkScheduleCompleted: invalid input.");
             if (callback != null) {
@@ -483,7 +530,6 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
         taskLogsCollectionRef
                 .whereEqualTo("scheduleId", scheduleId)
                 .whereEqualTo("date", new Timestamp(dateZeroTime.getTime()))
-                // Có thể thêm .whereEqualTo("status", "done") nếu chỉ xóa log "done"
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     // Danh sách các Task xóa
@@ -494,7 +540,6 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         deleteTasks.add(doc.getReference().delete());
                     }
-
                     // Đợi tất cả các Task xóa hoàn tất
                     Tasks.whenAll(deleteTasks)
                             .addOnSuccessListener(v -> {
@@ -537,9 +582,7 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
         dateZeroTime.set(Calendar.MILLISECOND, 0);
 
         // Tạo đối tượng TaskLogModel
-        TaskLogModel taskLog = new TaskLogModel(scheduleId, new Timestamp(dateZeroTime.getTime()), true);
-        taskLog.setTaskName(taskName);
-        taskLog.setUserPhotoUrl("");
+        TaskLogModel taskLog = new TaskLogModel(scheduleId, taskName, new Timestamp(dateZeroTime.getTime()), true, "");
 
         // Lấy tham chiếu đến subcollection 'task_logs' dưới cây cụ thể của người dùng
         CollectionReference taskLogsCollectionRef = userRef
@@ -549,7 +592,6 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
                 .collection(Constants.TASK_LOGS_COLLECTION); // "task_logs"
 
         // Thêm document log mới. Firestore sẽ tự tạo ID.
-        // Firestore Rules cần cho phép người dùng ghi vào đây.
         taskLogsCollectionRef.add(taskLog)
                 .addOnSuccessListener(documentReference -> {
                     Log.d(TAG, "Task log added successfully for schedule: " + scheduleId + " on date: " + dateZeroTime.getTime());
@@ -577,8 +619,6 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
             this.isCompleted = isCompleted;
         }
     }
-
-    // --- NEW Method to check if a schedule is due on a specific date ---
     private boolean isDueOnDate(ScheduleModel schedule, Calendar targetDateZeroTime) {
         if (schedule == null || schedule.getStartDate() == null || schedule.getFrequency() == null || schedule.getFrequency() <= 0) {
             Log.w(TAG, "isDueOnDate: invalid schedule data.");
@@ -594,16 +634,13 @@ public class ScheduleRepositoryImpl implements ScheduleRepository {
         startCal.set(Calendar.SECOND, 0);
         startCal.set(Calendar.MILLISECOND, 0);
 
-        // Check if target date is on or after the start date
         if (targetDateZeroTime.before(startCal)) {
             return false;
         }
 
-        // Calculate days between start date and target date (ignoring time)
         long diffMillis = targetDateZeroTime.getTimeInMillis() - startCal.getTimeInMillis();
         int daysBetween = (int) TimeUnit.DAYS.convert(diffMillis, TimeUnit.MILLISECONDS);
 
-        // Check if daysBetween is a multiple of frequency
         return daysBetween % schedule.getFrequency() == 0;
     }
 

@@ -35,6 +35,7 @@ import com.example.myplantcare.data.repositories.MyPlantRepositoryImpl;
 import com.example.myplantcare.models.MyPlantModel;
 // import com.example.myplantcare.utils.FileUtils; // Không cần thiết cho upload Uri
 import com.example.myplantcare.utils.FirestoreCallback;
+import com.example.myplantcare.viewmodels.AddPlantViewModel;
 import com.example.myplantcare.viewmodels.ImageViewModel;
 import com.example.myplantcare.viewmodels.SpeciesViewModel;
 import com.google.firebase.auth.FirebaseAuth; // Import Firebase Auth
@@ -60,22 +61,10 @@ public class AddPlantDialogFragment extends DialogFragment {
     private Uri selectedImageUri = null;
 
     private SpeciesViewModel speciesViewModel;
-    private ImageViewModel imageViewModel;
-
-    private MyPlantRepository myPlantRepository;
+    private AddPlantViewModel addPlantViewModel;
     private ActivityResultLauncher<Intent> imagePickerLauncher;
 
     private String userId;
-
-    public static AddPlantDialogFragment newInstance(String myPlantId, String userId) { // Thêm userId
-        AddPlantDialogFragment fragment = new AddPlantDialogFragment();
-        Bundle args = new Bundle();
-        args.putString("my_plant_id", myPlantId);
-        args.putString("user_id", userId);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     public interface OnSavePlantListener {
         void onSavePlant();
     }
@@ -88,6 +77,14 @@ public class AddPlantDialogFragment extends DialogFragment {
 
     public AddPlantDialogFragment() {
 
+    }
+    public static AddPlantDialogFragment newInstance(String myPlantId, String userId) { // Thêm userId
+        AddPlantDialogFragment fragment = new AddPlantDialogFragment();
+        Bundle args = new Bundle();
+        args.putString("my_plant_id", myPlantId);
+        args.putString("user_id", userId);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
@@ -119,9 +116,13 @@ public class AddPlantDialogFragment extends DialogFragment {
                     }
                 });
 
-        myPlantRepository = new MyPlantRepositoryImpl();
     }
 
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+    }
 
     @NonNull
     @Override
@@ -132,19 +133,14 @@ public class AddPlantDialogFragment extends DialogFragment {
 
         speciesViewModel = new ViewModelProvider(this).get(SpeciesViewModel.class);
 
-        imageViewModel = new ViewModelProvider(this, new ViewModelProvider.Factory() {
+        addPlantViewModel = new ViewModelProvider(this, new ViewModelProvider.Factory() {
             @NonNull
             @Override
             public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-                if (modelClass.isAssignableFrom(ImageViewModel.class)) {
-                    return (T) new ImageViewModel(requireContext());
-                }
-                throw new IllegalArgumentException("Unknown ViewModel class");
+                return (T) new AddPlantViewModel();
             }
-        }).get(ImageViewModel.class);
+        }).get(AddPlantViewModel.class);
 
-
-        // --- Tìm Views ---
         imageViewPlantPreview = view.findViewById(R.id.image_view_plant_preview);
         editTextPlantName = view.findViewById(R.id.edit_text_plant_name);
         spinnerPlantType = view.findViewById(R.id.spinner_plant_type);
@@ -154,16 +150,13 @@ public class AddPlantDialogFragment extends DialogFragment {
         buttonSavePlant = view.findViewById(R.id.button_save_plant);
         editTextLocation = view.findViewById(R.id.edit_text_plant_location);
 
-        // --- Setup Spinner Loại cây ---
         setupPlantTypeSpinner();
 
-        // --- Setup Click Listeners ---
         buttonCloseDialogPlant.setOnClickListener(v -> dismiss());
         buttonOpenDatePicker.setOnClickListener(v -> showDatePickerDialog());
         imageViewPlantPreview.setOnClickListener(v -> openImagePicker());
         buttonSavePlant.setOnClickListener(v -> savePlant());
-
-
+        observeViewModels();
         builder.setView(view);
 
         AlertDialog dialog = builder.create();
@@ -171,10 +164,33 @@ public class AddPlantDialogFragment extends DialogFragment {
             dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         }
 
-        // Hiển thị ngày trồng mặc định (ngày hiện tại)
         updatePlantingDateLabel();
 
         return dialog;
+    }
+
+    private void observeViewModels() {
+        addPlantViewModel.isLoading.observe(this, isLoading -> {
+            showLoading(isLoading);
+        });
+        addPlantViewModel.errorMessage.observe(this, error -> {
+            if (error != null && !error.isEmpty()) {
+                Toast.makeText(requireContext(), "Lỗi: " + error, Toast.LENGTH_SHORT).show();
+                addPlantViewModel.clearErrorMessage();
+            }
+        });
+        addPlantViewModel.saveSuccess.observe(this, isSuccess -> {
+            Log.d(TAG, "AddPlantViewModel saveSuccess: " + isSuccess);
+            if (isSuccess != null && isSuccess) { // Kiểm tra isSuccess không null và là true
+                Log.d(TAG, "AddPlantViewModel saveSuccess: true");
+                Toast.makeText(requireContext(), "Cây đã được lưu", Toast.LENGTH_SHORT).show();
+                if (onSavePlantListener != null) {
+                    onSavePlantListener.onSavePlant();
+                }
+                dismiss(); // Đóng dialog sau khi lưu thành công
+                addPlantViewModel.clearSaveSuccess(); // Xóa trạng thái thành công
+            }
+        });
     }
 
 
@@ -183,7 +199,6 @@ public class AddPlantDialogFragment extends DialogFragment {
         if (this.userId == null || this.userId.isEmpty()) {
             Log.e(TAG, "User ID is null or empty. Cannot save plant.");
             Toast.makeText(requireContext(), "Lỗi: Không có thông tin người dùng.", Toast.LENGTH_SHORT).show();
-            // Tùy chọn: Đóng dialog hoặc chuyển hướng đến login
              dismiss();
             return;
         }
@@ -226,66 +241,7 @@ public class AddPlantDialogFragment extends DialogFragment {
         // myPlantToSave.setProgress(0); // Set progress nếu cần
         // myPlantToSave.setCreatedAt(new Timestamp(plantingDateCalendar.getTime())); // Lưu ngày trồng vào created_at hoặc trường riêng
 
-        // --- Logic lưu ---
-        showLoading(true); // Bắt đầu hiển thị trạng thái tải
-
-        // Tạo callback xử lý kết quả lưu Firestore (chung cho cả 2 trường hợp có/không ảnh)
-        FirestoreCallback<Void> saveToFirestoreCallback = new FirestoreCallback<Void>() {
-            @Override
-            public void onSuccess(Void data) {
-                Log.d(TAG, "Plant saved to Firestore successfully.");
-                Toast.makeText(requireContext(), "Cây đã được lưu", Toast.LENGTH_SHORT).show();
-                showLoading(false); // Ẩn loading
-                // Gọi listener nếu được gán
-                if (onSavePlantListener != null) {
-                    onSavePlantListener.onSavePlant();
-                }
-                dismiss(); // Đóng dialog
-            }
-
-            @Override
-            public void onError(Exception e) {
-                Log.e(TAG, "Error saving plant to Firestore: " + e.getMessage(), e);
-                Toast.makeText(requireContext(), "Lỗi khi lưu cây: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                showLoading(false); // Ẩn loading
-            }
-        };
-
-
-        if(selectedImageUri != null) {
-            // Có ảnh -> Upload ảnh trước
-            Log.d(TAG, "Image selected, proceeding to upload.");
-            // Call ViewModel để upload ảnh, xử lý kết quả bằng callback
-            imageViewModel.uploadImage(selectedImageUri, new FirestoreCallback<String>() { // Truyền Uri trực tiếp
-                @Override
-                public void onSuccess(String imageUrl) {
-                    Log.d(TAG, "Image uploaded successfully. URL: " + imageUrl);
-                    // Ảnh upload thành công, set URL vào model
-                    myPlantToSave.setImage(imageUrl);
-                    // Bây giờ lưu model vào Firestore
-                    savePlantToFirestore(userId, myPlantToSave, saveToFirestoreCallback); // Gọi hàm lưu vào Firestore
-                }
-
-                @Override
-                public void onError(Exception e) {
-                    Log.e(TAG, "Image upload failed: " + e.getMessage(), e);
-                    Toast.makeText(requireContext(), "Lỗi upload ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    showLoading(false); // Ẩn loading
-                    // Không lưu cây vào Firestore nếu upload ảnh lỗi
-                }
-            });
-        } else {
-            // Không có ảnh -> Lưu cây trực tiếp vào Firestore
-            Log.d(TAG, "No image selected, saving plant directly.");
-            // Image URL trong myPlantToSave đang là null, phù hợp
-            savePlantToFirestore(userId, myPlantToSave, saveToFirestoreCallback);
-        }
-    }
-
-    // Hàm riêng để lưu đối tượng MyPlantModel vào Firestore (nhận thêm callback)
-    private void savePlantToFirestore(String userId, MyPlantModel myPlant, FirestoreCallback<Void> callback) {
-        Log.d(TAG, "Saving plant to Firestore...");
-        myPlantRepository.addMyPlant(userId, myPlant, callback); // Sử dụng callback được truyền vào
+        addPlantViewModel.savePlant(userId, myPlantToSave, selectedImageUri);
     }
 
     // Hàm hiển thị/ẩn trạng thái tải

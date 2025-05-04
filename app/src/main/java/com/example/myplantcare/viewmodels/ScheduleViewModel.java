@@ -99,14 +99,18 @@ public class ScheduleViewModel extends ViewModel {
 
     public void markScheduleCompleted(ScheduleWithMyPlantInfo scheduleItem) {
         // Kiểm tra tính hợp lệ của scheduleItem và userId, cũng như ngày đã load
-        if (userId == null || userId.isEmpty() || scheduleItem == null || scheduleItem.getSchedule().getId() == null || scheduleItem.getSchedule().getId().isEmpty() || scheduleItem.getMyPlant() == null || scheduleItem.getMyPlant().getId() == null || scheduleItem.getMyPlant().getId().isEmpty() || currentLoadedDate == null) {
+        if (userId == null || userId.isEmpty() || scheduleItem == null || scheduleItem.getSchedule().getId() == null
+                || scheduleItem.getSchedule().getId().isEmpty() || scheduleItem.getMyPlant() == null || scheduleItem.getMyPlant().getId() == null
+                || scheduleItem.getMyPlant().getId().isEmpty() || currentLoadedDate == null) {
             Log.w(TAG, "markScheduleCompleted: invalid input. userId, scheduleItem, or currentLoadedDate is null/empty.");
             _operationResult.postValue("Lỗi: Không đủ thông tin để hoàn thành công việc.");
             return;
         }
 
         _isMarkingUnmarking.setValue(true); // Bật trạng thái loading cho thao tác
-
+        if(scheduleItem.getTaskName() == null) {
+            scheduleItem.setTaskName("----");
+        }
         // Gọi Repository để thêm task log
         scheduleRepository.markScheduleCompleted(userId, scheduleItem.getMyPlant().getId(), scheduleItem.getSchedule().getId(),scheduleItem.getTaskName(), currentLoadedDate, new FirestoreCallback<Void>() {
             @Override
@@ -114,7 +118,7 @@ public class ScheduleViewModel extends ViewModel {
                 _isMarkingUnmarking.postValue(false); // Tắt loading
                 _operationResult.postValue("Đã hoàn thành công việc!"); // Thông báo thành công
                 Log.d(TAG, "Schedule marked completed successfully. Schedule ID: " + scheduleItem.getSchedule().getId());
-
+                Log.d(TAG, "Task name: " + scheduleItem.getTaskName());
                 // Tải lại lịch trình cho ngày hiện tại để cập nhật UI
                 loadSchedulesForDate(currentLoadedDate);
             }

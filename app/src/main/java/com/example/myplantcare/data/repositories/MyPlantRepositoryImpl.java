@@ -7,6 +7,7 @@ import com.example.myplantcare.utils.Constants;
 import com.example.myplantcare.utils.FirestoreCallback;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -14,16 +15,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class MyPlantRepositoryImpl implements MyPlantRepository{
+public class MyPlantRepositoryImpl implements MyPlantRepository {
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    public MyPlantRepositoryImpl() {
+    }
+
     @Override
     public void getAllMyPlants(String userId, FirestoreCallback<List<MyPlantModel>> callback) {
         CollectionReference myPLantsRef = db.collection(Constants.USERS_COLLECTION)
                 .document(userId).collection(Constants.MY_PLANTS_COLLECTION);
         myPLantsRef.get().addOnSuccessListener(queryDocumentSnapshots -> {
             List<MyPlantModel> myPlants = new ArrayList<>();
-            for(QueryDocumentSnapshot doc : queryDocumentSnapshots){
+            for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                 MyPlantModel myPlant = doc.toObject(MyPlantModel.class);
                 myPlant.setId(doc.getId());
                 myPlants.add(myPlant);
@@ -94,7 +99,9 @@ public class MyPlantRepositoryImpl implements MyPlantRepository{
                 .collection(Constants.MY_PLANTS_COLLECTION)
                 .document(myPlantId);
 
-        docRef.update(updates) // Sử dụng update() để chỉ cập nhật các trường trong map
+        updates.put("updated_at", FieldValue.serverTimestamp());
+
+        docRef.update(updates)
                 .addOnSuccessListener(unused -> {
                     Log.d("MyPlantRepository", "Plant updated successfully for ID: " + myPlantId + " for user: " + userId);
                     callback.onSuccess(null);
@@ -103,7 +110,6 @@ public class MyPlantRepositoryImpl implements MyPlantRepository{
                     Log.e("MyPlantRepository", "Error updating plant for ID: " + myPlantId + " for user: " + userId, e);
                     callback.onError(e);
                 });
-
     }
 
     @Override

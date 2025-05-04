@@ -14,7 +14,6 @@ public class MyPlantModel {
     private String nickname;
     private String location;
     private double progress; // Tiến độ phát triển (ví dụ: 0.0 - 1.0)
-    private String plantId; // Tham chiếu đến Plant template ID
     @Exclude
     private String userId; // Tham chiếu đến User ID
 
@@ -44,7 +43,6 @@ public class MyPlantModel {
     public void setId(String id) { this.id = id; }
     public String getNickname() { return nickname; }
     public void setNickname(String nickname) { this.nickname = nickname; }
-    // ... các getters/setters khác
 
     @PropertyName("created_at")
     public Timestamp getCreatedAt() { return createdAt; }
@@ -54,8 +52,6 @@ public class MyPlantModel {
     public Timestamp getUpdatedAt() { return updatedAt; }
     @PropertyName("updated_at")
     public void setUpdatedAt(Timestamp updatedAt) { this.updatedAt = updatedAt; }
-    public String getPlantId() { return plantId; }
-    public void setPlantId(String plantId) { this.plantId = plantId; }
     public String getUserId() { return userId; }
     public void setUserId(String userId) { this.userId = userId; }
     public String getLocation() { return location; }

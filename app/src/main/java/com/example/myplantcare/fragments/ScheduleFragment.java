@@ -336,7 +336,7 @@ public class ScheduleFragment extends Fragment implements
     }
 
     private void showAddScheduleDialog() {
-        AddScheduleDialogFragment addScheduleDialogFragment = AddScheduleDialogFragment.newInstance(null, userId);
+        AddScheduleDialogFragment addScheduleDialogFragment = AddScheduleDialogFragment.newInstance(null, userId, null);
         addScheduleDialogFragment.show(getParentFragmentManager(), "ADD_SCHEDULE_DIALOG");
     }
 
@@ -383,6 +383,7 @@ public class ScheduleFragment extends Fragment implements
 
         if (scheduleViewModel != null && currentSelectedDate != null && checkedTasksInGroup != null && !checkedTasksInGroup.isEmpty()) {
             for (ScheduleWithMyPlantInfo task : checkedTasksInGroup) {
+                Log.d(TAG, "Marking task complete: " + task.getTaskName());
                 scheduleViewModel.markScheduleCompleted(task);
             }
             Toast.makeText(getContext(), "Đang đánh dấu hoàn thành các công việc đã chọn...", Toast.LENGTH_SHORT).show();

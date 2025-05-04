@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -32,19 +33,16 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
     }
 
     private OnTaskGroupActionListener groupActionListener;
-//    private ScheduleDetailAdapter.OnTaskCompletionChangeListener itemCompletionListener; // Listener for individual item changes
+//    private ScheduleDetailAdapter.OnTaskCompletionChangeListener itemCompletionListener;
 
 
-    // --- Constructor with Listeners ---
     public ScheduleAdapter(List<Pair<String, List<ScheduleWithMyPlantInfo>>> scheduleList,
                            boolean isCompletedList,
                            OnTaskGroupActionListener groupActionListener
-//                           ScheduleDetailAdapter.OnTaskCompletionChangeListener itemCompletionListener
     ) {
         this.scheduleList = scheduleList;
         this.isCompletedList = isCompletedList;
         this.groupActionListener = groupActionListener;
-//        this.itemCompletionListener = itemCompletionListener;
     }
 
     public ScheduleAdapter(List<Pair<String, List<ScheduleWithMyPlantInfo>>> scheduleList) {
@@ -87,12 +85,13 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
             holder.markAsComplete.setImageResource(R.drawable.ic_rollback); // Assuming you have ic_rollback drawable
             // Optionally hide the markAsComplete button if the group is empty
             holder.markAsComplete.setVisibility(tasks != null && !tasks.isEmpty() ? View.VISIBLE : View.GONE);
+            holder.backgroundTask.setBackgroundResource(R.color.bg_task_completed);
 
         } else {
             // If this is the uncompleted list, show mark all complete icon (or similar)
             holder.markAsComplete.setImageResource(R.drawable.ic_task_checked); // Assuming you have ic_done_all or similar
-            // Optionally hide the markAsComplete button if the group is empty
             holder.markAsComplete.setVisibility(tasks != null && !tasks.isEmpty() ? View.VISIBLE : View.GONE);
+            holder.backgroundTask.setBackgroundResource(R.color.bg_task_uncompleted);
         }
 
         holder.markAsComplete.setOnClickListener(v -> {
@@ -135,6 +134,7 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
         TextView taskName;
         RecyclerView recyclerViewTasks;
         ImageView taskIcon, markAsComplete;
+        RelativeLayout backgroundTask;
 
         public ScheduleViewHolder(View itemView) {
             super(itemView);
@@ -142,6 +142,7 @@ public class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.Schedu
             recyclerViewTasks = itemView.findViewById(R.id.recyclerViewTasks);
             taskIcon = itemView.findViewById(R.id.ic_task);
             markAsComplete = itemView.findViewById(R.id.mark_as_complete);
+            backgroundTask = itemView.findViewById(R.id.background_task);
         }
 
     }

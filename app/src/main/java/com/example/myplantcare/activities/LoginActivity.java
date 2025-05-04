@@ -25,7 +25,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private TextView txtRegisterNow;
     private ImageView ivTogglePassword;
     private boolean isPasswordVisible = false;
+
     private TextView btnForgetPassword;
+    // Firebase Authentication instance
     private FirebaseAuth mAuth;
     FirebaseFirestore db;
     @Override
@@ -149,16 +151,17 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
-                        if (user != null) {                            if (newUser) {
-                            String uid = user.getUid();
-                            Map<String, Object> userInfo = new HashMap<>();
-                            userInfo.put("name", "Nguyễn Văn A");
-                            userInfo.put("email", trimmedEmail);
-                            userInfo.put("phone", "");
-                            userInfo.put("dob", "");
-                            userInfo.put("role", "");
-                            userInfo.put("cityId", "");
-
+                        if (user != null) {
+                            if (newUser) {
+                                String uid = user.getUid();
+                                Map<String, Object> userInfo = new HashMap<>();
+                                userInfo.put("name", "Người dùng");
+                                userInfo.put("email", trimmedEmail);
+                                userInfo.put("phone", "");
+                                userInfo.put("dob", "");
+                                userInfo.put("role", "");
+                                userInfo.put("cityId", "");
+                                userInfo.put("avatar", "");
 
                                 db.collection("users").document(uid)
                                         .set(userInfo)

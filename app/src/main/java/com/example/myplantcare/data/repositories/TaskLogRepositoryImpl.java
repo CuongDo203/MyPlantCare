@@ -1,11 +1,13 @@
 package com.example.myplantcare.data.repositories;
 
+import android.net.Uri;
 import android.util.Log;
 
 import com.example.myplantcare.models.TaskLogModel;
 import com.example.myplantcare.utils.Constants;
 import com.example.myplantcare.utils.FirestoreCallback;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -57,5 +59,36 @@ public class TaskLogRepositoryImpl implements TaskLogRepository{
                     // Trả về lỗi thông qua callback onError
                     callback.onError(e);
                 });;
+    }
+
+    @Override
+    public void uploadTaskLogImage(String userId, String myPlantId, String taskLogId, String imageUri, FirestoreCallback<Void> callback) {
+        if (userId == null || userId.isEmpty() || myPlantId == null || myPlantId.isEmpty() || taskLogId == null || taskLogId.isEmpty() || imageUri == null) {
+            Log.w(TAG, "uploadTaskLogImageAndUrl: invalid input.");
+            if (callback != null) {
+                callback.onError(new IllegalArgumentException("Required parameters must not be null/empty."));
+            }
+            return;
+        }
+        if (callback == null) {
+            Log.w(TAG, "uploadTaskLogImageAndUrl: callback is null. Cannot return result.");
+            return;
+        }
+
+        DocumentReference taskLogRef = db.collection(Constants.USERS_COLLECTION)
+                .document(userId)
+                .collection(Constants.MY_PLANTS_COLLECTION)
+                .document(myPlantId)
+                .collection(Constants.TASK_LOGS_COLLECTION)
+                .document(taskLogId);
+        taskLogRef.update("userPhotoUrl", imageUri.toString())
+                .addOnSuccessListener(unused -> {
+                    Log.d(TAG, "Task log image uploaded successfully for task log ID: " + taskLogId);
+                    callback.onSuccess(null);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error uploading task log image for task log ID: " + taskLogId, e);
+                    callback.onError(e);
+                });
     }
 }

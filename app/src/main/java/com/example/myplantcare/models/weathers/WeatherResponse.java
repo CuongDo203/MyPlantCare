@@ -35,4 +35,8 @@ public class WeatherResponse {
     public WindInfo getWind() {
         return wind;
     }
+
+    public String getCityName() {
+        return cityName;
+    }
 }
