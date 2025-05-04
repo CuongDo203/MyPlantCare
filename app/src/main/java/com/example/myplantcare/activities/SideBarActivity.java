@@ -114,6 +114,16 @@ public class SideBarActivity extends AppCompatActivity {
         });
 
         observeViewModel();
+        // Chuyển sang care_instruction activity
+        LinearLayout btnCareInstruction = findViewById(R.id.itemGuide);
+        btnCareInstruction.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent();
+                i.setClass(SideBarActivity.this, CareInstructionActivity.class);
+                startActivity(i);
+            }
+        });
     }
 
     private void observeViewModel() {
