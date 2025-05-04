@@ -22,7 +22,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myplantcare.R;
 import com.example.myplantcare.adapters.DetailNoteAdapter;
+import com.example.myplantcare.data.repositories.ImageRepository;
+import com.example.myplantcare.data.repositories.ImageRepositoryImpl;
 import com.example.myplantcare.models.DetailNote;
+import com.example.myplantcare.utils.FirestoreCallback;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -57,16 +60,20 @@ public class DetailNoteActivity extends AppCompatActivity {
     private FirebaseStorage storage;
     private StorageReference storageRoot;
 
+    private ImageRepository imageRepository;
+
+
     private final ActivityResultLauncher<String> imagePickerLauncher =
             registerForActivityResult(
                     new ActivityResultContracts.GetContent(),
                     uri -> {
                         if (uri != null && selectedPosition != -1) {
-                            // sang bước 3: upload
+                            // Gọi phương thức upload ảnh
                             uploadImageForItem(uri, selectedPosition);
                         }
                     }
             );
+
 
 
     @SuppressLint("SetTextI18n")
@@ -78,6 +85,14 @@ public class DetailNoteActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         storage = FirebaseStorage.getInstance();
         storageRoot = storage.getReference();
+
+
+        db = FirebaseFirestore.getInstance();
+        storage = FirebaseStorage.getInstance();
+        storageRoot = storage.getReference();
+
+        // Khởi tạo ImageRepository
+        imageRepository = new ImageRepositoryImpl(this);
 
         // Toolbar
         androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.insider_toolbar);
@@ -216,32 +231,52 @@ public class DetailNoteActivity extends AppCompatActivity {
                 });
     }
 
-    private void uploadImageForItem(Uri localUri, int position) {
-        // 1) Tạo đường dẫn trên Storage
-        String path = String.format(Locale.US,
-                "users/%s/my_plants/%s/notes/%s/items/%d.jpg",
-                userId, myPlantId, noteId, position
-        );
-        StorageReference ref = storageRoot.child(path);
+//    Up ảnh sử dụng firestorage
+//    private void uploadImageForItem(Uri localUri, int position) {
+//        // 1) Tạo đường dẫn trên Storage
+//        String path = String.format(Locale.US,
+//                "users/%s/my_plants/%s/notes/%s/items/%d.jpg",
+//                userId, myPlantId, noteId, position
+//        );
+//        StorageReference ref = storageRoot.child(path);
+//
+//        // 2) Upload file
+//        ref.putFile(localUri)
+//                .continueWithTask(task -> {
+//                    if (!task.isSuccessful()) throw task.getException();
+//                    // 3) Khi upload xong, lấy download URL
+//                    return ref.getDownloadUrl();
+//                })
+//                .addOnSuccessListener(downloadUri -> {
+//                    String url = downloadUri.toString();
+//                    // 4) Cập nhật model và adapter
+//                    DetailNote item = noteList.get(position);
+//                    item.setImageUrl(url);
+//                    adapter.notifyItemChanged(position);
+//                })
+//                .addOnFailureListener(e -> {
+//                    Toast.makeText(this, "Upload ảnh thất bại: " + e.getMessage(),
+//                            Toast.LENGTH_SHORT).show();
+//                });
+//    }
 
-        // 2) Upload file
-        ref.putFile(localUri)
-                .continueWithTask(task -> {
-                    if (!task.isSuccessful()) throw task.getException();
-                    // 3) Khi upload xong, lấy download URL
-                    return ref.getDownloadUrl();
-                })
-                .addOnSuccessListener(downloadUri -> {
-                    String url = downloadUri.toString();
-                    // 4) Cập nhật model và adapter
-                    DetailNote item = noteList.get(position);
-                    item.setImageUrl(url);
-                    adapter.notifyItemChanged(position);
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Upload ảnh thất bại: " + e.getMessage(),
-                            Toast.LENGTH_SHORT).show();
-                });
+    private void uploadImageForItem(Uri localUri, int position) {
+        // Sử dụng ImageRepository để upload ảnh
+        imageRepository.uploadImage(localUri, new FirestoreCallback<String>() {
+            @Override
+            public void onSuccess(String imageUrl) {
+                // Cập nhật model và adapter với URL của ảnh
+                DetailNote item = noteList.get(position);
+                item.setImageUrl(imageUrl);
+                adapter.notifyItemChanged(position);
+            }
+
+            @Override
+            public void onError(Exception exception) {
+                // Xử lý lỗi nếu có
+                Toast.makeText(DetailNoteActivity.this, "Upload ảnh thất bại: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 

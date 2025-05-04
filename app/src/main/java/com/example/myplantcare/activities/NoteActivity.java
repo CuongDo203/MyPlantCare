@@ -29,6 +29,7 @@ import com.example.myplantcare.models.MyPlantModel;
 import com.example.myplantcare.models.Note;
 import com.example.myplantcare.models.NoteSectionItem;
 import com.google.firebase.Timestamp;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -50,6 +51,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 
 import java.text.Normalizer;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 public class NoteActivity extends AppCompatActivity {
@@ -425,6 +427,39 @@ public class NoteActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+//    private void showSelectPlantDialog() {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_select_plant, null);
+//        builder.setView(dialogView);
+//
+//        RecyclerView recyclerView = dialogView.findViewById(R.id.recycler_plant_list);
+//        Button btnCancel = dialogView.findViewById(R.id.btn_cancel_dialog);
+//        Button btnCreate = dialogView.findViewById(R.id.btn_create_note);
+//
+//        List<MyPlantModel> plantList = new ArrayList<>();
+//        MyPlantAdapterForSelectDialog adapter = new MyPlantAdapterForSelectDialog(plantList, plant -> {
+//            selectedPlant = plant;
+//        });
+//
+//        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+//        recyclerView.setAdapter(adapter);
+//
+//        fetchMyPlants(plantList, adapter);
+//
+//        AlertDialog dialog = builder.create();
+//        dialog.show();
+//
+//        btnCancel.setOnClickListener(v -> dialog.dismiss());
+//
+//        btnCreate.setOnClickListener(v -> {
+//            if (selectedPlant != null) {
+//                dialog.dismiss();
+//                createNoteForPlant(selectedPlant);
+//            } else {
+//                Toast.makeText(this, "Vui lòng chọn một cây!", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//    }
 
     private void showSelectPlantDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -432,18 +467,23 @@ public class NoteActivity extends AppCompatActivity {
         builder.setView(dialogView);
 
         RecyclerView recyclerView = dialogView.findViewById(R.id.recycler_plant_list);
+        EditText etSearchPlant = dialogView.findViewById(R.id.search_plant_for_note);
         Button btnCancel = dialogView.findViewById(R.id.btn_cancel_dialog);
         Button btnCreate = dialogView.findViewById(R.id.btn_create_note);
 
         List<MyPlantModel> plantList = new ArrayList<>();
+
+        // Dùng AtomicReference để giữ cây được chọn
+        AtomicReference<MyPlantModel> selectedPlantRef = new AtomicReference<>();
+
         MyPlantAdapterForSelectDialog adapter = new MyPlantAdapterForSelectDialog(plantList, plant -> {
-            selectedPlant = plant;
+            selectedPlantRef.set(plant); // Gán cây được chọn vào biến tham chiếu
         });
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        fetchMyPlants(plantList, adapter);
+        fetchMyPlants(plantList, adapter); // Hàm này cần cập nhật adapter khi load xong
 
         AlertDialog dialog = builder.create();
         dialog.show();
@@ -451,6 +491,7 @@ public class NoteActivity extends AppCompatActivity {
         btnCancel.setOnClickListener(v -> dialog.dismiss());
 
         btnCreate.setOnClickListener(v -> {
+            MyPlantModel selectedPlant = selectedPlantRef.get(); // Lấy cây được chọn
             if (selectedPlant != null) {
                 dialog.dismiss();
                 createNoteForPlant(selectedPlant);
@@ -458,28 +499,69 @@ public class NoteActivity extends AppCompatActivity {
                 Toast.makeText(this, "Vui lòng chọn một cây!", Toast.LENGTH_SHORT).show();
             }
         });
+
+        etSearchPlant.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                adapter.filter(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
     }
+
 
     // 2. Lấy danh sách cây của tôi
     @SuppressLint("NotifyDataSetChanged")
+//    private void fetchMyPlants(List<MyPlantModel> plantList, MyPlantAdapterForSelectDialog adapter) {
+//        db.collection("users").document(userId)
+//                .collection("my_plants")
+//                .get()
+//                .addOnSuccessListener(querySnapshot -> {
+//                    plantList.clear();
+//                    for (QueryDocumentSnapshot doc : querySnapshot) {
+//                        MyPlantModel plant = doc.toObject(MyPlantModel.class);
+//                        plant.setId(doc.getId());
+//                        plantList.add(plant);
+//                    }
+//                    adapter.notifyDataSetChanged();
+//                })
+//                .addOnFailureListener(e -> {
+//                    Log.e("NoteActivity", "Lỗi khi lấy danh sách cây: " + e.getMessage());
+//                    Toast.makeText(this, "Lỗi tải cây của bạn!", Toast.LENGTH_SHORT).show();
+//                });
+//    }
+
     private void fetchMyPlants(List<MyPlantModel> plantList, MyPlantAdapterForSelectDialog adapter) {
         db.collection("users").document(userId)
                 .collection("my_plants")
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
+                    Log.d("DEBUG", "QuerySnapshot size: " + querySnapshot.size());
                     plantList.clear();
                     for (QueryDocumentSnapshot doc : querySnapshot) {
                         MyPlantModel plant = doc.toObject(MyPlantModel.class);
                         plant.setId(doc.getId());
                         plantList.add(plant);
+                        Log.d("DEBUG", "Plant added: " + plant.getNickname());
                     }
-                    adapter.notifyDataSetChanged();
+                    // Update the adapter after data is fetched
+                    adapter.updateList(plantList);
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("NoteActivity", "Lỗi khi lấy danh sách cây: " + e.getMessage());
-                    Toast.makeText(this, "Lỗi tải cây của bạn!", Toast.LENGTH_SHORT).show();
+                    Log.e("ERROR", "Error fetching plants: ", e);
+                    Toast.makeText(this, "Không thể tải danh sách cây!", Toast.LENGTH_SHORT).show();
                 });
     }
+
+
+
+
+
 
     private void createNoteForPlant(MyPlantModel plant) {
         String noteId = UUID.randomUUID().toString();

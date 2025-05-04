@@ -8,6 +8,7 @@
     android:background="@drawable/bg_dialog"
     android:layout_gravity="center">
 
+    <!-- Tiêu đề -->
     <TextView
         android:id="@+id/tv_dialog_title"
         android:layout_width="match_parent"
@@ -18,6 +19,24 @@
         android:textColor="@android:color/black"
         android:layout_marginBottom="16dp" />
 
+    <!-- SearchView (Nút tìm kiếm cây) -->
+    <EditText
+        android:id="@+id/search_plant_for_note"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tìm kiếm cây..."
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_search_highlight"
+        android:elevation="4dp"
+        android:layout_gravity="center"
+        android:inputType="text"
+        android:minHeight="48dp"
+        android:padding="12dp"
+        android:textSize="16sp" />
+
+
+
+    <!-- RecyclerView hiển thị danh sách cây -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_plant_list"
         android:layout_width="match_parent"
@@ -26,6 +45,7 @@
         android:scrollbars="vertical"
         android:contentDescription="@string/note_list_desc" />
 
+    <!-- Các nút Hủy và Tạo -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
