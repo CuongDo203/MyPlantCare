@@ -45,7 +45,6 @@ public class InstructionDetailActivity extends AppCompatActivity {
     }
 
     private void loadInstructionsFromFirestore(String plantName, String city, String season) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         // 🔹 1. Lấy note từ document chính
         db.collection("care_instructions")

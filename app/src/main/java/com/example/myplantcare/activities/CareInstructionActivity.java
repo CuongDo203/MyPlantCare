@@ -16,10 +16,8 @@ import com.example.myplantcare.R;
 import com.example.myplantcare.models.MyPlantModel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.*;
-
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 public class CareInstructionActivity extends AppCompatActivity {
     private Spinner plantSpinner;

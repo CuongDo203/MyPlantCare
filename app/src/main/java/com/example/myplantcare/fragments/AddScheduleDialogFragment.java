@@ -532,7 +532,7 @@ public class AddScheduleDialogFragment extends DialogFragment {
 
     private void setPeriodicNotification(MyPlantModel myPlant, ScheduleModel schedule) {
         // Kiểm tra tần suất lặp lại từ ScheduleModel (số ngày lặp lại)
-        int frequencyInDays = schedule.getFrequency();  // Giả sử frequency được lưu dưới dạng số ngày
+        int frequencyInDays = schedule.getFrequency();  // frequency được lưu dưới dạng số ngày
 
         if (frequencyInDays <= 0) {
             // Nếu tần suất không hợp lệ, không tạo thông báo
@@ -547,6 +547,7 @@ public class AddScheduleDialogFragment extends DialogFragment {
             return;
         }
         schedule.getTime();
+
         // Chuyển Timestamp thành Calendar
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(timestamp.toDate().getTime());  // Chuyển đổi Timestamp thành Date rồi lấy mili giây
