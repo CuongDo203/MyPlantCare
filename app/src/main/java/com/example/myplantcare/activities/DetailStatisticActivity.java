@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -272,68 +273,135 @@ public class DetailStatisticActivity extends AppCompatActivity {
         chart.invalidate();
     }
 
+//    DO NOT DELETE
+//    private void showAddDialog() {
+//        View view = getLayoutInflater().inflate(R.layout.dialog_add_growth, null);
+//        TextInputEditText etHeight = view.findViewById(R.id.etHeight);
+//        TextInputEditText etLeaf   = view.findViewById(R.id.etLeaf);
+//        TextInputEditText etFlower = view.findViewById(R.id.etFlower);
+//        TextInputEditText etFruit  = view.findViewById(R.id.etFruit);
+//        TextView tvDate            = view.findViewById(R.id.tvDate);
+//
+//        Date now = new Date();
+//        tvDate.setText(new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(now));
+//
+//        new AlertDialog.Builder(this)
+//                .setTitle("Thêm thông số phát triển")
+//                .setView(view)
+//                .setPositiveButton("Lưu", (dialog, which) -> {
+//                    String hStr  = etHeight.getText().toString().trim();
+//                    String lfStr = etLeaf.getText().toString().trim();
+//                    String flStr = etFlower.getText().toString().trim();
+//                    String frStr = etFruit.getText().toString().trim();
+//
+//                    Map<String, Object> updates = new HashMap<>();
+//                    Timestamp nowTs = Timestamp.now();
+//
+//                    if (!hStr.isEmpty()) {
+//                        Map<String, Object> heightEntry = new HashMap<>();
+//                        heightEntry.put("date", nowTs);
+//                        heightEntry.put("height", Double.parseDouble(hStr));
+//                        updates.put("heights", FieldValue.arrayUnion(heightEntry));
+//                    }
+//                    if (!lfStr.isEmpty()) {
+//                        Map<String, Object> leafEntry = new HashMap<>();
+//                        leafEntry.put("date", nowTs);
+//                        leafEntry.put("number_of_leaf", Integer.parseInt(lfStr));
+//                        updates.put("leaf", FieldValue.arrayUnion(leafEntry));
+//                    }
+//                    if (!flStr.isEmpty()) {
+//                        Map<String, Object> flowerEntry = new HashMap<>();
+//                        flowerEntry.put("date", nowTs);
+//                        flowerEntry.put("number_of_flower", Integer.parseInt(flStr));
+//                        updates.put("flower", FieldValue.arrayUnion(flowerEntry));
+//                    }
+//                    if (!frStr.isEmpty()) {
+//                        Map<String, Object> fruitEntry = new HashMap<>();
+//                        fruitEntry.put("date", nowTs);
+//                        fruitEntry.put("number_of_fruit", Integer.parseInt(frStr));
+//                        updates.put("fruit", FieldValue.arrayUnion(fruitEntry));
+//                    }
+//
+//                    growthRef.set(updates, SetOptions.merge())
+//                            .addOnSuccessListener(aVoid -> {
+//                                Log.d(TAG, "Firestore merge OK – các mảng đã được cập nhật");
+//                                Toast.makeText(this, "Đã thêm thành công!", Toast.LENGTH_SHORT).show();
+//                                fetchAndRedraw();
+//                            })
+//                            .addOnFailureListener(e -> {
+//                                Log.e(TAG, "Firestore merge lỗi", e);
+//                                Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+//                            });
+//                })
+//                .setNegativeButton("Hủy", null)
+//                .show();
+//    }
+
     private void showAddDialog() {
         View view = getLayoutInflater().inflate(R.layout.dialog_add_growth, null);
+        AlertDialog dialog = new AlertDialog.Builder(this).setView(view).create();
+
         TextInputEditText etHeight = view.findViewById(R.id.etHeight);
         TextInputEditText etLeaf   = view.findViewById(R.id.etLeaf);
         TextInputEditText etFlower = view.findViewById(R.id.etFlower);
         TextInputEditText etFruit  = view.findViewById(R.id.etFruit);
         TextView tvDate            = view.findViewById(R.id.tvDate);
+        Button btnSave             = view.findViewById(R.id.btnSave);
+        Button btnCancel           = view.findViewById(R.id.btnCancel);
 
         Date now = new Date();
         tvDate.setText(new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(now));
 
-        new AlertDialog.Builder(this)
-                .setTitle("Thêm thông số phát triển")
-                .setView(view)
-                .setPositiveButton("Lưu", (dialog, which) -> {
-                    String hStr  = etHeight.getText().toString().trim();
-                    String lfStr = etLeaf.getText().toString().trim();
-                    String flStr = etFlower.getText().toString().trim();
-                    String frStr = etFruit.getText().toString().trim();
+        btnSave.setOnClickListener(v -> {
+            String hStr  = etHeight.getText().toString().trim();
+            String lfStr = etLeaf.getText().toString().trim();
+            String flStr = etFlower.getText().toString().trim();
+            String frStr = etFruit.getText().toString().trim();
 
-                    Map<String, Object> updates = new HashMap<>();
-                    Timestamp nowTs = Timestamp.now();
+            Map<String, Object> updates = new HashMap<>();
+            Timestamp nowTs = Timestamp.now();
 
-                    if (!hStr.isEmpty()) {
-                        Map<String, Object> heightEntry = new HashMap<>();
-                        heightEntry.put("date", nowTs);
-                        heightEntry.put("height", Double.parseDouble(hStr));
-                        updates.put("heights", FieldValue.arrayUnion(heightEntry));
-                    }
-                    if (!lfStr.isEmpty()) {
-                        Map<String, Object> leafEntry = new HashMap<>();
-                        leafEntry.put("date", nowTs);
-                        leafEntry.put("number_of_leaf", Integer.parseInt(lfStr));
-                        updates.put("leaf", FieldValue.arrayUnion(leafEntry));
-                    }
-                    if (!flStr.isEmpty()) {
-                        Map<String, Object> flowerEntry = new HashMap<>();
-                        flowerEntry.put("date", nowTs);
-                        flowerEntry.put("number_of_flower", Integer.parseInt(flStr));
-                        updates.put("flower", FieldValue.arrayUnion(flowerEntry));
-                    }
-                    if (!frStr.isEmpty()) {
-                        Map<String, Object> fruitEntry = new HashMap<>();
-                        fruitEntry.put("date", nowTs);
-                        fruitEntry.put("number_of_fruit", Integer.parseInt(frStr));
-                        updates.put("fruit", FieldValue.arrayUnion(fruitEntry));
-                    }
+            if (!hStr.isEmpty()) {
+                Map<String, Object> heightEntry = new HashMap<>();
+                heightEntry.put("date", nowTs);
+                heightEntry.put("height", Double.parseDouble(hStr));
+                updates.put("heights", FieldValue.arrayUnion(heightEntry));
+            }
+            if (!lfStr.isEmpty()) {
+                Map<String, Object> leafEntry = new HashMap<>();
+                leafEntry.put("date", nowTs);
+                leafEntry.put("number_of_leaf", Integer.parseInt(lfStr));
+                updates.put("leaf", FieldValue.arrayUnion(leafEntry));
+            }
+            if (!flStr.isEmpty()) {
+                Map<String, Object> flowerEntry = new HashMap<>();
+                flowerEntry.put("date", nowTs);
+                flowerEntry.put("number_of_flower", Integer.parseInt(flStr));
+                updates.put("flower", FieldValue.arrayUnion(flowerEntry));
+            }
+            if (!frStr.isEmpty()) {
+                Map<String, Object> fruitEntry = new HashMap<>();
+                fruitEntry.put("date", nowTs);
+                fruitEntry.put("number_of_fruit", Integer.parseInt(frStr));
+                updates.put("fruit", FieldValue.arrayUnion(fruitEntry));
+            }
 
-                    growthRef.set(updates, SetOptions.merge())
-                            .addOnSuccessListener(aVoid -> {
-                                Log.d(TAG, "Firestore merge OK – các mảng đã được cập nhật");
-                                Toast.makeText(this, "Đã thêm thành công!", Toast.LENGTH_SHORT).show();
-                                fetchAndRedraw();
-                            })
-                            .addOnFailureListener(e -> {
-                                Log.e(TAG, "Firestore merge lỗi", e);
-                                Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            });
-                })
-                .setNegativeButton("Hủy", null)
-                .show();
+            growthRef.set(updates, SetOptions.merge())
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(this, "Đã thêm thành công!", Toast.LENGTH_SHORT).show();
+                        fetchAndRedraw();
+                        dialog.dismiss();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+        });
+
+        btnCancel.setOnClickListener(v -> dialog.dismiss());
+
+        dialog.show();
     }
 }
+
 
 

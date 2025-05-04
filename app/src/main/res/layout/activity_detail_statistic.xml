@@ -30,7 +30,8 @@
             android:id="@+id/lineChartHeights"
             android:layout_width="match_parent"
             android:layout_height="250dp"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginTop="8dp"
+            android:background="#5C9160"/>
 
         <View
             android:layout_width="match_parent"
@@ -40,7 +41,8 @@
             android:id="@+id/lineChartOthers"
             android:layout_width="match_parent"
             android:layout_height="250dp"
-            android:layout_marginTop="8dp"/>
+            android:layout_marginTop="8dp"
+            android:background="#5C9160"/>
 
         <!-- === PHẦN ẢNH CÂY & CHỈ SỐ BỔ SUNG === -->
         <LinearLayout

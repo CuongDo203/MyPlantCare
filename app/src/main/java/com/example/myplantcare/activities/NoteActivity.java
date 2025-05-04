@@ -29,7 +29,6 @@ import com.example.myplantcare.models.MyPlantModel;
 import com.example.myplantcare.models.Note;
 import com.example.myplantcare.models.NoteSectionItem;
 import com.google.firebase.Timestamp;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
