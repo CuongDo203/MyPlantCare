@@ -103,7 +103,7 @@ public class CareInstructionActivity extends AppCompatActivity {
     }
 
     private void displayPlantInfo(MyPlantModel selectedPlant) {
-        String plantId = selectedPlant.getPlantId();
+        String plantId = selectedPlant.getId();
         if (plantId == null || plantId.isEmpty()) return;
 
         db.collection("plants").document(plantId)
@@ -152,7 +152,7 @@ public class CareInstructionActivity extends AppCompatActivity {
                             names.add(plantName);
                             MyPlantModel mockPlant = new MyPlantModel();
                             mockPlant.setNickname(plantName);
-                            mockPlant.setPlantId(doc.getId());
+                            mockPlant.setId(doc.getId());
                             plantMap.put(plantName, mockPlant);
                         }
                     }
