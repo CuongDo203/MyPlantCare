@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_select_plant"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/bg_dialog"
+    android:layout_gravity="center">
+
+    <!-- Tiêu đề -->
+    <TextView
+        android:id="@+id/tv_dialog_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Chọn cây để thêm ghi chú"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
+        android:layout_marginBottom="16dp" />
+
+    <!-- SearchView (Nút tìm kiếm cây) -->
+    <EditText
+        android:id="@+id/search_plant_for_note"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Tìm kiếm cây..."
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_search_highlight"
+        android:elevation="4dp"
+        android:layout_gravity="center"
+        android:inputType="text"
+        android:minHeight="48dp"
+        android:padding="12dp"
+        android:textSize="16sp" />
+
+
+
+    <!-- RecyclerView hiển thị danh sách cây -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_plant_list"
+        android:layout_width="match_parent"
+        android:background="@android:color/transparent"
+        android:layout_height="300dp"
+        android:scrollbars="vertical"
+        android:contentDescription="@string/note_list_desc" />
+
+    <!-- Các nút Hủy và Tạo -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="16dp"
+        android:gravity="end">
+
+        <Button
+            android:id="@+id/btn_cancel_dialog"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Hủy"
+            android:backgroundTint="@color/green_button"
+            android:textColor="@android:color/white"/>
+
+        <Space
+            android:layout_width="16dp"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/btn_create_note"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Tạo"
+            android:backgroundTint="@color/green_button"
+            android:textColor="@android:color/white"/>
+    </LinearLayout>
+</LinearLayout>

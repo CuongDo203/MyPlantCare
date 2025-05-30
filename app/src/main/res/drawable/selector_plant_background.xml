@@ -1,0 +1,6 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Khi được chọn, sử dụng gradient background -->
+    <item android:drawable="@drawable/bg_gradient" android:state_selected="true"/>
+    <!-- Khi không được chọn, sử dụng background bình thường -->
+    <item android:drawable="@drawable/bg_plant_normal"/>
+</selector>

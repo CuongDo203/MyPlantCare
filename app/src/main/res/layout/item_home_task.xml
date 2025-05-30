@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="8dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="12dp"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        >
+
+        <!-- Ảnh minh họa cây -->
+        <ImageView
+            android:id="@+id/iv_plant_image"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:scaleType="centerCrop"
+            tools:src="@drawable/ic_launcher_background"
+            android:contentDescription="Plant Image" />
+
+        <!-- Icon công việc -->
+        <ImageView
+            android:id="@+id/iv_task_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:src="@drawable/ic_tuoi_nuoc"
+            android:layout_marginStart="10dp"
+            android:contentDescription="Task Icon" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="5dp"
+            android:layout_weight="1"
+            >
+            <!-- Tiêu đề công việc (e.g., Plant Nickname + Task Name) -->
+            <TextView
+                android:id="@+id/tv_task_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="Cây EFG cần tưới nước"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="5dp"
+                android:gravity="center_vertical"
+                >
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_alarmclock"
+                    android:contentDescription="Time Icon" />
+                <!-- Thời gian và địa điểm -->
+                <TextView
+                    android:id="@+id/tv_task_time_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    tools:text="9:30 AM - Ban công"
+                    android:textSize="14sp"
+                    android:textColor="@color/gray_text" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Icon mũi tên -->
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/arrow_right"
+            android:contentDescription="Navigate Icon" />
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
