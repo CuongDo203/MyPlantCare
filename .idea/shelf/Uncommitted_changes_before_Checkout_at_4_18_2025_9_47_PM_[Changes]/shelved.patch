@@ -1,0 +1,104 @@
+Index: .idea/gradle.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"GradleMigrationSettings\" migrationVersion=\"1\" />\r\n  <component name=\"GradleSettings\">\r\n    <option name=\"linkedExternalProjectsSettings\">\r\n      <GradleProjectSettings>\r\n        <option name=\"testRunner\" value=\"CHOOSE_PER_TEST\" />\r\n        <option name=\"externalProjectPath\" value=\"$PROJECT_DIR$\" />\r\n        <option name=\"gradleJvm\" value=\"23\" />\r\n        <option name=\"modules\">\r\n          <set>\r\n            <option value=\"$PROJECT_DIR$\" />\r\n            <option value=\"$PROJECT_DIR$/app\" />\r\n          </set>\r\n        </option>\r\n      </GradleProjectSettings>\r\n    </option>\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/gradle.xml b/.idea/gradle.xml
+--- a/.idea/gradle.xml	(revision 6af7c9b98a0d679f6c0b8ad6c3da9c58b09d03d1)
++++ b/.idea/gradle.xml	(date 1744966460662)
+@@ -6,7 +6,7 @@
+       <GradleProjectSettings>
+         <option name="testRunner" value="CHOOSE_PER_TEST" />
+         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+-        <option name="gradleJvm" value="23" />
++        <option name="gradleJvm" value="jbr-21" />
+         <option name="modules">
+           <set>
+             <option value="$PROJECT_DIR$" />
+Index: app/src/main/res/layout/guide_row.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<LinearLayout xmlns:android=\"http://schemas.android.com/apk/res/android\"\r\n    android:layout_width=\"match_parent\"\r\n    android:layout_height=\"wrap_content\"\r\n    android:orientation=\"horizontal\"\r\n    android:paddingVertical=\"12dp\"\r\n    android:paddingHorizontal=\"8dp\"\r\n    android:gravity=\"center_vertical\"\r\n    android:clickable=\"true\"\r\n    android:focusable=\"true\"\r\n    android:background=\"?attr/selectableItemBackground\">\r\n\r\n    <!-- Icon bên trái -->\r\n    <ImageView\r\n        android:id=\"@+id/ivIcon\"\r\n        android:layout_width=\"20dp\"\r\n        android:layout_height=\"20dp\"\r\n        android:src=\"@drawable/ic_guide\" />\r\n    <!-- Bạn có thể đổi icon -->\r\n    <!--    android:contentDescription=\"Icon\" />-->\r\n\r\n    <!-- Text mô tả -->\r\n    <TextView\r\n        android:id=\"@+id/tvTitle\"\r\n        android:layout_width=\"0dp\"\r\n        android:layout_height=\"wrap_content\"\r\n        android:layout_weight=\"1\"\r\n        android:layout_marginStart=\"16dp\"\r\n        android:text=\"Hướng dẫn chăm sóc\"\r\n        android:textSize=\"16sp\"\r\n        android:textColor=\"@android:color/black\" />\r\n\r\n    <!-- Mũi tên -->\r\n    <ImageView\r\n        android:id=\"@+id/ivArrow\"\r\n        android:layout_width=\"16dp\"\r\n        android:layout_height=\"16dp\"\r\n        android:src=\"@drawable/ic_arrow_right\"\r\n        android:contentDescription=\"Arrow\" />\r\n</LinearLayout>\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/res/layout/guide_row.xml b/app/src/main/res/layout/guide_row.xml
+--- a/app/src/main/res/layout/guide_row.xml	(revision 6af7c9b98a0d679f6c0b8ad6c3da9c58b09d03d1)
++++ b/app/src/main/res/layout/guide_row.xml	(date 1744966907820)
+@@ -12,7 +12,7 @@
+ 
+     <!-- Icon bên trái -->
+     <ImageView
+-        android:id="@+id/ivIcon"
++        android:id="@+id/CareInstruction_Button"
+         android:layout_width="20dp"
+         android:layout_height="20dp"
+         android:src="@drawable/ic_guide" />
+Index: .idea/compiler.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"CompilerConfiguration\">\r\n    <bytecodeTargetLevel target=\"23\" />\r\n  </component>\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/compiler.xml b/.idea/compiler.xml
+--- a/.idea/compiler.xml	(revision 6af7c9b98a0d679f6c0b8ad6c3da9c58b09d03d1)
++++ b/.idea/compiler.xml	(date 1744966460646)
+@@ -1,6 +1,6 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+   <component name="CompilerConfiguration">
+-    <bytecodeTargetLevel target="23" />
++    <bytecodeTargetLevel target="21" />
+   </component>
+ </project>
+\ No newline at end of file
+Index: app/src/main/java/com/example/myplantcare/activities/SideBarActivity.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.myplantcare.activities;\r\n\r\nimport android.os.Bundle;\r\nimport android.view.View;\r\nimport android.widget.ImageView;\r\n\r\nimport androidx.appcompat.app.AppCompatActivity;\r\n\r\nimport com.example.myplantcare.R;\r\n\r\n// SideBarActivity.java\r\npublic class SideBarActivity extends AppCompatActivity {\r\n    ImageView ivReturn;\r\n\r\n    @Override\r\n    protected void onCreate(Bundle savedInstanceState) {\r\n        super.onCreate(savedInstanceState);\r\n        setContentView(R.layout.side_bar);\r\n        // Nút return dùng lại id ivMenu\r\n\r\n        ivReturn = findViewById(R.id.ivReturn);\r\n        ivReturn.setOnClickListener(new View.OnClickListener() {\r\n            @Override\r\n            public void onClick(View v) {\r\n                finish(); // Đóng SideBarActivity và quay về MainActivity\r\n                overridePendingTransition(android.R.anim.slide_in_left, android.R.anim.slide_out_right); // Optional: hiệu ứng chuyển cảnh\r\n            }\r\n        });\r\n        // Xử lý sự kiện trong side_bar nếu cần\r\n    }\r\n}\r\n\r\n
+===================================================================
+diff --git a/app/src/main/java/com/example/myplantcare/activities/SideBarActivity.java b/app/src/main/java/com/example/myplantcare/activities/SideBarActivity.java
+--- a/app/src/main/java/com/example/myplantcare/activities/SideBarActivity.java	(revision 6af7c9b98a0d679f6c0b8ad6c3da9c58b09d03d1)
++++ b/app/src/main/java/com/example/myplantcare/activities/SideBarActivity.java	(date 1744966907877)
+@@ -1,5 +1,6 @@
+ package com.example.myplantcare.activities;
+ 
++import android.content.Intent;
+ import android.os.Bundle;
+ import android.view.View;
+ import android.widget.ImageView;
+@@ -27,6 +28,15 @@
+             }
+         });
+         // Xử lý sự kiện trong side_bar nếu cần
++
++        ImageView img = findViewById((R.id.CareInstruction_Button));
++        img.setOnClickListener(new View.OnClickListener() {
++            @Override
++            public void onClick(View v) {
++                Intent intent = new Intent(SideBarActivity.this, CareInstructionActivity.class);
++                startActivity(intent);
++            }
++        });
+     }
+ }
+ 
+Index: app/src/main/java/com/example/myplantcare/viewmodels/ImageViewModel.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.myplantcare.viewmodels;\r\n\r\nimport android.content.Context;\r\nimport android.util.Log;\r\n\r\nimport androidx.lifecycle.MutableLiveData;\r\nimport androidx.lifecycle.ViewModel;\r\n\r\nimport com.example.myplantcare.data.repositories.ImageRepository;\r\nimport com.example.myplantcare.data.repositories.ImageRepositoryImpl;\r\nimport com.example.myplantcare.utils.FirestoreCallback;\r\n\r\nimport java.io.File;\r\n\r\npublic class ImageViewModel extends ViewModel {\r\n\r\n    private final MutableLiveData<String> _imageUrl = new MutableLiveData<>();\r\n    public MutableLiveData<String> imageUrl = _imageUrl;\r\n\r\n    private ImageRepository imageRepository;\r\n\r\n    public ImageViewModel(Context context) {\r\n        imageRepository = new ImageRepositoryImpl(context);\r\n    }\r\n\r\n    public void uploadImage(File imageFile) {\r\n        imageRepository.uploadImage(imageFile, new FirestoreCallback<String>() {\r\n            @Override\r\n            public void onSuccess(String result) {\r\n                _imageUrl.postValue(result);\r\n            }\r\n            @Override\r\n            public void onError(Exception e) {\r\n                Log.e(\"Cloudinary\", \"Lỗi upload ảnh: \" + e.getMessage());\r\n            }\r\n        });\r\n    }\r\n\r\n}\r\n
+===================================================================
+diff --git a/app/src/main/java/com/example/myplantcare/viewmodels/ImageViewModel.java b/app/src/main/java/com/example/myplantcare/viewmodels/ImageViewModel.java
+--- a/app/src/main/java/com/example/myplantcare/viewmodels/ImageViewModel.java	(revision 6af7c9b98a0d679f6c0b8ad6c3da9c58b09d03d1)
++++ b/app/src/main/java/com/example/myplantcare/viewmodels/ImageViewModel.java	(date 1744972955541)
+@@ -13,7 +13,6 @@
+ import java.io.File;
+ 
+ public class ImageViewModel extends ViewModel {
+-
+     private final MutableLiveData<String> _imageUrl = new MutableLiveData<>();
+     public MutableLiveData<String> imageUrl = _imageUrl;
+ 

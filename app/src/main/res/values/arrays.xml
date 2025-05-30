@@ -1,0 +1,19 @@
+<resources>
+    <array name="plant_categories">
+        <item>Trong nhà</item>
+        <item>Ngoài trời</item>
+    </array>
+    <string-array name="seasons">
+        <item>Xuân</item>
+        <item>Hạ</item>
+        <item>Thu</item>
+        <item>Đông</item>
+    </string-array>
+    <string-array name="cities">
+        <item>Hà Nội</item>
+        <item>Hồ Chí Minh</item>
+        <item>Đà Nẵng</item>
+        <item>Cần Thơ</item>
+        <item>Hải Phòng</item>
+    </string-array>
+</resources>

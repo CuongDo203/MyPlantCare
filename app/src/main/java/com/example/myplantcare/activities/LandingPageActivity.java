@@ -9,9 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.myplantcare.R;
 
 public class LandingPageActivity extends AppCompatActivity {
-
     Button btnStart;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -19,7 +17,6 @@ public class LandingPageActivity extends AppCompatActivity {
         initContents();
         handleEvent();
     }
-
     private void initContents() {
         btnStart = findViewById(R.id.btnStart);
     }

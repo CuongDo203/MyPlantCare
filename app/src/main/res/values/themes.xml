@@ -1,15 +1,35 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.MyPlantCare" parent="Theme.Material3.Light.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">#6200EE</item>
+        <item name="colorPrimaryVariant">#3700B3</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorSurface">#FFFFFF</item> <!-- Chỉnh màu nền sáng -->
     </style>
 
     <style name="Theme.MyPlantCare" parent="Base.Theme.MyPlantCare" />
 
-    <style name="DialogAnimation">
+    <style name="DialogAnimation" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.3</item> <!-- Mức độ mờ (0.0 đến 1.0) -->
         <item name="android:windowEnterAnimation">@anim/slide_in</item>
         <item name="android:windowExitAnimation">@anim/slide_out</item>
     </style>
+
+    <style name="TabTextStyle" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">18sp</item> <!-- Tăng kích thước chữ -->
+        <item name="android:textStyle">bold</item> <!-- Đậm chữ -->
+    </style>
+
+    <style name="Theme.MyPlantCare.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.MyPlantCare.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.MyPlantCare.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>

@@ -1,0 +1,10 @@
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_save_detail_note"
+        android:icon="@drawable/ic_save_note"
+        android:title="Lưu"
+        app:showAsAction="ifRoom"
+        tools:ignore="HardcodedText" />
+</menu>
