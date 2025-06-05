@@ -16,9 +16,9 @@ public class MyPlantApplication extends Application {
 
         // Khởi tạo Cloudinary MediaManager
         Map<String, String> config = new HashMap<>();
-        config.put("cloud_name", "djugptpce");
-        config.put("api_key", "949566295821873");
-        config.put("api_secret", "iK5cmT1V3lWXIsvSTjrq0TMxOcg");   // Thay bằng API Secret của bạn
+        config.put("cloud_name", "CLOUD_NAME");
+        config.put("api_key", "API_KEY");
+        config.put("api_secret", "API_SECRET");   // Thay bằng API Secret của bạn
         // config.put("secure", "true"); // Tùy chọn: Đảm bảo dùng HTTPS
 
         try {
